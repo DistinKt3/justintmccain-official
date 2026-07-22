@@ -6,3 +6,6 @@ dist/
 .env.local
 coverage/
 .superpowers/
+
+# Real fixtures the engineer must place locally
+tests/fixtures/iphone.heic
