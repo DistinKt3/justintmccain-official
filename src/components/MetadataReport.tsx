@@ -26,7 +26,7 @@ function groupByCategory(findings: Finding[]): Record<Category, Finding[]> {
 export function MetadataReport({ findings, heicNote }: Props) {
   if (findings.length === 0) {
     return (
-      <p className="report-empty">No hidden metadata found. This file is already clean.</p>
+      <p className="report-empty">Clean already. Nothing hidden in this file.</p>
     );
   }
 
@@ -41,7 +41,7 @@ export function MetadataReport({ findings, heicNote }: Props) {
       <h2 id="report-heading" className="visually-hidden">Detected metadata</h2>
       {lat !== null && lng !== null && <GpsCallout lat={lat} lng={lng} />}
       {heicNote && (
-        <p className="report-note">HEIC will be converted to a clean JPEG.</p>
+        <p className="report-note">HEIC will become a clean JPEG.</p>
       )}
       {CATEGORY_ORDER.map((cat, idx) => {
         const rows = byCategory[cat];

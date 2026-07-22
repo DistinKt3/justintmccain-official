@@ -26,19 +26,19 @@ describe('App integration (happy path)', () => {
     const file = new File([bytes as Uint8Array<ArrayBuffer>], 'IMG_0001.jpg', { type: 'image/jpeg' });
 
     render(<App />);
-    const input = screen.getByLabelText(/drop a file/i) as HTMLInputElement;
+    const input = screen.getByLabelText(/drop a photo/i) as HTMLInputElement;
     await user.upload(input, file);
 
     await waitFor(() => {
-      expect(screen.getByText(/reveals where it was taken/i)).toBeInTheDocument();
+      expect(screen.getByText(/remembers where you were/i)).toBeInTheDocument();
     });
     expect(screen.getByText('Apple')).toBeInTheDocument();
     expect(screen.getByText('iPhone 15 Pro')).toBeInTheDocument();
 
-    await user.click(screen.getByRole('button', { name: /remove metadata and download/i }));
+    await user.click(screen.getByRole('button', { name: /strip it clean/i }));
 
     await waitFor(() => {
-      expect(screen.getByRole('heading', { name: /done\. your file is clean\./i })).toBeInTheDocument();
+      expect(screen.getByRole('heading', { name: /clean\. ready to share\./i })).toBeInTheDocument();
     });
     expect(screen.getByText(/removed location/i)).toBeInTheDocument();
     expect(screen.getByText(/removed device/i)).toBeInTheDocument();
@@ -49,11 +49,11 @@ describe('App integration (happy path)', () => {
     const file = new File([gifBytes as Uint8Array<ArrayBuffer>], 'animated.gif', { type: 'image/gif' });
 
     render(<App />);
-    const input = screen.getByLabelText(/drop a file/i) as HTMLInputElement;
+    const input = screen.getByLabelText(/drop a photo/i) as HTMLInputElement;
     await user.upload(input, file);
 
     await waitFor(() => {
-      expect(screen.getByRole('alert')).toHaveTextContent(/only support jpeg, png, heic, and pdf/i);
+      expect(screen.getByRole('alert')).toHaveTextContent(/jpeg, png, heic, or pdf only/i);
     });
   });
 });

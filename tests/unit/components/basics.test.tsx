@@ -8,7 +8,7 @@ import { Skeleton } from '../../../src/components/Skeleton';
 describe('PrivacyBadge', () => {
   it('states files never leave the device', () => {
     render(<PrivacyBadge />);
-    expect(screen.getByText(/nothing is uploaded/i)).toBeInTheDocument();
+    expect(screen.getByText(/nothing leaves this tab/i)).toBeInTheDocument();
   });
 });
 

@@ -12,7 +12,7 @@ const captured: Finding = { category: 'Timestamps', label: 'Capture time', value
 describe('MetadataReport', () => {
   it('renders the friendly empty message when there are no findings', () => {
     render(<MetadataReport findings={[]} />);
-    expect(screen.getByText(/no hidden metadata found/i)).toBeInTheDocument();
+    expect(screen.getByText(/clean already\. nothing hidden in this file/i)).toBeInTheDocument();
   });
 
   it('renders category sections when findings exist', () => {
@@ -25,8 +25,8 @@ describe('MetadataReport', () => {
 
   it('renders GpsCallout when Location findings are present', () => {
     render(<MetadataReport findings={[gpsLat, gpsLng, make]} />);
-    expect(screen.getByText(/reveals where it was taken/i)).toBeInTheDocument();
-    expect(screen.getByRole('link', { name: /view on google maps/i })).toHaveAttribute(
+    expect(screen.getByText(/remembers where you were/i)).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: /see exactly where/i })).toHaveAttribute(
       'href',
       expect.stringMatching(/^https:\/\/www\.google\.com\/maps\?q=/),
     );
@@ -34,17 +34,17 @@ describe('MetadataReport', () => {
 
   it('does NOT render GpsCallout when there are no Location findings', () => {
     render(<MetadataReport findings={[make, captured]} />);
-    expect(screen.queryByText(/reveals where it was taken/i)).not.toBeInTheDocument();
+    expect(screen.queryByText(/remembers where you were/i)).not.toBeInTheDocument();
   });
 
   it('renders the HEIC conversion note when heicNote prop is true', () => {
     render(<MetadataReport findings={[make]} heicNote />);
-    expect(screen.getByText(/heic will be converted to a clean jpeg/i)).toBeInTheDocument();
+    expect(screen.getByText(/heic will become a clean jpeg/i)).toBeInTheDocument();
   });
 
   it('parses coordinates from formatted values back to signed decimals for the Maps URL', () => {
     render(<MetadataReport findings={[gpsLat, gpsLng]} />);
-    const link = screen.getByRole('link', { name: /view on google maps/i });
+    const link = screen.getByRole('link', { name: /see exactly where/i });
     expect(link).toHaveAttribute('href', 'https://www.google.com/maps?q=37.7749,-122.4194');
   });
 });

@@ -6,7 +6,7 @@ import { ScrubButton } from '../../../src/components/ScrubButton';
 describe('ScrubButton', () => {
   it('renders the primary label when not loading', () => {
     render(<ScrubButton loading={false} onClick={() => {}} />);
-    expect(screen.getByRole('button', { name: /remove metadata and download/i })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /strip it clean/i })).toBeInTheDocument();
   });
 
   it('renders the loading label and is disabled when loading', () => {
@@ -14,7 +14,7 @@ describe('ScrubButton', () => {
     const button = screen.getByRole('button');
     expect(button).toBeDisabled();
     expect(button).toHaveAttribute('aria-busy', 'true');
-    expect(button).toHaveTextContent(/scrubbing/i);
+    expect(button).toHaveTextContent(/stripping/i);
   });
 
   it('invokes onClick when clicked and not loading', async () => {

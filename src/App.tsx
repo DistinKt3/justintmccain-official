@@ -1,5 +1,5 @@
 import { useReducer, useCallback, useEffect } from 'react';
-import { PrivacyBadge } from './components/PrivacyBadge';
+import { Masthead } from './components/Masthead';
 import { DropZone } from './components/DropZone';
 import { FileHeader } from './components/FileHeader';
 import { MetadataReport } from './components/MetadataReport';
@@ -23,10 +23,10 @@ import {
   type ScrubResult,
 } from './lib/types';
 
-const ERR_UNSUPPORTED = 'Sorry, we only support JPEG, PNG, HEIC, and PDF right now.';
-const ERR_OVERSIZED = 'This file is over 25 MB. Try a smaller one.';
-const ERR_CORRUPT = "We couldn't read this file. It may be corrupt or password protected.";
-const ERR_SCRUB = 'Something went wrong while removing metadata. Try again.';
+const ERR_UNSUPPORTED = 'JPEG, PNG, HEIC, or PDF only.';
+const ERR_OVERSIZED = 'Too big. 25 MB max.';
+const ERR_CORRUPT = "Can't read this file. It may be broken or locked.";
+const ERR_SCRUB = 'Strip failed. Try again.';
 
 async function readMetadata(bytes: Uint8Array, kind: FileKind): Promise<Finding[]> {
   switch (kind) {
@@ -134,7 +134,7 @@ export function App() {
     <main className="app">
       {errorMessage && <ErrorBanner message={errorMessage} onDismiss={onDismiss} />}
       <header className="app__header">
-        <PrivacyBadge />
+        <Masthead />
       </header>
       <div className="app__content" aria-live="polite">
         {currentContent.kind === 'empty' && <DropZone onFile={onFile} />}

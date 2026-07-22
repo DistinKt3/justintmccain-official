@@ -10,14 +10,14 @@ function makeFile(name = 'photo.jpg', type = 'image/jpeg'): File {
 describe('DropZone', () => {
   it('renders the prompt text', () => {
     render(<DropZone onFile={() => {}} />);
-    expect(screen.getByText(/drop a file to see what it's leaking/i)).toBeInTheDocument();
-    expect(screen.getByText(/JPEG, PNG, HEIC, PDF/i)).toBeInTheDocument();
+    expect(screen.getByText(/drop a photo\. see what it says about you/i)).toBeInTheDocument();
+    expect(screen.getByText(/JPEG, PNG, HEIC, or PDF/i)).toBeInTheDocument();
   });
 
   it('calls onFile when a file is picked via the input', async () => {
     const onFile = vi.fn();
     render(<DropZone onFile={onFile} />);
-    const input = screen.getByLabelText(/drop a file/i) as HTMLInputElement;
+    const input = screen.getByLabelText(/drop a photo/i) as HTMLInputElement;
     await userEvent.upload(input, makeFile('a.jpg'));
     expect(onFile).toHaveBeenCalledOnce();
     expect(onFile.mock.calls[0][0].name).toBe('a.jpg');
@@ -55,6 +55,6 @@ describe('DropZone', () => {
 
   it('input has an accessible label', () => {
     render(<DropZone onFile={() => {}} />);
-    expect(screen.getByLabelText(/drop a file to see what it's leaking/i)).toBeInTheDocument();
+    expect(screen.getByLabelText(/drop a photo\. see what it says about you/i)).toBeInTheDocument();
   });
 });

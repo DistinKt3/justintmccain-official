@@ -6,7 +6,7 @@ import { DoneSummary } from '../../../src/components/DoneSummary';
 describe('DoneSummary', () => {
   it('shows the confirmation heading', () => {
     render(<DoneSummary removedCategories={['Location']} onReset={() => {}} />);
-    expect(screen.getByRole('heading', { level: 2 })).toHaveTextContent(/done\. your file is clean\./i);
+    expect(screen.getByRole('heading', { level: 2 })).toHaveTextContent(/clean\. ready to share\./i);
   });
 
   it('lists each removed category', () => {
@@ -18,13 +18,19 @@ describe('DoneSummary', () => {
 
   it('shows the empty state when no categories were removed', () => {
     render(<DoneSummary removedCategories={[]} onReset={() => {}} />);
-    expect(screen.getByText(/the file had no metadata to remove/i)).toBeInTheDocument();
+    expect(screen.getByText(/nothing to strip\. already clean\./i)).toBeInTheDocument();
   });
 
   it('invokes onReset when the reset link is clicked', async () => {
     const onReset = vi.fn();
     render(<DoneSummary removedCategories={[]} onReset={onReset} />);
-    await userEvent.click(screen.getByRole('button', { name: /scrub another file/i }));
+    await userEvent.click(screen.getByRole('button', { name: /do another/i }));
     expect(onReset).toHaveBeenCalledOnce();
+  });
+
+  it('renders paired phrases for Location and Device', () => {
+    render(<DoneSummary removedCategories={['Location', 'Device']} onReset={() => {}} />);
+    expect(screen.getByText(/where you were/i)).toBeInTheDocument();
+    expect(screen.getByText(/what you shot with/i)).toBeInTheDocument();
   });
 });

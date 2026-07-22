@@ -16,10 +16,10 @@ export function ScrubButton({ loading, onClick }: Props) {
       {loading ? (
         <>
           <span className="scrub-button__spinner" aria-hidden="true" />
-          Scrubbing...
+          Stripping...
         </>
       ) : (
-        'Remove metadata and download'
+        'Strip it clean'
       )}
     </button>
   );

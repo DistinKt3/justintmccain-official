@@ -44,10 +44,11 @@ export function DropZone({ onFile }: Props) {
         accept={ACCEPT}
         onChange={onChange}
         className="visually-hidden"
-        aria-label="Drop a file to see what it's leaking."
+        aria-label="Drop a photo. See what it says about you."
       />
-      <p className="dropzone__prompt">Drop a file to see what it&apos;s leaking.</p>
-      <p className="dropzone__hint">JPEG, PNG, HEIC, PDF. Up to 25 MB.</p>
+      <p className="dropzone__prompt">Drop a photo. See what it says about you.</p>
+      <p className="dropzone__hint">JPEG, PNG, HEIC, or PDF. Up to 25 MB.</p>
+      <p className="dropzone__promise">Under 30 seconds.</p>
     </label>
   );
 }
