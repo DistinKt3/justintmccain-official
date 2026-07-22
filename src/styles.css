@@ -33,9 +33,6 @@ a {
   text-decoration: none;
 }
 
-a:hover {
-  text-decoration: underline;
-}
 
 /* Focus ring -- single token, applied via :focus-visible */
 :focus-visible {
@@ -46,6 +43,9 @@ a:hover {
 
 /* Hover gate -- no :hover rules outside this query */
 @media (hover: hover) and (pointer: fine) {
+  a:hover {
+    text-decoration: underline;
+  }
   /* component-level :hover rules live under this in their own files */
 }
 
