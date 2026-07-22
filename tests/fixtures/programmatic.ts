@@ -1,4 +1,7 @@
 import piexif from 'piexifjs';
+import { uint8ToBinaryString, binaryStringToUint8, base64ToBinaryString } from '../../src/lib/binary';
+
+export { uint8ToBinaryString, binaryStringToUint8, base64ToBinaryString };
 
 // Minimal 1x1 white baseline JPEG (public-domain, well-known 1x1 test image, no EXIF).
 export const BASE_JPEG_B64 =
@@ -12,25 +15,6 @@ export const BASE_JPEG_B64 =
   'FEKRobHBCSMzUvAVYnLRChYkNOEl8RcYGRomJygpKjU2Nzg5OkNERUZHSElKU1RVVldYWVpjZGVm' +
   'Z2hpanN0dXZ3eHl6goOEhYaHiImKkpOUlZaXmJmaoqOkpaanqKmqsrO0tba3uLm6wsPExcbHyMnK' +
   '0tPU1dbX2Nna4uPk5ebn6Onq8vP09fb3+Pn6/9oADAMBAAIRAxEAPwD3+iiigD//2Q==';
-
-export function base64ToBinaryString(b64: string): string {
-  return atob(b64);
-}
-
-export function binaryStringToUint8(s: string): Uint8Array {
-  const bytes = new Uint8Array(s.length);
-  for (let i = 0; i < s.length; i++) bytes[i] = s.charCodeAt(i);
-  return bytes;
-}
-
-export function uint8ToBinaryString(bytes: Uint8Array): string {
-  let s = '';
-  const chunkSize = 0x8000;
-  for (let i = 0; i < bytes.length; i += chunkSize) {
-    s += String.fromCharCode(...bytes.subarray(i, i + chunkSize));
-  }
-  return s;
-}
 
 function decimalToDMSRational(deg: number): [number, number][] {
   const abs = Math.abs(deg);
