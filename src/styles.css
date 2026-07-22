@@ -69,3 +69,52 @@ a {
   white-space: nowrap;
   border: 0;
 }
+
+/* --- PrivacyBadge --- */
+.privacy-badge {
+  font-size: var(--text-xs);
+  color: var(--ink-3);
+  margin: 0;
+}
+
+/* --- FileHeader --- */
+.file-header {
+  display: flex;
+  align-items: baseline;
+  gap: 1rem;
+  padding: 1rem 0;
+  border-bottom: 1px solid var(--surface-3);
+}
+.file-header__name {
+  font-size: var(--text-md);
+  color: var(--ink-1);
+  font-weight: 500;
+  flex: 1;
+  word-break: break-word;
+}
+.file-header__size {
+  font-size: var(--text-sm);
+  color: var(--ink-3);
+  font-variant-numeric: tabular-nums;
+}
+.file-header__reset {
+  color: var(--ink-2);
+  font-size: var(--text-sm);
+  text-decoration: underline;
+  text-underline-offset: 4px;
+  transition: transform var(--dur-fast) var(--ease-out);
+}
+.file-header__reset:active { transform: scale(0.97); }
+
+/* --- Skeleton --- */
+.skeleton {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 32px 0;
+}
+.skeleton__row {
+  height: 16px;
+  background: var(--surface-2);
+  border-radius: 4px;
+}
