@@ -87,9 +87,10 @@ export function categorize(raw: Record<string, unknown>, _kind: FileKind): Findi
         rawKey: key,
       });
     } else if (key.startsWith('GPS')) {
+      const suffix = key.replace(/^GPS/, '');
       findings.push({
         category: 'Location',
-        label: humanizeUnknown(key.replace(/^GPS/, 'GPS ')),
+        label: `GPS ${humanizeUnknown(suffix)}`,
         value: formatValue(key, value),
         rawKey: key,
       });

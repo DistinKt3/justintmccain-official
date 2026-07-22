@@ -75,6 +75,14 @@ describe('categorize', () => {
     expect(result[0].value).toContain('W');
   });
 
+  it('humanizes unknown GPS keys without mangling prefix', () => {
+    const result = categorize({ GPSImgDirection: 123.45 }, 'jpeg');
+    const gpsField = result.find(f => f.rawKey === 'GPSImgDirection');
+    expect(gpsField).toBeDefined();
+    expect(gpsField?.category).toBe('Location');
+    expect(gpsField?.label).toBe('GPS Img Direction');
+  });
+
   it('is deterministic (stable ordering)', () => {
     const raw = { Model: 'A', Make: 'B', GPSLatitude: 1, Producer: 'C' };
     const a = categorize(raw, 'jpeg').map(f => f.rawKey);
