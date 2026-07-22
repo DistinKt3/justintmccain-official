@@ -433,3 +433,33 @@ a {
   .error-banner { animation-name: error-enter-reduced; transform: none; }
   @keyframes error-enter-reduced { to { opacity: 1; } }
 }
+
+/* --- App shell / layout --- */
+.app {
+  display: flex;
+  flex-direction: column;
+  min-height: 100dvh;
+  padding: 24px;
+}
+.app__header {
+  padding-bottom: 16px;
+}
+.app__content { flex: 1; }
+.app__actions {
+  padding: 24px 0;
+  display: flex;
+  justify-content: flex-start;
+}
+
+/* Asymmetric column on desktop */
+@media (min-width: 1024px) {
+  .app { padding: 40px 0; }
+  .app__header {
+    padding: 0 40px 24px;
+  }
+  .app__content {
+    margin-left: 22vw;
+    max-width: 56vw;
+    padding: 0 40px;
+  }
+}

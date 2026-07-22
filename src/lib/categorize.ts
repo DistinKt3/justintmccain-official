@@ -80,10 +80,20 @@ export function categorize(raw: Record<string, unknown>, _kind: FileKind): Findi
 
     const mapped = FIELD_MAP[key];
     if (mapped) {
+      // exifr returns GPSLatitude/GPSLongitude as DMS arrays; the decimal
+      // values live in raw.latitude / raw.longitude. Use those so that
+      // formatGpsLat/Lng produces the "37.774900° N" string that MetadataReport
+      // needs to render GpsCallout.
+      let resolvedValue = value;
+      if (key === 'GPSLatitude' && typeof raw['latitude'] === 'number') {
+        resolvedValue = raw['latitude'];
+      } else if (key === 'GPSLongitude' && typeof raw['longitude'] === 'number') {
+        resolvedValue = raw['longitude'];
+      }
       findings.push({
         category: mapped.category,
         label: mapped.label,
-        value: formatValue(key, value),
+        value: formatValue(key, resolvedValue),
         rawKey: key,
       });
     } else if (key.startsWith('GPS')) {
