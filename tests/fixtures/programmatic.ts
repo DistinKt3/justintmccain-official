@@ -83,3 +83,40 @@ export function buildJpegWithExif(opts: JpegFixtureOptions = {}): Uint8Array {
 export function buildPlainJpeg(): Uint8Array {
   return binaryStringToUint8(base64ToBinaryString(BASE_JPEG_B64));
 }
+
+// ---------------------------------------------------------------------------
+// PDF fixtures (pdf-lib)
+// ---------------------------------------------------------------------------
+
+import { PDFDocument } from 'pdf-lib';
+
+export interface PdfFixtureOptions {
+  title?: string;
+  author?: string;
+  subject?: string;
+  keywords?: string[];
+  creator?: string;
+  producer?: string;
+  creationDate?: Date;
+  modificationDate?: Date;
+}
+
+export async function buildAuthoredPdf(opts: PdfFixtureOptions = {}): Promise<Uint8Array> {
+  const doc = await PDFDocument.create({ updateMetadata: false });
+  doc.addPage([612, 792]);
+  if (opts.title) doc.setTitle(opts.title);
+  if (opts.author) doc.setAuthor(opts.author);
+  if (opts.subject) doc.setSubject(opts.subject);
+  if (opts.keywords) doc.setKeywords(opts.keywords);
+  if (opts.creator) doc.setCreator(opts.creator);
+  if (opts.producer) doc.setProducer(opts.producer);
+  if (opts.creationDate) doc.setCreationDate(opts.creationDate);
+  if (opts.modificationDate) doc.setModificationDate(opts.modificationDate);
+  return doc.save({ useObjectStreams: false });
+}
+
+export async function buildBarePdf(): Promise<Uint8Array> {
+  const doc = await PDFDocument.create({ updateMetadata: false });
+  doc.addPage([612, 792]);
+  return doc.save({ useObjectStreams: false });
+}
