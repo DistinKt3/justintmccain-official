@@ -8,7 +8,7 @@ interface Props {
 export function DoneSummary({ removedCategories, onReset }: Props) {
   return (
     <section className="done" aria-labelledby="done-heading">
-      <h2 id="done-heading" className="done__heading">Done. Your file is clean.</h2>
+      <h2 id="done-heading" className="done__heading" tabIndex={-1}>Done. Your file is clean.</h2>
       {removedCategories.length > 0 ? (
         <ul className="done__list">
           {removedCategories.map((cat, i) => (

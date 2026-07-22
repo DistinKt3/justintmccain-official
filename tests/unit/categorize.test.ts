@@ -89,4 +89,19 @@ describe('categorize', () => {
     const b = categorize(raw, 'jpeg').map(f => f.rawKey);
     expect(a).toEqual(b);
   });
+
+  it('does not duplicate GPS coords into Other when exifr decimal keys are present', () => {
+    const result = categorize({
+      GPSLatitude: [37, 46, 29],
+      latitude: 37.7749,
+      GPSLongitude: [122, 25, 9],
+      longitude: -122.4194,
+    }, 'jpeg');
+    const locations = result.filter(f => f.category === 'Location');
+    const others = result.filter(f => f.category === 'Other');
+    expect(locations).toHaveLength(2);
+    expect(locations.find(f => f.rawKey === 'GPSLatitude')?.value).toContain('N');
+    expect(locations.find(f => f.rawKey === 'GPSLongitude')?.value).toContain('W');
+    expect(others).toHaveLength(0);
+  });
 });

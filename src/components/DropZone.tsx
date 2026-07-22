@@ -34,6 +34,7 @@ export function DropZone({ onFile }: Props) {
   return (
     <label
       className={`dropzone${dragActive ? ' dropzone--active' : ''}`}
+      tabIndex={-1}
       onDrop={onDrop}
       onDragOver={onDragOver}
       onDragLeave={onDragLeave}

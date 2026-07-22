@@ -183,7 +183,7 @@ a {
 .report-section__label {
   font-size: var(--text-xs);
   font-weight: 500;
-  letter-spacing: 0.06em;
+  letter-spacing: 0.02em;
   text-transform: uppercase;
   color: var(--ink-3);
   margin: 0 0 12px;
@@ -229,7 +229,7 @@ a {
   to { opacity: 1; transform: scale(1); }
 }
 .gps-callout__heading {
-  font-size: var(--text-lg);
+  font-size: var(--text-2xl);
   color: var(--warn-strong);
   font-weight: 600;
   margin: 0 0 12px;
@@ -315,7 +315,9 @@ a {
 
 @media (prefers-reduced-motion: reduce) {
   .scrub-button__spinner { animation-duration: 2000ms; }
+  .scrub-button:not(:disabled):hover { transform: none; }
   .scrub-button:active:not(:disabled) { transform: none; }
+  .file-header__reset:active { transform: none; }
 }
 
 /* --- DoneSummary --- */

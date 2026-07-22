@@ -74,7 +74,12 @@ export function categorize(raw: Record<string, unknown>, _kind: FileKind): Findi
   const findings: Finding[] = [];
   const keys = Object.keys(raw).sort();
 
+  const skip = new Set<string>();
+  if ('GPSLatitude' in raw) skip.add('latitude');
+  if ('GPSLongitude' in raw) skip.add('longitude');
+
   for (const key of keys) {
+    if (skip.has(key)) continue;
     const value = raw[key];
     if (isEmpty(value)) continue;
 
