@@ -15,6 +15,8 @@ Vanish ships as a **separate Next.js app**, not embedded in the `career-planning
 
 The fit is not incidental: Vanish *is* signal → enforcement → evidence, literally — a user's data is the signal, the opt-out request is the enforcement, the PDF report is the evidence. Design decisions below lean into that instead of treating it as a coincidence.
 
+**Why dark stays the default here (not inherited without asking):** the user arrives having just discovered exposed personal data — often alone, at a screen, in a moment closer to "checking something worrying" than "browsing a portfolio." Dark suits that moment; it doesn't feel institutional or performatively "safe," it feels like the private, unhurried space the zero-log promise is actually describing. The one deliberate break — Evidence Paper on `/report` (§3.6) — isn't decoration, it's the payoff: the moment of worry resolves into a printed, keepable fact. Dark-to-light across the flow mirrors the product's own arc, not just the parent brand's.
+
 ### 1.1 Product identity
 
 | Element | Treatment |
@@ -94,6 +96,18 @@ No `prefers-reduced-motion` fallback work is needed beyond this tier — there's
 
 Six screens, same routes and step order as PRD §10. Each section below states layout, components, states, and copy direction. Full component definitions are in §4.
 
+### 3.0 Flow-wide behavior
+
+Applies to every screen from `/scan` through `/dashboard` (landing and report are endpoints, not flow steps):
+
+- **Step indicator:** plain text, mono-caption, Slate — *"Step 2 of 4"* (`/scan` → `/scan/running` → `/results` → `/dashboard`; landing isn't a step, report is the destination, not counted either) — placed consistently near the wordmark on every in-flow screen. No node-dot progress marker: stays consistent with the utility-first call already made for this product — this is a functional readout, not a branded moment.
+- **Back-navigation:** every in-flow screen has a way back to the previous one. Because SessionState (PRD §13) already holds everything in memory for the session, going back never discards data — a user who returns to `/scan` from `/results` to fix a mistyped city sees their form pre-filled, not blank. Going back from `/scan/running` cancels the in-flight scan cleanly (no orphaned requests, nothing to clean up server-side since the scan function is stateless per PRD §18).
+- **Mobile/responsive:** single-column layout at all widths — this design has no multi-column screens to collapse, so "responsive" here means specific behaviors, not a breakpoint overhaul:
+  - Sticky footers (`/results`, `/dashboard`) are deliberately thumb-zone placement, not an accident of the desktop layout — primary action stays reachable one-handed on a phone.
+  - Field groups on `/scan` (§3.2) stack in the same grouped order on mobile; no group ever splits across a scroll boundary mid-group.
+  - The "+ add" alias pattern (§3.2) needs a mobile-specific answer: added alias fields append below the trigger and auto-scroll into view on add, since a fiddly one-handed reach to a field that appeared off-screen is a common mobile form failure.
+  - Status chips and confidence badges keep their text label at every width (never collapse to color/icon-only) — this is also the accessibility answer for color-blind users, stated here as intentional rather than assumed.
+
 ### 3.1 `/` — Landing
 
 **Layout:** Signal Black background, centered column, max-width matching brand's `--maxw-text` (46rem) for the promise line. No hero art.
@@ -112,15 +126,29 @@ Six screens, same routes and step order as PRD §10. Each section below states l
 
 **Layout:** Single Deck-surface card (border: 1px Grid, radius consistent with brand card treatment) centered on Signal Black. Vertical form.
 
-**Fields** (per PRD §11.2, order preserved): full name*, aliases (repeatable, optional), city* + state*, age range* (dropdown), email*, phone (optional), prior cities (optional).
+**Fields, grouped** (per PRD §11.2 field list, order preserved within groups; grouping added — 8 ungrouped fields exceeds the ≤4-per-group cognitive-load guideline):
+
+1. **About you** — full name*, aliases/maiden names (repeatable, optional), age range* (dropdown).
+2. **Where you live** — city* + state*, prior cities (optional).
+3. **How to reach you** — email*, phone (optional).
+4. **Consent** — its own block, see below (unchanged from original spec — already correctly separated).
+
+Each group gets a small Slate label (mono-caption) and a visual break (spacing, not a border — avoid nested-card syndrome inside a form that's already a card). Groups stack in this order on every screen width (§3.0).
 
 **Component notes:**
-- Required-field marker: the node atom (small, Mint), replacing a bare asterisk — ties form semantics to the brand mark instead of a generic symbol.
+- Required-field marker: the node atom (small, Mint), replacing a bare asterisk — ties form semantics to the brand mark instead of a generic symbol. Required state is also programmatic (`aria-required="true"`), not visual-only.
 - Field help text: **inline caption** (not a tooltip) — Slate, Inter, small, always visible beneath the field, explaining *why* it matters (PRD's own requirement, e.g. age range disambiguates namesakes). Written plainly, no jargon. Resolved away from a tooltip deliberately: this form is read once, top-to-bottom, not scanned repeatedly — a hover-delay interaction adds friction for zero benefit, and an always-visible caption is more reassuring for a user who's anxious and doesn't want to have to discover help text exists.
 - Consent block: **visually separated**, not an inline checkbox row. Its own bordered sub-panel (Grid border) inside the form card, checkbox + the PRD's exact required legal text: *"I authorize Vanish to submit opt-out and deletion requests for my own personal information on my behalf."* This gets weight because it's the legal/trust hinge of the whole product, not a formality to breeze past.
 - Primary CTA: "Start scan" — disabled (Grid, no fill) until all required fields + consent are satisfied; becomes Mint-filled once valid.
 
-**States:** default, focus (Mint ring — brand's existing `--ring: 2px solid var(--mint)`), inline validation error (see §4 Form field states), disabled submit, enabled submit.
+**States:** default, focus (Mint ring — brand's existing `--ring: 2px solid var(--mint)`, transition per §2), disabled submit, enabled submit.
+
+**Validation error (scripted, not just named):** inline, beneath the field, same position as help text (replaces it while the error is showing) — plain and specific, matching the voice guide, never a generic "Invalid input":
+- Empty required field: *"We need this to search for you."*
+- Malformed email: *"Doesn't look like a full email address — check for typos."*
+- No state selected with a city entered: *"Which state? Brokers index by state, so this narrows the search."*
+
+Error tone uses the neutral warning color from §4.2 (not amber, not mint), and the field keeps its Grid border shape — only the border color and the caption swap, so the field doesn't jump in size when an error appears (avoid layout shift).
 
 ### 3.3 `/scan/running`
 
@@ -153,7 +181,7 @@ Six screens, same routes and step order as PRD §10. Each section below states l
 
 **Header:** *"X ready · Y sent · Z done"* (Mono, matches the brand's receipt/ledger texture) + the persistent reminder that nothing is stored server-side (Slate, small, always visible — this is the product's core promise and should never require a click to see).
 
-**Row content:** broker name, status chip (READY / SENT / DONE), and the row's one-click action (open prefilled email, open prefilled opt-out link, or — once DONE — nothing further).
+**Row content:** broker name, status chip (READY / SENT / DONE), and the row's one-click action (open prefilled email, open prefilled opt-out link, or — once DONE — nothing further). Email-method rows always show a secondary "Copy instead" text action next to "Open email" — not hidden behind a failure state. A user whose mail client doesn't open (unconfigured default app, webmail-only setup) needs a visible way out *before* they get stuck, not a recovery path they have to go looking for.
 
 **Status chip states:**
 - READY — Slate outline, neutral (nothing has happened yet).
@@ -162,7 +190,9 @@ Six screens, same routes and step order as PRD §10. Each section below states l
 
 Chip-to-chip transitions (READY→SENT, SENT→DONE) use the blur-mask crossfade specified in §2, since each is an outline→fill shape change, not just a color change.
 
-**Footer:** "Download report" (Mint, primary — since the report is the durable record, it's a primary action, not an afterthought) + "Clear everything" (secondary/outline, destructive-adjacent but not styled alarmingly — this is a *feature*, not an error state, per the product's zero-retention promise).
+**Footer:** "Download report" (Mint, primary — since the report is the durable record, it's a primary action, not an afterthought) + "Clear everything" (secondary/outline — not styled alarmingly, this is a *feature*, not an error state, per the product's zero-retention promise, but it is irreversible and can discard unfinished work, so it gets a confirmation).
+
+**"Clear everything" confirmation:** inline, not a modal — pressing it swaps the button in place for *"This clears everything, including requests you haven't sent yet. Clear it?"* with Confirm / Cancel, rather than interrupting with a dialog. An inline swap keeps the user in context and is enough friction to prevent an accidental tap without the weight of a modal for something that's still just resetting a browser tab, not a server-side deletion.
 
 ### 3.6 `/report`
 
