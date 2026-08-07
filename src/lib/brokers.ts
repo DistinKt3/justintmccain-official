@@ -27,6 +27,13 @@ export interface BrokerRecord {
   rateLimitMs: number;
   enabled: boolean;
   verifiedAt?: string;
+  /** Where the opt-out route came from. 'ca-registry' is a state filing and is
+   *  required for email-method brokers; 'published' is the broker's documented
+   *  opt-out page and is only allowed for link-method, where a stale URL fails
+   *  visibly rather than silently. See the header of brokers.json. */
+  source?: "ca-registry" | "published";
+  /** Can the user see they're listed without paying or registering? */
+  freeToView?: boolean;
   note?: string;
 }
 

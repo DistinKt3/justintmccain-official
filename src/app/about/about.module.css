@@ -1,0 +1,71 @@
+.block {
+  margin-top: 2.75rem;
+  padding-top: 1.75rem;
+  border-top: 1px solid var(--grid);
+  max-width: 44rem;
+}
+
+.block:first-of-type {
+  border-top: 0;
+}
+
+.h2 {
+  font-family: var(--font-display);
+  font-size: 1.25rem;
+  font-weight: 500;
+  letter-spacing: -0.02em;
+  color: var(--daylight);
+  margin-bottom: 1rem;
+}
+
+.list {
+  display: grid;
+  gap: 0.875rem;
+}
+
+.list li {
+  position: relative;
+  padding-left: 1.125rem;
+  color: var(--slate);
+  font-size: 0.9375rem;
+  line-height: 1.65;
+}
+
+/* node atom as list bullet — same primitive as the form's required marker */
+.list li::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0.6em;
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: var(--mint);
+  opacity: 0.7;
+}
+
+.list strong {
+  color: var(--daylight);
+  font-weight: 500;
+}
+
+.body {
+  color: var(--slate);
+  font-size: 0.9375rem;
+  line-height: 1.7;
+  margin-bottom: 0.875rem;
+}
+
+.body strong {
+  color: var(--daylight);
+  font-weight: 500;
+}
+
+.cta {
+  display: flex;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+  margin-top: 3rem;
+  padding-top: 2rem;
+  border-top: 1px solid var(--grid);
+}

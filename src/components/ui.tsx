@@ -48,6 +48,25 @@ export function TopBar({
 export function Footer() {
   return (
     <footer className={s.siteFooter}>
+      <nav className={s.footerLinks} aria-label="Resources">
+        <Link href="/brokers">Every registered data broker (549)</Link>
+        <span className={s.footerDot} aria-hidden="true">
+          ·
+        </span>
+        <Link href="/about">What Vanish is &amp; isn&rsquo;t</Link>
+      </nav>
+      <p className={s.footerCredit}>
+        Broker data from the{" "}
+        <a
+          href="https://cppa.ca.gov/data_broker_registry/"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          California Privacy Protection Agency
+        </a>{" "}
+        registry, published under the Delete Act. Reorganised, not authored by
+        us.
+      </p>
       <p>
         A SIGNAL project by{" "}
         <a

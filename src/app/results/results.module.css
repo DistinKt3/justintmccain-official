@@ -81,6 +81,33 @@
   font-size: 1rem;
   font-weight: 500;
   color: var(--daylight);
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+/* Sets expectations before the click: on a free site you'll see your own
+   record; on a paywalled one you'll be told it exists and asked to pay.
+   The opt-out works either way — better to know which is coming. */
+.freeTag,
+.paidTag {
+  font-family: var(--font-mono);
+  font-size: 0.625rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  border-radius: var(--radius-chip);
+  padding: 0.1rem 0.45rem;
+  border: 1px solid;
+  flex: none;
+}
+.freeTag {
+  color: var(--mint);
+  border-color: var(--mint);
+}
+.paidTag {
+  color: var(--slate);
+  border-color: var(--grid);
 }
 
 .brokerNote {

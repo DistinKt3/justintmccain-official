@@ -165,7 +165,14 @@ function AssistedSection({ count }: { count: number }) {
           return (
             <li key={broker.id} className={`${s.card} ${v.assistedCard}`}>
               <div className={v.cardHead}>
-                <span className={v.brokerName}>{broker.name}</span>
+                <span className={v.brokerName}>
+                  {broker.name}
+                  {broker.freeToView ? (
+                    <span className={v.freeTag}>Free to view</span>
+                  ) : (
+                    <span className={v.paidTag}>May ask you to pay</span>
+                  )}
+                </span>
                 <a
                   className={v.viewLink}
                   href={buildSearchUrl(broker, session.identity)}

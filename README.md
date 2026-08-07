@@ -72,30 +72,61 @@ src/
 `src/data/brokers.json` is the whole registry. Adding coverage is a data change,
 not a code change.
 
-**Nine brokers ship enabled**, each verified against the California Privacy
-Protection Agency's Data Broker Registry — the annual filing the Delete Act
-(SB 362) requires, published as machine-readable CSV:
+**23 brokers ship enabled**, ordered by value to the user: sites where you can
+actually see your own record for free come first, because that's where the "oh,
+there I am" moment happens. Paywalled sites come later — your data is still there
+and the opt-out still works, you just may not get to read the record first. The
+`freeToView` flag drives that badge in the UI.
+
+Most opt-out routes come from the California Privacy Protection Agency's Data
+Broker Registry — the annual filing the Delete Act (SB 362) requires, published as
+machine-readable CSV:
 
 > https://cppa.ca.gov/data_broker_registry/complete-reg-data-brokers.csv
 
-That source is preferred over the brokers' own opt-out pages: it's a legal
-declaration rather than marketing copy, it can't be quietly reworded, and it's
-reachable without fighting anyone's bot detection (7 of the 9 return HTTP 403 to
-automated requests). It also corrected two records originally taken from broker
-pages — see `docs/BROKER-WORKSHEET.md`.
+A legal declaration beats a marketing page: it can't be quietly reworded, and it's
+reachable without fighting anyone's bot detection (nearly every broker here returns
+HTTP 403 to automated requests). It also corrected two records originally taken
+from broker pages — see `docs/BROKER-WORKSHEET.md`.
 
-Coverage is wider than nine sites: BeenVerified's opt-out also covers PeopleLooker,
+Coverage is wider than 23 sites: BeenVerified's opt-out also covers PeopleLooker,
 NeighborWho and NumberGuru; Intelius also covers US Search.
 
-**Radaris and TruePeopleSearch are deliberately absent.** Neither appears anywhere
-in the California registry under any name, and both block automated access — so
-there is no authoritative opt-out address to give a user. Guessing one produces
-exactly the silent failure this project exists to prevent.
+### The verification rule, and how it's scoped
 
-Read `docs/BROKER-VERIFICATION.md` before touching the registry. The short version:
-never enable a broker whose opt-out address you haven't read off an authoritative
-source — a wrong address means the user's request silently goes nowhere while they
-believe they're done.
+Every record carries a `source`:
+
+- **`ca-registry`** — taken from the broker's state filing. Authoritative.
+- **`published`** — the broker's documented opt-out page, used for sites absent
+  from California's registry that are too exposing to leave out (several of the
+  biggest *free* people-search sites are in this group).
+
+**`optOutMethod: "email"` requires `ca-registry`.** A wrong email fails *silently*
+— the request goes nowhere and the user believes they're done. That's the failure
+this project exists to prevent, so it gets the strict bar.
+
+**`optOutMethod: "link"` may use `published`.** A wrong URL fails *visibly* — the
+user sees a 404 and the note tells them to use the site's footer link instead.
+Visible failure is recoverable; silent failure isn't.
+
+Read `docs/BROKER-VERIFICATION.md` before touching the registry.
+
+## The public broker directory
+
+`/brokers` publishes all 549 registered brokers with the opt-out route each filed,
+filterable and searchable. `/about` states plainly what the tool does and doesn't
+do, with every number computed live from the registry so it can't drift.
+
+The framing matters and is deliberate: California's DROP service — which submits
+deletion requests to every registered broker automatically — is genuinely for
+California residents only. **That automation doesn't travel. The list does.** The
+addresses those brokers filed are just addresses, and a "do not sell my info" form
+generally accepts a request from anyone. Publishing the dataset is useful to
+everyone; claiming to replicate DROP would not be true.
+
+Regenerate `src/data/registry.json` from the CPPA CSV when brokers re-register
+(annually). It's ~104KB raw / 27KB gzipped, and the long filing text is kept only
+for the 202 brokers that didn't file a direct opt-out URL.
 
 ### Assisted checks, and what the "scan" really is
 

@@ -516,6 +516,38 @@
   padding-top: 3rem;
   color: var(--slate);
   font-size: 0.8125rem;
+  display: grid;
+  gap: 0.625rem;
+}
+
+.footerLinks {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+  padding-bottom: 0.75rem;
+  border-bottom: 1px solid var(--grid);
+}
+.footerLinks a {
+  color: var(--daylight);
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+}
+@media (hover: hover) and (pointer: fine) {
+  .footerLinks a:hover {
+    color: var(--mint);
+  }
+}
+
+.footerDot {
+  color: var(--grid);
+}
+
+.footerCredit {
+  line-height: 1.6;
+  max-width: 44rem;
 }
 .siteFooter a {
   color: var(--slate);
