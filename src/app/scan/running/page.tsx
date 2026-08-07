@@ -1,7 +1,7 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import { ScanChip, TopBar, ui as s } from "@/components/ui";
 import { activeBrokers } from "@/lib/brokers";
 import { canScan, useSession, useSessionDispatch } from "@/lib/session";
@@ -21,7 +21,6 @@ export default function ScanRunningPage() {
   const brokers = activeBrokers();
   const [resolved, setResolved] = useState<Record<string, ScanOutcome>>({});
   const [done, setDone] = useState(0);
-  const startedRef = useRef(false);
 
   useEffect(() => {
     // A user who lands here without completing intake goes back, not into a
@@ -30,11 +29,15 @@ export default function ScanRunningPage() {
       router.replace("/scan");
       return;
     }
-    if (startedRef.current) return;
-    startedRef.current = true;
 
-    // Aborting on unmount stops a stale response from landing after the user
-    // has already navigated away (implementation spec §5).
+    // Each mount owns its own controller and its own fetch. Deliberately NOT
+    // guarded by a ref that survives remount: React StrictMode mounts, cleans
+    // up, then mounts again in development, and a surviving "already started"
+    // flag would let the cleanup abort the only request we ever send — the
+    // scan would hang at 0 forever. The same would happen on any genuine
+    // remount. The abort signal alone is the right staleness guard: a stale
+    // response is discarded below, and a fresh mount simply scans again.
+    // /api/scan is side-effect-free, so running it twice in dev costs nothing.
     const controller = new AbortController();
     let timers: ReturnType<typeof setTimeout>[] = [];
 
@@ -59,6 +62,11 @@ export default function ScanRunningPage() {
         }
 
         const data = (await res.json()) as { results: BrokerScanResult[] };
+
+        // A response that landed after this mount was torn down belongs to a
+        // navigation the user already left. Drop it rather than driving the
+        // UI of a screen that no longer exists.
+        if (controller.signal.aborted) return;
 
         data.results.forEach((result, i) => {
           timers.push(
@@ -102,7 +110,8 @@ export default function ScanRunningPage() {
       timers.forEach(clearTimeout);
       timers = [];
     };
-    // Intentionally runs once on mount; startedRef guards re-entry.
+    // Runs per mount. Leaving mid-scan aborts the in-flight request so a
+    // stale response can't land after the user has navigated away.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 

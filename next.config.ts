@@ -15,6 +15,17 @@ import type { NextConfig } from "next";
  * - No `unsafe-eval`. `unsafe-inline` for style is required by Next's runtime
  *   style injection; script keeps a strict policy.
  */
+const isDev = process.env.NODE_ENV === "development";
+
+/**
+ * React's dev build uses eval() for debugging features (it never does in
+ * production). Rather than weaken the shipped policy, 'unsafe-eval' is added
+ * ONLY when NODE_ENV is development — production keeps the strict policy.
+ */
+const scriptSrc = isDev
+  ? "script-src 'self' 'unsafe-inline' 'unsafe-eval'"
+  : "script-src 'self' 'unsafe-inline'";
+
 const securityHeaders = [
   { key: "X-Content-Type-Options", value: "nosniff" },
   { key: "X-Frame-Options", value: "DENY" },
@@ -31,7 +42,7 @@ const securityHeaders = [
     key: "Content-Security-Policy",
     value: [
       "default-src 'self'",
-      "script-src 'self' 'unsafe-inline'",
+      scriptSrc,
       "style-src 'self' 'unsafe-inline'",
       "img-src 'self' data: blob:",
       "font-src 'self'",

@@ -34,6 +34,10 @@
   display: inline-flex;
   align-items: center;
   gap: 0.5rem;
+  /* A navigation control, so it gets the full 44px target even though the
+     text is small. (The footer credit is exempt — it's an inline link inside
+     a sentence, which WCAG 2.5.8 excludes from the target-size rule.) */
+  min-height: 44px;
   font-family: var(--font-display);
   font-weight: 700;
   letter-spacing: -0.02em;
