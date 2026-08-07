@@ -1,7 +1,7 @@
 # Vanish — Design Spec
 
 **Date:** 2026-08-06
-**Status:** Draft, pending user review
+**Status:** Draft, revised after `emil-design-eng` + `impeccable` passes — pending final user review
 **Source:** `Vanish_PRD.docx` (v1.3, MVP / zero-database / zero-log edition)
 **Brand source:** `career-planning-tools/brand/01-brand-guidelines.md` + `site/css/main.css` (SIGNAL system)
 
@@ -45,6 +45,9 @@ The fit is not incidental: Vanish *is* signal → enforcement → evidence, lite
 
 --ease:      cubic-bezier(0.16, 1, 0.3, 1);
 --dur-micro: 240ms;
+
+--gut:     clamp(1.25rem, 5vw, 2.5rem);   /* horizontal gutter */
+--section: clamp(5rem, 12vh, 9rem);       /* vertical rhythm between major blocks */
 ```
 
 No third chromatic accent is introduced. Amber stays rationed to the "honored/done" moment exactly as the brand doc requires — see §3.4 for the one place it appears solid.
@@ -65,10 +68,23 @@ Mono type carries the "evidence" feeling in place of adjectives — a confidence
 
 **Utility-first, confirmed.** No scroll-linked animation, no 3D, no signal-field art — including on the landing screen. This was an explicit call against the brand's default cinematic treatment, made because the user's task (find data, file removals, in under 15 minutes) is served by speed and low cognitive load, not spectacle.
 
-What remains, inherited from the brand's existing micro-interaction tier:
-- State-change transitions: 200–500ms fade/slide, `--ease` (expo-out).
-- Hover states on interactive elements only (never hover-only affordances — brand's own accessibility rule).
+What remains, inherited from the brand's existing micro-interaction tier — durations are specific per element, not a single blanket range, so small things feel fast and big things don't feel abrupt:
+
+| Element | Duration | Easing | Notes |
+|---|---|---|---|
+| Button press | 100–160ms | `--ease` | `scale(0.97)` on `:active` — see §4.1 |
+| Status chip color/fill change | 150–200ms | `--ease` | Outline→fill swaps (e.g. dashboard READY→SENT→DONE) add a `filter: blur(2px)` crossfade — a plain color transition shows two overlapping shapes instead of one morphing state |
+| Focus ring appearance | 120ms | `ease-out` | Instant pop reads as a glitch; 120ms reads as responsive |
+| Dropdown/select open (age range, state) | 150–250ms | `--ease` | Occasional-use tier — standard animation, not suppressed |
+| New row entering `/scan/running` list | 200ms | `--ease` | CSS transition, not keyframes — rows arrive unpredictably and a second arrival mid-animation must retarget smoothly, not restart. `opacity 0→1`, `translateY(8px)→0`. Stagger 40ms if 2+ rows land within ~100ms |
+| Screen-to-screen | 200–300ms | `--ease` | Fade/slide |
+
+General rules carried over regardless of element:
+- Anything that enters starts from `opacity: 0` + a visible starting shape (e.g. `scale(0.95)`, never `scale(0)` or a hard cut) — nothing in the real world appears from nothing.
+- Hover states on interactive elements only (never hover-only affordances — brand's own accessibility rule), and gated behind `@media (hover: hover) and (pointer: fine)` so touch taps don't trigger false hover states.
+- Status chips are **not interactive** — no hover state on them at all. Don't animate what isn't clickable.
 - One-time count-up on the `/results` match count (the brand's documented micro-interaction, used exactly once, matching "one hero motion per view" even in the utility-first mode).
+- **One deliberate exception:** the `/dashboard` DONE-state transition (§3.5) is the product's single rare, user-initiated "honored" payoff moment — it earns a touch more than the bare micro-interaction tier (node atom scales in `0.9→1` + opacity, 220ms, fill settling just after). Everywhere else, restraint wins.
 
 No `prefers-reduced-motion` fallback work is needed beyond this tier — there's nothing large enough to need a fallback. State it in the implementation spec as "N/A — no motion large enough to warrant a static substitute" rather than silently dropping the brand's reduced-motion discipline.
 
@@ -100,7 +116,7 @@ Six screens, same routes and step order as PRD §10. Each section below states l
 
 **Component notes:**
 - Required-field marker: the node atom (small, Mint), replacing a bare asterisk — ties form semantics to the brand mark instead of a generic symbol.
-- Field help text: Slate, Inter, small — tooltip or inline caption explaining *why* the field matters (PRD's own requirement, e.g. age range disambiguates namesakes). Written plainly, no jargon.
+- Field help text: **inline caption** (not a tooltip) — Slate, Inter, small, always visible beneath the field, explaining *why* it matters (PRD's own requirement, e.g. age range disambiguates namesakes). Written plainly, no jargon. Resolved away from a tooltip deliberately: this form is read once, top-to-bottom, not scanned repeatedly — a hover-delay interaction adds friction for zero benefit, and an always-visible caption is more reassuring for a user who's anxious and doesn't want to have to discover help text exists.
 - Consent block: **visually separated**, not an inline checkbox row. Its own bordered sub-panel (Grid border) inside the form card, checkbox + the PRD's exact required legal text: *"I authorize Vanish to submit opt-out and deletion requests for my own personal information on my behalf."* This gets weight because it's the legal/trust hinge of the whole product, not a formality to breeze past.
 - Primary CTA: "Start scan" — disabled (Grid, no fill) until all required fields + consent are satisfied; becomes Mint-filled once valid.
 
@@ -111,8 +127,8 @@ Six screens, same routes and step order as PRD §10. Each section below states l
 **Layout:** Signal Black background, progress bar + live counter top, streaming list of per-broker rows below.
 
 **Content:**
-- Progress bar: Mint fill on Grid track. Label above: *"Searched 22 of 54 sites… 7 matches so far."* (PRD copy, kept — it's already the right tone: plain, specific, no hype.)
-- Per-broker row: broker name (Inter, Daylight) + status chip (right-aligned). Rows stream in as results arrive; never reorder once placed (avoids motion-sickness / disorientation for a user already anxious).
+- Progress bar: Mint fill on Grid track, `ease-out` on each fill update rather than a hard jump between values. Real broker-search timing is uneven; an eased (not instant) fill reads as "still working" instead of "stalled" — same principle as a fast-spinning spinner improving perceived speed at identical real speed. Label above: *"Searched 22 of 54 sites… 7 matches so far."* (PRD copy, kept — it's already the right tone: plain, specific, no hype.)
+- Per-broker row: broker name (Inter, Daylight) + status chip (right-aligned). Rows stream in as results arrive (entrance spec: §2 table — CSS transition, not keyframes, staggered if simultaneous) and never reorder once placed (avoids motion-sickness / disorientation for a user already anxious).
 - Never blocks on one slow broker — PRD's own requirement; a stalled row resolves to "error, skipped" after its own timeout and the scan continues. This is a UX guarantee, not just a technical one: the user should never wonder if the whole scan has frozen.
 
 **Status chip states** (see §4.3 for full spec): searching (neutral/Slate, pulsing dot), match (Mint), no match (Grid, muted), error (Amber outline — **not filled**, see §3.4 rationale).
@@ -129,6 +145,8 @@ Six screens, same routes and step order as PRD §10. Each section below states l
 
 **Why amber is *not* used for the error chip here or in §3.3:** the brand's own discipline is "amber = the honored/receipt moment, rationed." An error/no-match state is neither. Using amber for errors would dilute the one signal amber is supposed to carry cleanly by the time the user reaches `/dashboard`. Errors get a distinct outline treatment in a non-brand-accent color (Grid-bordered, Slate text) so amber's meaning stays intact end to end.
 
+**Empty state (zero matches):** not an edge case to leave unhandled — for this product, "we found nothing" is a *good* outcome and the most common thing to accidentally ship looking like a failure. Treatment: node atom in a calm, neutral (Slate) rendering, no error/warning styling of any kind, headline *"Good news — we didn't find you on any of the 54 sites we checked."* No CTA needed beyond a way back to `/report` (a clean scan is still worth a record) or re-running with additional aliases.
+
 ### 3.5 `/dashboard`
 
 **Layout:** Signal Black background, header summary + list of confirmed-match rows.
@@ -140,7 +158,9 @@ Six screens, same routes and step order as PRD §10. Each section below states l
 **Status chip states:**
 - READY — Slate outline, neutral (nothing has happened yet).
 - SENT — Mint fill (in motion, user acted, not yet closed).
-- DONE — **Amber fill + node atom**, the one place in the product where amber renders solid. This is deliberate: DONE is the actual "honored" moment the brand's whole color rationale describes, so it's the single correct place to spend that accent.
+- DONE — **Amber fill + node atom**, the one place in the product where amber renders solid. This is deliberate: DONE is the actual "honored" moment the brand's whole color rationale describes, so it's the single correct place to spend that accent. It's also the one spot in the product that earns motion beyond the bare micro-interaction tier (see §2) — rare, user-initiated, and the actual payoff of the whole flow.
+
+Chip-to-chip transitions (READY→SENT, SENT→DONE) use the blur-mask crossfade specified in §2, since each is an outline→fill shape change, not just a color change.
 
 **Footer:** "Download report" (Mint, primary — since the report is the durable record, it's a primary action, not an afterthought) + "Clear everything" (secondary/outline, destructive-adjacent but not styled alarmingly — this is a *feature*, not an error state, per the product's zero-retention promise).
 
@@ -162,13 +182,16 @@ Defined once, reused across all six screens. No screen invents its own variant.
 - **Primary:** Mint fill, Signal Black text, radius/weight matching brand button treatment.
 - **Secondary/outline:** Grid border, Daylight text, transparent fill.
 - **Disabled:** Grid fill, Slate text, no interaction.
+- **Press feedback (all variants):** `transform: scale(0.97)` on `:active`, `transition: transform 160ms ease-out`. Every pressable element in the product gets this — it's what makes the UI feel like it's listening, not just displaying.
 
 ### 4.2 Form field
 - Label (Inter, Daylight, small-caps or standard per brand's existing label treatment) + input (Deck surface, Grid border, Daylight text) + optional Slate help text below.
-- Focus: Mint ring (`--ring`).
+- Focus: Mint ring (`--ring`), `transition: box-shadow 120ms ease-out` — instant appearance reads as a glitch, 120ms reads as responsive.
 - Error: Grid border → error-red-adjacent... **not** amber, **not** mint. Use a neutral warning tone (desaturated, not a new brand hue — implementation spec should confirm exact value; this spec's constraint is *no new chromatic accent*, so the error tone must be achievable via existing tokens or a single approved desaturated addition, decided at build time with the brand's "never introduce a third hue" rule as the hard constraint).
 
 ### 4.3 Status chip (5 states)
+Not interactive — no hover state, no press feedback. Don't animate what isn't clickable.
+
 | State | Color | Fill |
 |---|---|---|
 | Searching | Slate | outline, pulsing dot |
@@ -176,6 +199,8 @@ Defined once, reused across all six screens. No screen invents its own variant.
 | No match | Grid | muted, no border emphasis |
 | Error | Grid-bordered, Slate text | outline (not amber — see §3.4) |
 | Done / honored | Amber | **solid fill**, only state that gets a solid brand accent |
+
+Transitions between states use the blur-mask crossfade + durations specified in §2, not a plain color transition — see §3.5 for where this matters most (READY→SENT→DONE).
 
 ### 4.4 Confidence badge
 Mono chip, three levels: HIGH (Mint outline), MED (Slate outline), LOW (Grid outline, muted). Text always uppercase, tracked, matching the brand's mono-caption spec (`+0.08em`).
