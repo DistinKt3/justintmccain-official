@@ -1,5 +1,5 @@
 /**
- * VANISH — Broker registry loader
+ * VANISH: Broker registry loader
  *
  * Static, version-controlled reference data. Read-only. Never user data.
  */
@@ -47,7 +47,7 @@ export function activeBrokers(): BrokerRecord[] {
   return ALL.filter((b) => b.enabled);
 }
 
-/** Includes staged/unverified records — for admin views and docs only. */
+/** Includes staged/unverified records, for admin views and docs only. */
 export function allBrokers(): BrokerRecord[] {
   return ALL;
 }
@@ -59,7 +59,7 @@ export function getBroker(id: string): BrokerRecord | undefined {
 /* --- URL building ---------------------------------------------------------
    Identity values are URL-encoded into a search link the USER opens in their
    own browser. This never leaves the client for `assisted` brokers, so the
-   broker sees a normal human visit from the user's own IP — not a scrape,
+   broker sees a normal human visit from the user's own IP, not a scrape
    and not Vanish's server acting on their behalf.
    ------------------------------------------------------------------------ */
 

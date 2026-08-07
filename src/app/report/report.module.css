@@ -1,5 +1,5 @@
 /* ============================================================================
-   /report — Evidence Paper
+   /report: Evidence Paper
    The one light surface in the product. This is the payoff: the moment of
    worry resolves into a printed, keepable fact.
    ========================================================================== */
@@ -41,7 +41,7 @@
   font-size: var(--t-mono);
   letter-spacing: 0.08em;
   text-transform: uppercase;
-  /* mint-ink, not raw mint — raw mint fails contrast on paper */
+  /* mint-ink, not raw mint. Raw mint fails contrast on paper */
   color: var(--mint-ink);
   margin-top: 0.2rem;
 }
@@ -94,7 +94,7 @@
   opacity: 0.55;
   cursor: not-allowed;
 }
-/* Focus ring must be visible on paper too — mint disappears here */
+/* Focus ring must be visible on paper too. Mint disappears here */
 .primaryBtn:focus-visible {
   outline: 2px solid var(--mint-ink);
   outline-offset: 2px;

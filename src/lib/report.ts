@@ -1,12 +1,12 @@
 /**
- * VANISH — PDF report generator
+ * VANISH: PDF report generator
  *
  * Runs entirely in the browser. The user's identity never touches a server to
- * produce this file — jsPDF builds the bytes locally and the browser saves
+ * produce this file. jsPDF builds the bytes locally and the browser saves
  * them. This is the ONLY record that survives closing the tab (PRD §11.6).
  *
  * Rendered on Evidence Paper: the brand's light "ledger" surface, used exactly
- * as documented — proof/record content goes light, everything else stays dark.
+ * as documented: proof and record content goes light, everything else dark.
  */
 
 import { jsPDF } from "jspdf";
@@ -26,7 +26,7 @@ const PAGE_H = 841.89;
 const CONTENT_W = PAGE_W - MARGIN * 2;
 
 function fmtDate(iso: string | null): string {
-  if (!iso) return "—";
+  if (!iso) return "Not given";
   try {
     return new Date(iso).toLocaleString("en-US", {
       dateStyle: "medium",
@@ -120,14 +120,14 @@ export function buildReport(session: SessionState): jsPDF {
   rule(14);
 
   body(
-    "This is your record of what was searched, what was found, and exactly what you sent. Vanish stored none of it — this file is the only copy.",
+    "This is your record of what was searched, what was found, and exactly what you sent. Vanish stored none of it, so this file is the only copy.",
     { muted: true },
   );
   y += 8;
 
   /* --- Identity --------------------------------------------------------- */
   heading("Who this record is for");
-  kv("Name", session.identity.fullName || "—");
+  kv("Name", session.identity.fullName || "Not given");
   if (session.identity.aliases.length) {
     kv("Other names", session.identity.aliases.join(", "));
   }
@@ -140,15 +140,15 @@ export function buildReport(session: SessionState): jsPDF {
   if (session.identity.priorCities.length) {
     kv("Previous", session.identity.priorCities.join("; "));
   }
-  kv("Age range", session.identity.ageRange || "—");
-  kv("Contact email", session.identity.email || "—");
+  kv("Age range", session.identity.ageRange || "Not given");
+  kv("Contact email", session.identity.email || "Not given");
   if (session.identity.phone) kv("Phone", session.identity.phone);
   y += 6;
 
   /* --- Authorization ---------------------------------------------------- */
   heading("Authorization");
   kv("Granted", fmtDate(session.consentAt));
-  kv("Legal basis", "CCPA / CPRA — consumer acting on own behalf");
+  kv("Legal basis", "CCPA / CPRA, consumer acting on own behalf");
   y += 2;
   body(session.consentText, { muted: true });
   y += 8;
@@ -157,7 +157,7 @@ export function buildReport(session: SessionState): jsPDF {
   /* --- Every broker searched, found or not ------------------------------ */
   heading("Every site checked");
   body(
-    "Included in full — sites that had nothing on you are part of the record too.",
+    "Included in full. Sites that had nothing on you are part of the record too.",
     { muted: true, size: 8.5 },
   );
   y += 6;
@@ -176,7 +176,7 @@ export function buildReport(session: SessionState): jsPDF {
           ? "no match"
           : result.outcome === "blocked"
             ? "blocked automated check"
-            : "error — skipped";
+            : "error, skipped";
     doc.setTextColor(...(result.outcome === "match" ? MINT_INK : MUTED));
     doc.text(label, MARGIN + 220, y);
     y += 13;
@@ -208,8 +208,8 @@ export function buildReport(session: SessionState): jsPDF {
     kv(
       "Method",
       request.method === "email"
-        ? `Email to ${request.emailTo ?? "—"}`
-        : `Opt-out form — ${request.prefilledUrl ?? "—"}`,
+        ? `Email to ${request.emailTo ?? "Not given"}`
+        : `Opt-out form: ${request.prefilledUrl ?? "Not given"}`,
     );
     kv("Listing", match.listingUrl);
     kv("Confidence", match.confidence.toUpperCase());
@@ -244,7 +244,7 @@ export function buildReport(session: SessionState): jsPDF {
   /* --- What happens next ------------------------------------------------ */
   heading("What happens next");
   body(
-    "Vanish cannot watch for the brokers' replies — it has no access to your inbox and keeps no record of you. Confirmations arrive in your own email. Some brokers require you to click a confirmation link before the removal takes effect, so check your inbox and spam folder.",
+    "Vanish cannot watch for the brokers' replies. It has no access to your inbox and keeps no record of you. Confirmations arrive in your own email. Some brokers require you to click a confirmation link before the removal takes effect, so check your inbox and spam folder.",
     { muted: true },
   );
   y += 4;

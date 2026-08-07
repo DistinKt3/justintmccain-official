@@ -202,17 +202,110 @@
   font-family: var(--font-mono);
   font-size: 0.6875rem;
   color: var(--slate);
-  text-decoration: none;
   word-break: break-all;
-  /* keeps the 44px combined target with the button above */
   display: inline-flex;
   align-items: center;
-  min-height: 22px;
+  min-height: 20px;
+}
+
+.copyBtn {
+  background: none;
+  border: 0;
+  padding: 0.25rem 0;
+  color: var(--slate);
+  font-size: 0.75rem;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  min-height: 32px;
 }
 @media (hover: hover) and (pointer: fine) {
-  .rowEmail:hover {
+  .copyBtn:hover {
     color: var(--mint);
   }
+}
+
+.deadNote {
+  margin-top: 0.5rem;
+  color: var(--alert);
+  font-size: 0.75rem;
+  line-height: 1.5;
+}
+
+.fixedNote {
+  margin-top: 0.4rem;
+  color: var(--slate);
+  font-size: 0.6875rem;
+  line-height: 1.5;
+  font-style: italic;
+}
+
+/* --- Personalisation ------------------------------------------------------- */
+
+.personalPrompt {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  flex-wrap: wrap;
+  padding: 1rem 1.25rem;
+  margin-bottom: 1.25rem;
+  background: var(--deck);
+  border: 1px solid var(--grid);
+  border-radius: var(--radius);
+}
+
+.personalCopy {
+  flex: 1 1 22rem;
+  color: var(--slate);
+  font-size: 0.875rem;
+  line-height: 1.6;
+}
+
+.personalOn {
+  margin-bottom: 1.25rem;
+  color: var(--slate);
+  font-size: 0.875rem;
+}
+.personalOn strong {
+  color: var(--daylight);
+  font-weight: 500;
+}
+
+.linkBtn {
+  background: none;
+  border: 0;
+  padding: 0;
+  color: var(--mint);
+  font-size: 0.875rem;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.personalForm {
+  padding: 1.25rem;
+  margin-bottom: 1.25rem;
+  background: var(--deck);
+  border: 1px solid var(--grid);
+  border-radius: var(--radius);
+}
+
+.personalRow {
+  display: grid;
+  gap: 0.5rem;
+  grid-template-columns: 1fr;
+}
+
+@media (min-width: 44rem) {
+  .personalRow {
+    grid-template-columns: 1.4fr 1fr 5rem 1.4fr;
+  }
+}
+
+.personalActions {
+  display: flex;
+  gap: 0.5rem;
+  margin-top: 0.75rem;
+  flex-wrap: wrap;
 }
 
 @media (max-width: 34rem) {

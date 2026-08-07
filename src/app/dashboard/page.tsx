@@ -42,7 +42,7 @@ export default function DashboardPage() {
         done
       </p>
 
-      {/* The product's core promise, always visible — never behind a click. */}
+      {/* The product's core promise, always visible, never behind a click. */}
       <p className={d.reminder}>
         Nothing here is stored. Closing this tab erases all of it, including
         requests you haven&rsquo;t sent yet. Download the report to keep a
@@ -60,7 +60,7 @@ export default function DashboardPage() {
           Download report
         </Link>
 
-        {/* Inline confirmation, not a modal — keeps the user in context, and
+        {/* Inline confirmation rather than a modal. Keeps the user in context, and
             this is still just resetting a browser tab, not a server-side
             deletion. But it can discard unsent work, so it gets a step. */}
         {confirmingClear ? (

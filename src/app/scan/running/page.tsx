@@ -33,7 +33,7 @@ export default function ScanRunningPage() {
     // Each mount owns its own controller and its own fetch. Deliberately NOT
     // guarded by a ref that survives remount: React StrictMode mounts, cleans
     // up, then mounts again in development, and a surviving "already started"
-    // flag would let the cleanup abort the only request we ever send — the
+    // flag would let the cleanup abort the only request we ever send. The
     // scan would hang at 0 forever. The same would happen on any genuine
     // remount. The abort signal alone is the right staleness guard: a stale
     // response is discarded below, and a fresh mount simply scans again.
@@ -48,7 +48,7 @@ export default function ScanRunningPage() {
         const res = await fetch("/api/scan", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          // Identity travels in the BODY only — never a query string, so it
+          // Identity travels in the BODY only, never a query string, so it
           // cannot land in hosting or CDN access logs.
           body: JSON.stringify({ identity: session.identity }),
           signal: controller.signal,
@@ -130,7 +130,7 @@ export default function ScanRunningPage() {
           Searched {done} of {total} sites &middot; {matches}{" "}
           {matches === 1 ? "match" : "matches"} so far
         </p>
-        {/* Eased fill, never a hard jump — broker timing is uneven and an
+        {/* Eased fill, never a hard jump. Broker timing is uneven and an
             eased bar reads as "still working" rather than "stalled". */}
         <div
           className={r.track}

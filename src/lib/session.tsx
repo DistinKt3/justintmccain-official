@@ -1,7 +1,7 @@
 "use client";
 
 /**
- * VANISH — Session state
+ * VANISH: Session state
  *
  * The entire run lives in this reducer, in browser memory, for the lifetime of
  * the tab. There is no persistence layer by design (PRD §5, §14).
@@ -154,7 +154,7 @@ function sessionReducer(
       };
 
     case "RESET":
-      // Total purge. There is nothing else to clear — no server call needed,
+      // Total purge. There is nothing else to clear. No server call needed,
       // no storage to evict. This is the whole of "Clear everything".
       return INITIAL_SESSION;
 

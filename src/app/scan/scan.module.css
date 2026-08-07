@@ -3,7 +3,7 @@
   max-width: var(--maxw-form);
 }
 
-/* fieldset/legend reset — used for semantic grouping, not the browser's box */
+/* fieldset/legend reset. Used for semantic grouping, not the browser's box */
 .form fieldset {
   border: 0;
   padding: 0;

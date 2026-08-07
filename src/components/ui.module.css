@@ -1,5 +1,5 @@
 /* ============================================================================
-   VANISH — Shared component system (design spec §4)
+   VANISH: Shared component system (design spec §4)
    Defined once, reused across all six screens. No screen invents a variant.
    ========================================================================== */
 
@@ -35,7 +35,7 @@
   align-items: center;
   gap: 0.5rem;
   /* A navigation control, so it gets the full 44px target even though the
-     text is small. (The footer credit is exempt — it's an inline link inside
+     text is small. (The footer credit is exempt because it's an inline link inside
      a sentence, which WCAG 2.5.8 excludes from the target-size rule.) */
   min-height: 44px;
   font-family: var(--font-display);
@@ -49,7 +49,7 @@
   text-decoration: none;
 }
 
-/* The mark: node atom rendered as a left-to-right fade — erasure, not capture.
+/* The mark: node atom rendered as a left-to-right fade. Erasure, not capture.
    Visual inverse of the JTM brand's solid "honored" node, same primitive. */
 .markFade {
   display: inline-flex;
@@ -124,7 +124,7 @@
   align-items: center;
   justify-content: center;
   gap: 0.5rem;
-  /* 44px minimum touch target — verified at 375px width */
+  /* 44px minimum touch target, verified at 375px width */
   min-height: 44px;
   padding: 0.625rem 1.25rem;
   border-radius: var(--radius);
@@ -140,7 +140,7 @@
     color var(--dur-micro) var(--ease);
 }
 
-/* Press feedback on every pressable element — what makes the UI feel like
+/* Press feedback on every pressable element. This is what makes the UI feel like
    it's listening, not just displaying. */
 .btn:active:not(:disabled) {
   transform: scale(0.97);
@@ -232,7 +232,7 @@
   color: var(--daylight);
 }
 
-/* Required marker: the node atom, not a bare asterisk — ties form semantics
+/* Required marker: the node atom, not a bare asterisk. Ties form semantics
    to the brand mark. Required is also programmatic via aria-required. */
 .reqDot {
   width: 5px;
@@ -261,7 +261,7 @@
   border-color: #2c3846;
 }
 
-/* Error swaps border color + caption only — never size, so nothing shifts. */
+/* Error swaps border color and caption only, never size, so nothing shifts. */
 .inputError {
   border-color: var(--alert);
 }
@@ -346,7 +346,7 @@
   }
 }
 
-/* --- Consent block (its own bordered sub-panel — the legal/trust hinge) ---- */
+/* --- Consent block (its own bordered sub-panel, the legal/trust hinge) ---- */
 
 .consent {
   border: 1px solid var(--grid);
@@ -379,7 +379,7 @@
 
 /* --- Status chip (design spec §4.3) ---------------------------------------
    Not interactive: no hover, no press. Don't animate what isn't clickable.
-   Every chip carries a TEXT label at every width — never color-only, which
+   Every chip carries a TEXT label at every width, never color-only, which
    is also the color-blind accessibility answer.
    ------------------------------------------------------------------------ */
 
@@ -414,7 +414,7 @@
   border-color: var(--grid);
   color: #6b7785;
 }
-/* Error is NOT amber — amber's meaning is reserved for the honored/done
+/* Error is NOT amber. Amber's meaning is reserved for the honored/done
    moment. Diluting it here would weaken it by the time the user reaches
    the dashboard. See design spec §3.4. */
 .chipError {

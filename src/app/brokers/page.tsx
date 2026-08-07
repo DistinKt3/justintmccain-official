@@ -5,7 +5,7 @@ import BrokerTable from "./BrokerTable";
 import b from "./brokers.module.css";
 
 export const metadata: Metadata = {
-  title: "Every registered data broker — Vanish",
+  title: "Every registered data broker | Vanish",
   description:
     "All 549 data brokers registered with California, with the opt-out route each one filed. Free to use from anywhere.",
 };
@@ -20,7 +20,7 @@ export default function BrokersPage() {
       <h1 className={s.h1}>Every registered data broker</h1>
       <p className={s.lede}>
         {counts.total} companies that told the State of California they trade in
-        personal data &mdash; and the opt-out route each one filed. Vanish
+        personal data, and the opt-out route each one filed. Vanish
         doesn&rsquo;t automate any of this. It&rsquo;s here so you can work
         through it yourself.
       </p>
@@ -36,7 +36,7 @@ export default function BrokersPage() {
           </a>{" "}
           and disclose, in writing, how a consumer opts out. That filing is
           published as an open dataset. This page is that dataset, reorganised
-          and nothing more &mdash; retrieved {source.retrieved}.
+          and nothing more. Retrieved {source.retrieved}.
         </p>
         <p className={b.provBody}>
           <strong>You do not have to live in California to use it.</strong> The
@@ -45,15 +45,23 @@ export default function BrokersPage() {
           info&rdquo; form will generally take your request from anywhere, and
           several other states now have their own opt-out rights. What
           California&rsquo;s law guarantees its residents is the automated
-          deletion service (DROP) &mdash; that part doesn&rsquo;t travel. The
+          deletion service (DROP), and that part doesn&rsquo;t travel. The
           list does.
+        </p>
+        <p className={b.provBody}>
+          Being state-filed makes a link authoritative, not correct. We checked
+          all {counts.withOptOutUrl} of them, and{" "}
+          <strong>{counts.deadLinks} are broken</strong>. Those are companies that
+          registered an opt-out page and then moved or deleted it. Those rows say
+          so and point you at the email route instead of a dead end.
         </p>
         <p className={b.provNote}>
           Source of truth is the CPPA, not us. If a record here looks wrong,{" "}
           <a href={source.dataUrl} target="_blank" rel="noopener noreferrer">
             check the original CSV
           </a>
-          . Brokers re-register annually, so entries drift.
+          . Brokers re-register annually, so entries drift. Links last checked{" "}
+          {source.retrieved}.
         </p>
       </section>
 

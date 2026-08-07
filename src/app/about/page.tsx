@@ -47,8 +47,8 @@ export default function AboutPage() {
           <li>
             <strong>Genuinely zero-retention.</strong> No database, no account, no
             analytics, no logging of anything you type. Closing the tab erases
-            it. That&rsquo;s not a policy promise, it&rsquo;s the architecture
-            &mdash; there is nowhere for it to go.
+            it. That isn&rsquo;t a policy promise, it&rsquo;s the architecture.
+            There is nowhere for it to go.
           </li>
         </ul>
       </section>
@@ -72,8 +72,8 @@ export default function AboutPage() {
           </li>
           <li>
             <strong>It cannot confirm a removal happened.</strong> Brokers reply
-            to you, not to us &mdash; we have no inbox access and keep no record
-            of you. The statuses on your dashboard are ones you set yourself.
+            to you, not to us. We have no inbox access and keep no record of
+            you. The statuses on your dashboard are ones you set yourself.
           </li>
           <li>
             <strong>It is not comprehensive.</strong> {brokers.length} brokers is
@@ -100,8 +100,8 @@ export default function AboutPage() {
         <p className={a.body}>
           {freeToView.length} of the {brokers.length} let you see your own record
           for free. The others confirm a record exists and then charge to open it
-          &mdash; unpleasant, but your data is there either way, and the opt-out
-          works whether or not you pay to look. That&rsquo;s why the paywalled
+          That&rsquo;s unpleasant, but your data is there either way, and the
+          opt-out works whether or not you pay to look. That&rsquo;s why the paywalled
           ones are still on the list, just further down it.
         </p>
       </section>
@@ -119,16 +119,16 @@ export default function AboutPage() {
             California Privacy Protection Agency
           </a>{" "}
           and disclose how consumers opt out. That&rsquo;s a public dataset, and
-          it&rsquo;s where most of the opt-out addresses here come from &mdash;
-          a legal filing beats a marketing page.
+          it&rsquo;s where most of the opt-out addresses here come from. A legal
+          filing beats a marketing page.
         </p>
         <p className={a.body}>
           <strong>
             You don&rsquo;t need to be a Californian for the list to be useful.
           </strong>{" "}
-          What California guarantees its own residents is DROP &mdash; a service
-          that submits deletion requests to every registered broker on their
-          behalf, automatically. That part is genuinely theirs and doesn&rsquo;t
+          What California guarantees its own residents is DROP, a service that
+          submits deletion requests to every registered broker on their behalf,
+          automatically. That part is genuinely theirs and doesn&rsquo;t
           travel. But the addresses those brokers filed are just addresses, and a
           &ldquo;do not sell my info&rdquo; form generally accepts a request from
           anyone. The automation doesn&rsquo;t cross the state line. The
@@ -136,8 +136,8 @@ export default function AboutPage() {
         </p>
         <p className={a.body}>
           A handful of the biggest free people-search sites aren&rsquo;t in
-          California&rsquo;s registry at all. They&rsquo;re included anyway
-          &mdash; they expose too much to leave out &mdash; using their published
+          California&rsquo;s registry at all. They&rsquo;re included anyway,
+          because they expose too much to leave out, using their published
           opt-out pages, and each one tells you where to look if the link has
           moved.
         </p>

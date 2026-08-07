@@ -89,7 +89,7 @@
 
 /* Sets expectations before the click: on a free site you'll see your own
    record; on a paywalled one you'll be told it exists and asked to pay.
-   The opt-out works either way — better to know which is coming. */
+   The opt-out works either way, so it is better to know which is coming. */
 .freeTag,
 .paidTag {
   font-family: var(--font-mono);

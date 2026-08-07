@@ -1,4 +1,4 @@
-# Can Vanish actually scan? — validation, 2026-08-06
+# Can Vanish actually scan? Validation, 2026-08-06
 
 The premise worth testing: of the 500+ brokers in California's registry, surely
 *some* allow automated checks. This is what happened when that was measured.
@@ -12,14 +12,14 @@ the conclusion shapes what the product honestly is.
 
 Source: the CPPA Data Broker Registry CSV (549 filings, 528 unique hosts).
 
-1. **Reachability** — one plain GET per host homepage.
-2. **Consumer relevance** — does the homepage look like a place a person can look
+1. **Reachability.** One plain GET per host homepage.
+2. **Consumer relevance.** Does the homepage look like a place a person can look
    *themselves* up? Most registered brokers are B2B/adtech; you cannot "find your
    listing" on a firmographic data vendor.
-3. **Differential test** — the one that actually matters. Request a real common
+3. **Differential test.** The one that actually matters. Request a real common
    name (`John Smith`) and an impossible one (`Zzqxwvt Blorfnagle`), then compare
-   the responses. **If both come back the same, the site gives no usable signal** —
-   whatever we report about it would be noise.
+   the responses. **If both come back the same, the site gives no usable signal.**
+   Whatever we report about it would be noise.
 
 Step 3 is non-negotiable, and it is where an earlier, sloppier check of mine went
 wrong. I had originally accepted "HTTP 200 + the searched name appears in the
@@ -36,7 +36,7 @@ Presence of the name proves the site received the query, not that it found anyon
 | spydialer.com | 200 | byte-identical (delta 0) | ❌ no signal |
 | socialcatfish.com | 200 | byte-identical (delta 0) | ❌ no signal |
 | gladiknow.com | 200 | byte-identical (delta 0) | ❌ no signal |
-| peoplesearcher.com | 200 | 0 chars rendered text — JS shell | ❌ no signal |
+| peoplesearcher.com | 200 | 0 chars rendered text, a JS shell | ❌ no signal |
 | peoplefinders.com | 200 → 403 | inconsistent, then blocked | ❌ unreliable |
 | whitepages.com | 200 home / **403** search | blocked | ❌ |
 | truthfinder, instantcheckmate, nuwber, intelius | 403 | blocked | ❌ |
@@ -52,13 +52,13 @@ Spokeo's signal is robust across cases: `John Smith`/TX → 9,107 matches,
 conclusion that automated scanning is broadly viable. It isn't, and the reason is
 structural:
 
-The reachable 84% are overwhelmingly **B2B data brokers** — adtech, identity
+The reachable 84% are overwhelmingly **B2B data brokers**: adtech, identity
 resolution, marketing lists, recruiting databases. They don't block automation
 because they have no consumer-facing person lookup to protect. There is nothing
 for a user to "find themselves on."
 
-The **consumer people-search segment** — the only segment where Vanish's core
-action makes sense — is precisely the segment that blocks hardest, because
+The **consumer people-search segment**, the only one where Vanish's core action
+makes sense, is precisely the segment that blocks hardest, because
 scraped listings *are* their product. Reachability and relevance are inversely
 correlated here.
 
@@ -66,7 +66,7 @@ correlated here.
 
 Vanish v1 is **not** a scanner with a manual fallback. It is a **guided
 self-search** with one site that happens to be automatable. That's a positioning
-fact, not a bug, and the UI should keep telling the truth about it — which it does:
+fact, not a bug, and the UI should keep telling the truth about it, which it does:
 blocked brokers say so plainly and hand the user a link.
 
 The valuable parts of the product were never the scan anyway. Writing a correct
@@ -80,9 +80,9 @@ product needs.
 ## The bug this validation caught
 
 `peoplesearcher.com` was configured `scanStrategy: "html-parse"` and returns HTTP
-200 with a JavaScript shell — **zero** server-rendered text. The parser found no
-name and reported **"no match"**: telling the user they aren't listed on a site
-whose results never rendered.
+200 with a JavaScript shell containing **zero** server-rendered text. The parser
+found no name and reported **"no match"**, telling the user they aren't listed on
+a site whose results never rendered.
 
 A false "you're clean" is the worst output this product can produce. It converts
 "I haven't checked yet" into "I'm safe."
@@ -92,7 +92,7 @@ Two fixes landed:
 1. `peoplesearcher` → `scanStrategy: "assisted"`.
 2. A structural guard in `src/app/api/scan/route.ts`: any 200 with less than
    `MIN_RENDERED_TEXT` (1200 chars) of server-rendered text is reported as *"didn't
-   return readable results — check it yourself"*, never as a no-match. This
+   return readable results, check it yourself"*, never as a no-match. This
    protects every future broker added to the registry, not just this one.
 
 ## Re-testing later

@@ -31,7 +31,7 @@
   line-height: 1.65;
 }
 
-/* node atom as list bullet — same primitive as the form's required marker */
+/* node atom as list bullet, same primitive as the form's required marker */
 .list li::before {
   content: "";
   position: absolute;

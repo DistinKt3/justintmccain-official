@@ -58,7 +58,7 @@ export default function ResultsPage() {
           </h1>
           <p className={s.lede}>
             Open each listing and check it&rsquo;s really you before requesting
-            removal &mdash; some listings belong to a different person with your
+            removal. Some listings belong to a different person who shares your
             name.
           </p>
         </>
@@ -112,7 +112,7 @@ function EmptyState({ checked }: { checked: number }) {
     <section className={v.empty}>
       <span className={v.emptyMark} aria-hidden="true" />
       <h1 className={s.h1}>
-        Good news &mdash; we didn&rsquo;t find you on any of the {checked} sites
+        Good news. We didn&rsquo;t find you on any of the {checked} sites
         we checked.
       </h1>
       <p className={s.lede}>
@@ -134,8 +134,8 @@ function EmptyState({ checked }: { checked: number }) {
 
 /* --- Assisted checks ------------------------------------------------------
    Brokers that refuse automated requests. Vanish does not try to get around
-   that; the user opens the search themselves — a normal visit from their own
-   browser — and pastes back the listing URL if they find one.
+   that. The user opens the search themselves, which is a normal visit from
+   their own browser, and pastes back the listing URL if they find one.
    -------------------------------------------------------------------------- */
 
 function AssistedSection({ count }: { count: number }) {
@@ -151,8 +151,8 @@ function AssistedSection({ count }: { count: number }) {
       <p className={s.help}>
         These brokers block automated checks, so Vanish can&rsquo;t search them
         for you. Open each one, search for yourself, and if you find your
-        listing, paste its address back here &mdash; then we&rsquo;ll write the
-        removal request the same as any other.
+        listing, paste its address back here. We&rsquo;ll write the removal
+        request the same as any other.
       </p>
 
       <ul className={v.list}>
@@ -196,7 +196,7 @@ function AssistedSection({ count }: { count: number }) {
                       id: `${broker.id}-manual`,
                       brokerId: broker.id,
                       brokerName: broker.name,
-                      // The user looked at it themselves — that is the
+                      // The user looked at it themselves, which is the
                       // strongest confirmation available in this product.
                       confidence: "high",
                       listingUrl: url,
@@ -227,7 +227,7 @@ function PasteListing({ onAdd }: { onAdd: (url: string) => void }) {
       return;
     }
     if (!/^https?:\/\//i.test(trimmed)) {
-      setError("That should start with https:// — copy it from your address bar.");
+      setError("That should start with https://. Copy it from your address bar.");
       return;
     }
     setError("");

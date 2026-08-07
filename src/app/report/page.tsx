@@ -33,7 +33,7 @@ export default function ReportPage() {
       downloadReport(session);
     } catch {
       setError(
-        "The download didn't start. Your browser may be blocking it — try again, or use your browser's print-to-PDF on this page.",
+        "The download didn't start. Your browser may be blocking it. Try again, or use your browser's print-to-PDF on this page.",
       );
     } finally {
       setDownloading(false);
@@ -44,7 +44,7 @@ export default function ReportPage() {
     <div className={p.paper}>
       <main className={p.sheet}>
         <header className={p.masthead}>
-          {/* The masthead carries the page's H1 — every screen needs one, and
+          {/* The masthead carries the page's H1. Every screen needs one, and
               on a printed record the title IS the masthead. */}
           <div>
             <h1 className={p.wordmark}>VANISH</h1>
@@ -78,7 +78,7 @@ export default function ReportPage() {
         <section className={p.section}>
           <h2 className={p.h2}>Who this record is for</h2>
           <dl className={p.ledger}>
-            <Row label="Name" value={session.identity.fullName || "—"} />
+            <Row label="Name" value={session.identity.fullName || "Not given"} />
             {session.identity.aliases.length ? (
               <Row
                 label="Other names"
@@ -91,14 +91,14 @@ export default function ReportPage() {
                 session.identity.state ? `, ${session.identity.state}` : ""
               }`}
             />
-            <Row label="Age range" value={session.identity.ageRange || "—"} />
-            <Row label="Contact email" value={session.identity.email || "—"} />
+            <Row label="Age range" value={session.identity.ageRange || "Not given"} />
+            <Row label="Contact email" value={session.identity.email || "Not given"} />
             <Row
               label="Authorized"
               value={
                 session.consentAt
                   ? new Date(session.consentAt).toLocaleString()
-                  : "—"
+                  : "Not given"
               }
             />
           </dl>
@@ -121,7 +121,7 @@ export default function ReportPage() {
                       ? "No match"
                       : result.outcome === "blocked"
                         ? "Blocked automated check"
-                        : "Error — skipped"}
+                        : "Error, skipped"}
                 </span>
               </li>
             ))}
@@ -141,7 +141,7 @@ export default function ReportPage() {
                 <article key={match.id} className={p.request}>
                   <h3 className={p.h3}>{match.brokerName}</h3>
                   <dl className={p.ledger}>
-                    <Row label="Status" value={match.request?.status ?? "—"} />
+                    <Row label="Status" value={match.request?.status ?? "Not given"} />
                     <Row
                       label="Method"
                       value={
@@ -166,7 +166,7 @@ export default function ReportPage() {
         <section className={p.section}>
           <h2 className={p.h2}>What happens next</h2>
           <p className={p.muted}>
-            Vanish can&rsquo;t watch for the brokers&rsquo; replies — it has no
+            Vanish can&rsquo;t watch for the brokers&rsquo; replies. It has no
             access to your inbox and keeps no record of you. Confirmations
             arrive in your own email, and some brokers need you to click a
             confirmation link before the removal takes effect. Check your spam

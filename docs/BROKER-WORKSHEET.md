@@ -1,13 +1,14 @@
-# Broker verification — completed 2026-08-06
+# Broker verification, completed 2026-08-06
 
-**Status: done.** The registry went from 2 enabled brokers to 9, all verified
-against an authoritative source. Nothing here is left for you to fill in.
+**Status: done.** The registry went from 2 enabled brokers to 9 in this pass, and
+later to 23. Nothing here is left for you to fill in. See `BROKER-VERIFICATION.md`
+for the current list.
 
 ---
 
 ## How this was verified
 
-Not by reading the brokers' own opt-out pages — most of them (7 of 9) return
+Not by reading the brokers' own opt-out pages. Most of them (7 of 9) return
 HTTP 403 to anything that isn't a browser, and working around that is out of
 scope.
 
@@ -19,7 +20,7 @@ Instead: the **California Privacy Protection Agency Data Broker Registry**.
 Under California's Delete Act (SB 362), any data broker doing business in
 California must register annually with the CPPA and disclose, in writing, how a
 consumer opts out. That filing is a legal declaration published as machine-readable
-CSV — it's more authoritative than a footer link that can be reworded or moved, and
+CSV. It's more authoritative than a footer link that can be reworded or moved, and
 it's reachable without fighting anyone's bot detection.
 
 **This source corrected two records I had already marked "verified" from the
@@ -37,25 +38,25 @@ broker's own page disagree.
 
 ## The two brokers that got dropped
 
-**Radaris** and **TruePeopleSearch** are **not in the California registry at all** —
-zero matches across every field, under any name or URL. Every other major
+**Radaris** and **TruePeopleSearch** are **not in the California registry at all**,
+with zero matches across every field, under any name or URL. Every other major
 people-search site is there.
 
-They're plainly people-search data brokers, so a missing filing is conspicuous. But
-for our purposes the practical consequence is what matters: with no state filing
-*and* no reachable page, there is no authoritative opt-out address to hand a user.
-Guessing one would produce exactly the silent failure this project is built to
-avoid, so they're omitted.
+They're plainly people-search data brokers, so a missing filing is conspicuous. The
+practical consequence is what matters here: with no state filing *and* no reachable
+page, there is no state-verified opt-out address to hand a user.
 
-If you want them covered later, someone has to open them in a real browser and
-record the flow by hand. Neither was reachable any other way.
+**Both were added back later** under the scoped rule in `BROKER-VERIFICATION.md`.
+They are link-method rather than email-method, so a stale URL fails visibly with a
+404 the user can see and recover from, and each carries a footer fallback in its
+note. They were too exposing to leave out.
 
 ---
 
-## What shipped (9 brokers, all enabled)
+## What shipped in this pass (9 brokers)
 
-Account creation was your stated skip condition. **None of these require it** —
-that was checked against each filing.
+Account creation was your stated skip condition. **None of these require it**,
+and that was checked against each filing.
 
 | Broker | Scan | Opt-out method | Route |
 |---|---|---|---|
@@ -82,10 +83,10 @@ Two things this changed in the product beyond the count:
 
 ---
 
-## Scaling past 9
+## Scaling past 9 (since done: the registry now ships 23)
 
 The same CSV is the path to PRD §4.1's 40–60 broker target. It carries name, email,
-website, and opt-out text for all 549 registered brokers — a filter for
+website, and opt-out text for all 549 registered brokers. A filter for
 people-search operators returned 30 candidates, of which these 9 are the cleanest.
 Adding more is data entry against a source that's already been parsed, not research.
 

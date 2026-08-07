@@ -21,7 +21,7 @@ export default function IntakePage() {
   const dispatch = useSessionDispatch();
 
   // Seeded from session so navigating BACK to this screen never loses work
-  // (design spec §3.0) — SessionState lives above the router.
+  // (design spec §3.0). SessionState lives above the router.
   const [identity, setIdentity] = useState<Identity>(session.identity);
   const [consented, setConsented] = useState(Boolean(session.consentAt));
   const [errors, setErrors] = useState<FieldErrors>({});
@@ -29,7 +29,7 @@ export default function IntakePage() {
   const lastAliasRef = useRef<HTMLInputElement | null>(null);
   const focusNewAlias = useRef(false);
 
-  // Added repeatable fields scroll into view on mobile — a field that appears
+  // Added repeatable fields scroll into view on mobile. A field that appears
   // off-screen is a common one-handed form failure (design spec §3.0).
   useEffect(() => {
     if (focusNewAlias.current && lastAliasRef.current) {
@@ -183,7 +183,7 @@ export default function IntakePage() {
               + Add a name
             </button>
             <span className={s.fieldHelp}>
-              Maiden names and former names matter — brokers often keep a
+              Maiden names and former names matter, because brokers often keep a
               separate listing under each one.
             </span>
           </div>
@@ -267,7 +267,7 @@ export default function IntakePage() {
                   aria-describedby={errors.state ? "state-error" : undefined}
                   autoComplete="address-level1"
                 >
-                  <option value="">&mdash;</option>
+                  <option value="">State</option>
                   {US_STATES.map((st) => (
                     <option key={st} value={st}>
                       {st}
@@ -318,7 +318,7 @@ export default function IntakePage() {
             </button>
             <span className={s.fieldHelp}>
               Old addresses are what most broker listings are actually built
-              from — they hang around long after you move.
+              from, and they hang around long after you move.
             </span>
           </div>
         </fieldset>
@@ -377,7 +377,7 @@ export default function IntakePage() {
           </div>
         </fieldset>
 
-        {/* --- Group 4: Consent — the legal hinge, given its own weight --- */}
+        {/* --- Group 4: Consent, the legal hinge, given its own weight --- */}
         <fieldset className={s.fieldGroup}>
           <legend className={s.groupLabel}>Your authorization</legend>
           <div className={s.consent}>
@@ -396,7 +396,7 @@ export default function IntakePage() {
             <p className={s.fieldHelp} id="consent-help">
               Under the CCPA/CPRA you may act for yourself or name an authorized
               agent. This is the authorization that lets Vanish prepare requests
-              in your name &mdash; you still send every one of them yourself.
+              in your name. You still send every one of them yourself.
             </p>
             {submitted && !consented ? (
               <p className={s.fieldError} role="alert">

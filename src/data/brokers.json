@@ -1,46 +1,44 @@
 {
   "$comment": [
-    "VANISH BROKER REGISTRY — static, version-controlled reference data (PRD §16).",
-    "This is NOT user data. Adding coverage = adding a record, no code change.",
+    "VANISH BROKER REGISTRY. Static, version-controlled reference data (PRD §16).",
+    "This is NOT user data. Adding coverage means adding a record, no code change.",
     "",
-    "ORDERING MATTERS. The list is ordered by value to the user, not alphabetically:",
-    "sites where you can actually SEE your own record for free come first, because",
+    "ORDERING MATTERS. The list is ordered by value to the user, not alphabetically.",
+    "Sites where you can actually SEE your own record for free come first, because",
     "that is where someone gets the 'oh, there I am' moment that makes the rest of",
-    "the work worth doing. Paywalled sites still matter — your data is still there —",
-    "but they come later.",
+    "the work worth doing. Paywalled sites still matter, since your data is there",
+    "either way, but they come later.",
     "",
-    "PROVENANCE — every record carries `source`:",
-    "  'ca-registry' — the opt-out route is taken from the broker's own annual filing",
-    "     with the California Privacy Protection Agency under the Delete Act (SB 362).",
+    "PROVENANCE. Every record carries `source`:",
+    "  'ca-registry' means the opt-out route came from the broker's own annual",
+    "     filing with the California Privacy Protection Agency under the Delete Act",
+    "     (SB 362). A legal declaration, published as machine-readable CSV.",
     "     https://cppa.ca.gov/data_broker_registry/complete-reg-data-brokers.csv",
-    "     A legal declaration, published as machine-readable CSV. Authoritative.",
-    "  'published' — the broker's publicly documented opt-out page. Used for sites",
-    "     that are NOT in California's registry but are too important to a user to",
-    "     leave out (several of the biggest free people-search sites are in this",
-    "     group). Confirm on arrival; every one of these carries a footer fallback",
-    "     in its note.",
+    "  'published' means the broker's publicly documented opt-out page. Used for",
+    "     sites that are NOT in California's registry but matter too much to a user",
+    "     to leave out. Several of the biggest free people-search sites are in this",
+    "     group. Confirm on arrival; each one carries a footer fallback in its note.",
     "",
-    "THE VERIFICATION RULE, refined:",
+    "THE VERIFICATION RULE, scoped:",
     "  optOutMethod 'email' REQUIRES source 'ca-registry'. A wrong email address",
-    "  fails SILENTLY — the request goes nowhere and the user believes they are done.",
-    "  That is the failure mode this project exists to prevent, so it gets the",
-    "  strict bar.",
-    "  optOutMethod 'link' may use source 'published'. A wrong URL fails VISIBLY —",
-    "  the user sees a 404 and can fall back to the footer link, which the note tells",
+    "  fails SILENTLY. The request goes nowhere and the user believes they are done.",
+    "  That is the failure this project exists to prevent, so it gets the strict bar.",
+    "  optOutMethod 'link' may use source 'published'. A wrong URL fails VISIBLY.",
+    "  The user sees a 404 and can fall back to the footer link, which the note tells",
     "  them to do. Visible failure is recoverable; silent failure is not.",
     "",
-    "scanStrategy — see docs/SCAN-VIABILITY.md for the measurements behind this:",
-    "  'html-parse' — the broker serves search results to a plain request AND gives a",
-    "     different response for a real name than for an impossible one. Exactly one",
-    "     broker passes that test: Spokeo.",
-    "  'assisted'   — everything else. The user opens the search link in their own",
+    "scanStrategy. See docs/SCAN-VIABILITY.md for the measurements behind this:",
+    "  'html-parse' means the broker serves search results to a plain request AND",
+    "     answers differently for a real name than for an impossible one. Exactly",
+    "     one broker passes that test: Spokeo.",
+    "  'assisted' is everything else. The user opens the search link in their own",
     "     browser and pastes back the listing URL. Vanish does NOT attempt to defeat",
     "     bot detection (out of scope, PRD §4.2).",
     "",
-    "freeToView — can the user see that they are listed without paying or",
-    "registering? Drives the 'free to view' badge. Honest expectation-setting: a",
-    "paywalled site still holds your data and the opt-out still works, but you may",
-    "not get to read the record first."
+    "freeToView answers whether the user can see they are listed without paying or",
+    "registering. It drives the 'free to view' badge. A paywalled site still holds",
+    "your data and the opt-out still works, you just may not get to read the record",
+    "first, and it is better to know that before clicking."
   ],
   "brokers": [
     {
@@ -52,7 +50,10 @@
       "matchStrategy": "html-parse",
       "optOutMethod": "link",
       "optOutUrl": "https://www.truepeoplesearch.com/removal",
-      "requiredFields": ["listingUrl", "email"],
+      "requiredFields": [
+        "listingUrl",
+        "email"
+      ],
       "manualStep": "confirmation-email",
       "legalBasis": "CCPA/CPRA",
       "rateLimitMs": 2000,
@@ -60,7 +61,7 @@
       "verifiedAt": "2026-08-06",
       "source": "published",
       "freeToView": true,
-      "note": "One of the most exposing sites on this list — full address history, phone numbers and relatives, free and with no signup. Start here. If the removal link has moved, look for \"Remove My Record\" in their footer. Not registered with California, so treat the link as published-not-filed."
+      "note": "One of the most exposing sites on this list. Full address history, phone numbers and relatives, free, with no signup. Start here. If the removal link has moved, look for \"Remove My Record\" in their footer. Not registered with California, so treat the link as published rather than filed."
     },
     {
       "id": "fastpeoplesearch",
@@ -71,7 +72,10 @@
       "matchStrategy": "html-parse",
       "optOutMethod": "link",
       "optOutUrl": "https://www.fastpeoplesearch.com/removal",
-      "requiredFields": ["listingUrl", "email"],
+      "requiredFields": [
+        "listingUrl",
+        "email"
+      ],
       "manualStep": "confirmation-email",
       "legalBasis": "CCPA/CPRA",
       "rateLimitMs": 2000,
@@ -79,7 +83,7 @@
       "verifiedAt": "2026-08-06",
       "source": "published",
       "freeToView": true,
-      "note": "Same shape as TruePeopleSearch and frequently carries the same records — free, detailed, no signup. If the removal link has moved, look for \"Remove My Record\" in their footer."
+      "note": "Same shape as TruePeopleSearch, and it often carries the same records. Free, detailed, no signup. If the removal link has moved, look for \"Remove My Record\" in their footer."
     },
     {
       "id": "thatsthem",
@@ -90,7 +94,10 @@
       "matchStrategy": "html-parse",
       "optOutMethod": "link",
       "optOutUrl": "https://thatsthem.com/optout",
-      "requiredFields": ["listingUrl", "email"],
+      "requiredFields": [
+        "listingUrl",
+        "email"
+      ],
       "manualStep": null,
       "legalBasis": "CCPA/CPRA",
       "rateLimitMs": 2000,
@@ -98,7 +105,7 @@
       "verifiedAt": "2026-08-06",
       "source": "published",
       "freeToView": true,
-      "note": "Free and unusually detailed — often shows email addresses and IP-derived location alongside the usual address and phone. If the opt-out link has moved, look for \"Opt Out\" in their footer."
+      "note": "Free, and unusually detailed. It often shows email addresses and rough location from your IP alongside the usual address and phone. If the opt-out link has moved, look for \"Opt Out\" in their footer."
     },
     {
       "id": "cyberbackgroundchecks",
@@ -109,7 +116,10 @@
       "matchStrategy": "html-parse",
       "optOutMethod": "link",
       "optOutUrl": "https://www.cyberbackgroundchecks.com/removal",
-      "requiredFields": ["listingUrl", "email"],
+      "requiredFields": [
+        "listingUrl",
+        "email"
+      ],
       "manualStep": "confirmation-email",
       "legalBasis": "CCPA/CPRA",
       "rateLimitMs": 2000,
@@ -128,7 +138,10 @@
       "matchStrategy": "html-parse",
       "optOutMethod": "link",
       "optOutUrl": "https://www.advancedbackgroundchecks.com/removal",
-      "requiredFields": ["listingUrl", "email"],
+      "requiredFields": [
+        "listingUrl",
+        "email"
+      ],
       "manualStep": "confirmation-email",
       "legalBasis": "CCPA/CPRA",
       "rateLimitMs": 2000,
@@ -147,7 +160,10 @@
       "matchStrategy": "html-parse",
       "optOutMethod": "link",
       "optOutUrl": "https://www.usphonebook.com/opt-out",
-      "requiredFields": ["listingUrl", "email"],
+      "requiredFields": [
+        "listingUrl",
+        "email"
+      ],
       "manualStep": "confirmation-email",
       "legalBasis": "CCPA/CPRA",
       "rateLimitMs": 2000,
@@ -166,7 +182,10 @@
       "matchStrategy": "html-parse",
       "optOutMethod": "link",
       "optOutUrl": "https://clustrmaps.com/bl/opt-out",
-      "requiredFields": ["listingUrl", "email"],
+      "requiredFields": [
+        "listingUrl",
+        "email"
+      ],
       "manualStep": "confirmation-email",
       "legalBasis": "CCPA/CPRA",
       "rateLimitMs": 2000,
@@ -185,7 +204,10 @@
       "matchStrategy": "html-parse",
       "optOutMethod": "link",
       "optOutUrl": "https://radaris.com/control/privacy",
-      "requiredFields": ["listingUrl", "email"],
+      "requiredFields": [
+        "listingUrl",
+        "email"
+      ],
       "manualStep": "confirmation-email",
       "legalBasis": "CCPA/CPRA",
       "rateLimitMs": 2000,
@@ -193,7 +215,7 @@
       "verifiedAt": "2026-08-06",
       "source": "published",
       "freeToView": true,
-      "note": "Large and mostly free to view. Radaris has historically asked you to claim the profile before removing it — if it demands an account, stop and use the phone or email route on their contact page instead. Not registered with California."
+      "note": "Large, and mostly free to view. Radaris has historically asked you to claim the profile before it will remove anything. If it demands an account, stop there and use the phone or email route on their contact page instead. Not registered with California."
     },
     {
       "id": "nuwber",
@@ -206,7 +228,10 @@
       "optOutUrl": "https://nuwber.com/",
       "emailTo": "support@nuwber.com",
       "optOutPhone": "(844) 912-1292",
-      "requiredFields": ["listingUrl", "email"],
+      "requiredFields": [
+        "listingUrl",
+        "email"
+      ],
       "manualStep": null,
       "legalBasis": "CCPA/CPRA",
       "rateLimitMs": 2000,
@@ -214,7 +239,7 @@
       "verifiedAt": "2026-08-06",
       "source": "ca-registry",
       "freeToView": true,
-      "note": "Free to view. Email is the only opt-out route Nuwber filed with California — there is no form. Send the message below and keep the sent copy."
+      "note": "Free to view. Email is the only opt-out route Nuwber filed with California. There is no form. Send the message below and keep the sent copy."
     },
     {
       "id": "spokeo",
@@ -227,7 +252,10 @@
       "optOutUrl": "https://www.spokeo.com/optout",
       "emailTo": "legal@spokeo.com",
       "optOutPhone": "1-877-864-0183",
-      "requiredFields": ["listingUrl", "email"],
+      "requiredFields": [
+        "listingUrl",
+        "email"
+      ],
       "manualStep": "confirmation-email",
       "legalBasis": "CCPA/CPRA",
       "rateLimitMs": 1500,
@@ -235,7 +263,7 @@
       "verifiedAt": "2026-08-06",
       "source": "ca-registry",
       "freeToView": false,
-      "note": "The one site Vanish can check for you automatically. Shows that a record exists free, but paywalls the detail. Paste the exact profile URL and your email, then click the link Spokeo emails you — the removal does not take effect until you do. Each listing must be opted out separately."
+      "note": "The one site Vanish can check for you automatically. It shows that a record exists for free, then paywalls the detail. Paste the exact profile URL and your email, then click the link Spokeo emails you. The removal does not take effect until you do. Each listing has to be opted out separately."
     },
     {
       "id": "whitepages",
@@ -247,7 +275,10 @@
       "optOutMethod": "link",
       "optOutUrl": "https://www.whitepages.com/privacy/ccpa",
       "emailTo": "legal@whitepages.com",
-      "requiredFields": ["listingUrl", "email"],
+      "requiredFields": [
+        "listingUrl",
+        "email"
+      ],
       "manualStep": null,
       "legalBasis": "CCPA/CPRA",
       "rateLimitMs": 2000,
@@ -255,7 +286,7 @@
       "verifiedAt": "2026-08-06",
       "source": "ca-registry",
       "freeToView": true,
-      "note": "One of the oldest and most widely indexed. Shows names and partial addresses free. Whitepages has historically asked for phone verification to complete a suppression — if they ask, that's them, not a phishing step."
+      "note": "One of the oldest and most widely indexed. Shows names and partial addresses for free. Whitepages has historically asked for phone verification to finish a suppression. If they ask, that is them, not a phishing step."
     },
     {
       "id": "beenverified",
@@ -268,7 +299,10 @@
       "optOutUrl": "https://www.beenverified.com/app/optout/search",
       "emailTo": "ccpa@beenverified.com",
       "optOutPhone": "888-579-5910",
-      "requiredFields": ["listingUrl", "email"],
+      "requiredFields": [
+        "listingUrl",
+        "email"
+      ],
       "manualStep": "confirmation-email",
       "legalBasis": "CCPA/CPRA",
       "rateLimitMs": 1500,
@@ -289,7 +323,10 @@
       "optOutUrl": "https://www.intelius.com",
       "emailTo": "support@mailer.intelius.com",
       "optOutPhone": "(888) 245-1655",
-      "requiredFields": ["listingUrl", "email"],
+      "requiredFields": [
+        "listingUrl",
+        "email"
+      ],
       "manualStep": null,
       "legalBasis": "CCPA/CPRA",
       "rateLimitMs": 2000,
@@ -297,7 +334,7 @@
       "verifiedAt": "2026-08-06",
       "source": "ca-registry",
       "freeToView": false,
-      "note": "Also covers US Search. Their site route means finding your profile and using the \"Do Not Sell My Personal Information\" link at the bottom of the page; the email below is the route they filed with California, so it works without hunting for the link."
+      "note": "Also covers US Search. Their site route means finding your profile and using the \"Do Not Sell My Personal Information\" link at the bottom of the page. The email below is the route they filed with California, so it works without hunting for the link."
     },
     {
       "id": "peoplefinders",
@@ -309,7 +346,10 @@
       "optOutMethod": "link",
       "optOutUrl": "https://www.peoplefinders.com/about/privacy",
       "emailTo": "customercare@peoplefinders.com",
-      "requiredFields": ["listingUrl", "email"],
+      "requiredFields": [
+        "listingUrl",
+        "email"
+      ],
       "manualStep": "find-footer-link",
       "legalBasis": "CCPA/CPRA",
       "rateLimitMs": 2000,
@@ -317,7 +357,7 @@
       "verifiedAt": "2026-08-06",
       "source": "ca-registry",
       "freeToView": false,
-      "note": "PeopleFinders didn't file a direct opt-out URL — you reach it from the \"Do Not Sell My Info\" link in their site footer, or from Section V of the privacy policy linked here."
+      "note": "PeopleFinders didn't file a direct opt-out URL. You reach it from the \"Do Not Sell My Info\" link in their site footer, or from Section V of the privacy policy linked here."
     },
     {
       "id": "mylife",
@@ -328,7 +368,10 @@
       "matchStrategy": "html-parse",
       "optOutMethod": "link",
       "optOutUrl": "https://www.mylife.com/ccpa/index.pubview",
-      "requiredFields": ["listingUrl", "email"],
+      "requiredFields": [
+        "listingUrl",
+        "email"
+      ],
       "manualStep": "confirmation-email",
       "legalBasis": "CCPA/CPRA",
       "rateLimitMs": 2000,
@@ -336,7 +379,7 @@
       "verifiedAt": "2026-08-06",
       "source": "published",
       "freeToView": true,
-      "note": "Worth doing even though it's unpleasant: MyLife publishes a \"reputation score\" alongside your record, which is exactly the sort of thing people find when they search your name. If the opt-out link has moved, look for \"Do Not Sell My Info\" in their footer."
+      "note": "Worth doing even though it is unpleasant. MyLife publishes a \"reputation score\" next to your record, which is exactly the sort of thing people find when they search your name. If the opt-out link has moved, look for \"Do Not Sell My Info\" in their footer."
     },
     {
       "id": "peekyou",
@@ -347,7 +390,10 @@
       "matchStrategy": "html-parse",
       "optOutMethod": "link",
       "optOutUrl": "https://www.peekyou.com/privacy#DoNotSellMyInfo",
-      "requiredFields": ["listingUrl", "email"],
+      "requiredFields": [
+        "listingUrl",
+        "email"
+      ],
       "manualStep": null,
       "legalBasis": "CCPA/CPRA",
       "rateLimitMs": 2000,
@@ -355,7 +401,7 @@
       "verifiedAt": "2026-08-06",
       "source": "ca-registry",
       "freeToView": true,
-      "note": "Aggregates social and web profiles against your name rather than address records — a different exposure from the rest of this list, and the one most likely to surface in a casual search of you."
+      "note": "Aggregates social and web profiles against your name rather than address records. That is a different kind of exposure from the rest of this list, and the one most likely to surface if someone casually searches you."
     },
     {
       "id": "spydialer",
@@ -367,7 +413,10 @@
       "optOutMethod": "email",
       "optOutUrl": "https://www.spydialer.com/",
       "emailTo": "info@spydialer.com",
-      "requiredFields": ["listingUrl", "email"],
+      "requiredFields": [
+        "listingUrl",
+        "email"
+      ],
       "manualStep": null,
       "legalBasis": "CCPA/CPRA",
       "rateLimitMs": 2000,
@@ -375,7 +424,7 @@
       "verifiedAt": "2026-08-06",
       "source": "ca-registry",
       "freeToView": true,
-      "note": "Reverse phone and name lookup, free. Search from their homepage — they don't use a linkable results URL."
+      "note": "Reverse phone and name lookup, free. Search from their homepage. They don't use a linkable results URL."
     },
     {
       "id": "searchbug",
@@ -386,7 +435,10 @@
       "matchStrategy": "html-parse",
       "optOutMethod": "link",
       "optOutUrl": "https://www.searchbug.com/ccpa.aspx",
-      "requiredFields": ["listingUrl", "email"],
+      "requiredFields": [
+        "listingUrl",
+        "email"
+      ],
       "manualStep": null,
       "legalBasis": "CCPA/CPRA",
       "rateLimitMs": 2000,
@@ -407,7 +459,10 @@
       "optOutUrl": "https://www.truthfinder.com/opt-out/v2/",
       "emailTo": "help@truthfinder.com",
       "optOutPhone": "(800) 699-8081",
-      "requiredFields": ["listingUrl", "email"],
+      "requiredFields": [
+        "listingUrl",
+        "email"
+      ],
       "manualStep": "confirmation-email",
       "legalBasis": "CCPA/CPRA",
       "rateLimitMs": 2000,
@@ -415,7 +470,7 @@
       "verifiedAt": "2026-08-06",
       "source": "ca-registry",
       "freeToView": false,
-      "note": "Heavily paywalled — you likely won't see your own record without subscribing, but it is there and the opt-out works without paying. Reachable from their homepage as \"Do Not Sell My Personal Information\"."
+      "note": "Heavily paywalled, so you probably won't see your own record without subscribing. It is still there, and the opt-out works without paying. Reachable from their homepage as \"Do Not Sell My Personal Information\"."
     },
     {
       "id": "instantcheckmate",
@@ -428,7 +483,10 @@
       "optOutUrl": "https://www.instantcheckmate.com/opt-out",
       "emailTo": "support@instantcheckmate.com",
       "optOutPhone": "(800) 222-8985",
-      "requiredFields": ["listingUrl", "email"],
+      "requiredFields": [
+        "listingUrl",
+        "email"
+      ],
       "manualStep": "confirmation-email",
       "legalBasis": "CCPA/CPRA",
       "rateLimitMs": 2000,
@@ -436,7 +494,7 @@
       "verifiedAt": "2026-08-06",
       "source": "ca-registry",
       "freeToView": false,
-      "note": "Same operator as TruthFinder — opting out of one does not opt you out of the other. Do both. Also paywalled for viewing."
+      "note": "Same operator as TruthFinder. Opting out of one does not opt you out of the other, so do both. Also paywalled for viewing."
     },
     {
       "id": "peoplesearcher",
@@ -449,7 +507,10 @@
       "optOutUrl": "https://www.peoplesearcher.com/optOut/name/landing",
       "emailTo": "support@peoplesearcher.com",
       "optOutPhone": "(833) 634-0750",
-      "requiredFields": ["listingUrl", "email"],
+      "requiredFields": [
+        "listingUrl",
+        "email"
+      ],
       "manualStep": "confirmation-email",
       "legalBasis": "CCPA/CPRA",
       "rateLimitMs": 2000,
@@ -457,7 +518,7 @@
       "verifiedAt": "2026-08-06",
       "source": "ca-registry",
       "freeToView": false,
-      "note": "Also reachable from their homepage as \"Do Not Sell My Info\"."
+      "note": "Also reachable from their homepage as \"Do Not Sell My Info\". Their search page returns a JavaScript shell with no server-rendered text, so Vanish can't read it. See docs/SCAN-VIABILITY.md."
     },
     {
       "id": "socialcatfish",
@@ -468,7 +529,10 @@
       "matchStrategy": "html-parse",
       "optOutMethod": "link",
       "optOutUrl": "https://socialcatfish.com/faq/privacy/#ca-nv-privacy",
-      "requiredFields": ["listingUrl", "email"],
+      "requiredFields": [
+        "listingUrl",
+        "email"
+      ],
       "manualStep": null,
       "legalBasis": "CCPA/CPRA",
       "rateLimitMs": 2000,
@@ -476,7 +540,7 @@
       "verifiedAt": "2026-08-06",
       "source": "ca-registry",
       "freeToView": false,
-      "note": "Searches images and social profiles as well as records. Search from their page — they don't use a linkable results URL."
+      "note": "Searches images and social profiles as well as records. Search from their page. They don't use a linkable results URL."
     },
     {
       "id": "gladiknow",
@@ -488,7 +552,10 @@
       "optOutMethod": "email",
       "optOutUrl": "https://www.gladiknow.com/",
       "emailTo": "support@gladiknow.com",
-      "requiredFields": ["listingUrl", "email"],
+      "requiredFields": [
+        "listingUrl",
+        "email"
+      ],
       "manualStep": null,
       "legalBasis": "CCPA/CPRA",
       "rateLimitMs": 2000,
@@ -496,7 +563,7 @@
       "verifiedAt": "2026-08-06",
       "source": "ca-registry",
       "freeToView": false,
-      "note": "Smaller than the rest of this list but registered and reachable. Email is the route they filed with California."
+      "note": "Smaller than the rest of this list, but registered and reachable. Email is the route they filed with California."
     }
   ]
 }

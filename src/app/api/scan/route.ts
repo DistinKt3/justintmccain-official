@@ -13,7 +13,7 @@ import type {
 } from "@/lib/types";
 
 /**
- * POST /api/scan — the ONLY server-side function in Vanish. (PRD §18)
+ * POST /api/scan, the ONLY server-side function in Vanish. (PRD §18)
  *
  * ============================ ZERO-LOG DISCIPLINE ============================
  * This function is the single point where identity data touches a server. The
@@ -32,11 +32,11 @@ import type {
  *     no writes of any kind.
  *
  * If you need to debug this route, log the broker id and an error CLASS only
- * (see safeReason below) — never a value that came from the user.
+ * (see safeReason below), never a value that came from the user.
  * ============================================================================
  */
 
-// Never prerender or cache — this is a pure request/response function.
+// Never prerender or cache. This is a pure request/response function.
 export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
 export const maxDuration = 30;
@@ -49,7 +49,7 @@ const BROKER_TIMEOUT_MS = 8000;
  *
  * This guard exists because of a real false negative found in testing: several
  * people-search sites return HTTP 200 with a JavaScript shell containing zero
- * rendered text. Parsing that finds no name and would report "no match" —
+ * rendered text. Parsing that finds no name would then report "no match",
  * telling the user they aren't listed when the page never actually rendered.
  *
  * A silent false "you're clean" is the worst failure this product can produce.
@@ -67,7 +67,7 @@ interface ScanRequestBody {
 
 /**
  * Reduces any thrown value to a non-identifying, safe-to-display class.
- * Deliberately does NOT pass through err.message — a fetch error message can
+ * Deliberately does NOT pass through err.message, because a fetch error can
  * embed the request URL, which for some brokers contains the user's name.
  */
 function safeReason(err: unknown): string {
@@ -169,7 +169,7 @@ async function scanBroker(
   const searchUrl = buildSearchUrl(broker, identity);
 
   // `assisted` brokers actively refuse automated requests. We do NOT attempt
-  // to work around that — no header spoofing, no proxying, no CAPTCHA
+  // to work around that. No header spoofing, no proxying, no CAPTCHA
   // handling (explicitly out of scope, PRD §4.2). The user checks these in
   // their own browser, which is a normal human visit and the self-search the
   // product is built around.
@@ -178,7 +178,7 @@ async function scanBroker(
       brokerId: broker.id,
       brokerName: broker.name,
       outcome: "blocked",
-      reason: "This site blocks automated checks — open it yourself below.",
+      reason: "This site blocks automated checks. Open it yourself below.",
     };
   }
 
@@ -195,12 +195,12 @@ async function scanBroker(
         brokerId: broker.id,
         brokerName: broker.name,
         outcome: "blocked",
-        reason: "This site blocks automated checks — open it yourself below.",
+        reason: "This site blocks automated checks. Open it yourself below.",
       };
     }
 
     // A people-search site answers "we have no page for this person" with a
-    // 404. That's a clean negative, not a failure — reporting it as an error
+    // 404. That's a clean negative, not a failure. Reporting it as an error
     // would tell the user something went wrong and send them off to check a
     // site by hand for no reason. "No match" is both accurate and the
     // reassuring answer.
@@ -227,14 +227,14 @@ async function scanBroker(
     const text = $("body").text().replace(/\s+/g, " ").trim();
 
     // A 200 that renders nothing server-side tells us nothing. Do NOT let it
-    // fall through to "no match" — see MIN_RENDERED_TEXT above.
+    // fall through to "no match". See MIN_RENDERED_TEXT above.
     if (text.length < MIN_RENDERED_TEXT) {
       return {
         brokerId: broker.id,
         brokerName: broker.name,
         outcome: "blocked",
         reason:
-          "This site didn't return readable results — open it yourself below.",
+          "This site didn't return readable results. Open it yourself below.",
       };
     }
 
@@ -254,7 +254,7 @@ async function scanBroker(
       confidence: scored.confidence,
       listingUrl: searchUrl,
       matchedFields: scored.matchedFields,
-      // Only HIGH is pre-checked. PRD §11.4 — the user must consciously
+      // Only HIGH is pre-checked. PRD §11.4: the user must consciously
       // confirm borderline ones.
       selected: scored.confidence === "high",
     };
@@ -266,7 +266,7 @@ async function scanBroker(
       match,
     };
   } catch (err) {
-    // NOTE: safeReason deliberately discards err.message — it can contain the
+    // NOTE: safeReason deliberately discards err.message, since it can contain
     // request URL, which for some brokers embeds the user's name.
     return {
       brokerId: broker.id,
@@ -302,7 +302,7 @@ export async function POST(request: Request) {
   const results = await Promise.all(brokers.map((b) => scanBroker(b, identity)));
 
   // Response is returned and nothing is retained. No writes happen anywhere
-  // in this function — verify that stays true before merging any change here.
+  // in this function. Verify that stays true before merging any change here.
   return NextResponse.json(
     { results },
     { headers: { "Cache-Control": "no-store" } },

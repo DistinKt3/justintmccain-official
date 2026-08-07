@@ -16,7 +16,7 @@ export default function LandingPage() {
         scannable.length === 1
           ? "One of them we can check automatically."
           : `${scannable.length} of them we can check automatically.`
-      } The rest block automated tools, so you search those yourself — it's a couple of minutes each.`,
+      } The rest block automated tools, so you search those yourself. It takes a couple of minutes each.`,
     },
     {
       title: "Confirm",
@@ -40,9 +40,9 @@ export default function LandingPage() {
         </h1>
         <p className={s.lede}>
           Vanish walks you through {brokers.length} data brokers that publish
-          your name, address and phone number &mdash; free ones first, so you can
-          see for yourself &mdash; and writes a proper removal request for every
-          listing you find. About 15 minutes. Nothing about you is stored.
+          your name, address and phone number. Free ones first, so you can see
+          for yourself. Then it writes a proper removal request for every listing
+          you find. About 15 minutes, and nothing about you is stored.
         </p>
 
         <div className={p.ctaRow}>
@@ -71,7 +71,7 @@ export default function LandingPage() {
 
       {/* The honest bit, on the front page rather than buried in /about.
           A privacy tool that oversells its own reach is doing the same thing
-          to you that the brokers do — just in a friendlier voice. */}
+          to you that the brokers do, just in a friendlier voice. */}
       <section className={p.plainly} aria-labelledby="plainly-heading">
         <h2 id="plainly-heading" className={p.plainlyTitle}>
           Plainly, before you start
@@ -90,8 +90,8 @@ export default function LandingPage() {
                 you in full before you send them.
               </li>
               <li>
-                Zero-retention by architecture &mdash; no database, no account,
-                no analytics. Closing the tab erases everything.
+                Zero-retention by architecture. No database, no account, no
+                analytics. Closing the tab erases everything.
               </li>
             </ul>
           </div>
@@ -127,18 +127,18 @@ export default function LandingPage() {
 
       <section className={p.trustSection}>
         {/* PRD §11.1's trust row, minimally reworded. The original read "We
-            only search for you, with your consent" — which meant "only ever
-            your own identity, never a third party's", but now reads as "we do
-            the searching for you", which is the one claim this page just spent
-            three sections walking back. Same three promises, no ambiguity. */}
+            only search for you, with your consent", meaning "only ever your own
+            identity, never a third party's". On a page that now spends three
+            sections explaining we mostly don't do the searching, it read as the
+            one claim being walked back. Same three promises, no ambiguity. */}
         <p className={s.trust}>
           We only ever act on your own identity, with your consent. We never
           sell data. Clear everything in one click.
         </p>
         <p className={p.trustDetail}>
           There is no account and no database. Everything you type stays in this
-          browser tab and is gone when you close it &mdash; so the only lasting
-          record is the report you download yourself.
+          browser tab and is gone when you close it, so the only lasting record
+          is the report you download yourself.
         </p>
       </section>
 

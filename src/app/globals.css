@@ -1,7 +1,7 @@
 @import "../styles/tokens.css";
 
 /* ============================================================================
-   VANISH — Global base
+   VANISH: Global base
    Reset + element defaults only. Component styling lives in *.module.css.
    ========================================================================== */
 
@@ -79,7 +79,7 @@ ol {
 }
 
 /* Focus: visible, consistent, never removed.
-   120ms — an instant pop reads as a glitch, this reads as responsive. */
+   120ms. An instant pop reads as a glitch; this reads as responsive. */
 :focus-visible {
   outline: var(--ring);
   outline-offset: 2px;
@@ -103,7 +103,7 @@ ol {
 }
 
 /* The design has no motion large enough to need a static substitute
-   (design spec §2/§5), but honor the preference anyway — it costs nothing
+   (design spec §2/§5), but honor the preference anyway. It costs nothing
    and silently ignoring it would break the brand's stated discipline. */
 @media (prefers-reduced-motion: reduce) {
   *,

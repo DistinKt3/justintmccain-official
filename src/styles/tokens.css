@@ -1,5 +1,5 @@
 /* ============================================================================
-   VANISH — Design tokens
+   VANISH: Design tokens
    ----------------------------------------------------------------------------
    SOURCE OF TRUTH: ../../../career-planning-tools/site/css/main.css (SIGNAL)
    These values are reused VERBATIM from the JTM brand system. Do not fork,
@@ -58,20 +58,20 @@
   --slate: #a6b2bf;
   --mint: #5fe3c4;
   --amber: #e9b44c;
-  --paper: #f5f3ed; /* Evidence Paper — /report only */
+  --paper: #f5f3ed; /* Evidence Paper, /report only */
   --ink: #14181d; /* text on Evidence Paper */
   --mint-ink: #0b6b58; /* REQUIRED for mint on Evidence Paper (contrast) */
 
   /* --- Error tone -------------------------------------------------------
      Resolves the item deferred by design spec §4.2 / implementation spec §6.
      The spec PROPOSED #8B4A42, but that measures 2.89:1 on Signal Black and
-     2.63:1 on Deck — below the 3.0 floor for borders and well below 4.5 for
+     2.63:1 on Deck, below the 3.0 floor for borders and well below 4.5 for
      text. It fails AA and cannot ship.
 
-     #C4726A measured: 5.46:1 on Signal Black, 4.97:1 on Deck — AA for body
+     #C4726A measured: 5.46:1 on Signal Black, 4.97:1 on Deck, so AA for body
      text on both surfaces. Same desaturated warm-brick family the spec asked
      for (reads "attention needed", tonally adjacent to Amber's warmth without
-     competing with Amber's rationed "honored" meaning). Not a brand accent —
+     competing with Amber's rationed "honored" meaning). Not a brand accent:
      used only for validation errors, never for status or decoration.
      -------------------------------------------------------------------- */
   --alert: #c4726a;
@@ -98,12 +98,12 @@
 
   /* --- Motion ----------------------------------------------------------
      Confident expo-out. Calm and deliberate; privacy isn't frantic.
-     Durations are per-element (design spec §2), not one blanket value —
+     Durations are per-element (design spec §2), not one blanket value, so
      small things feel fast, big things don't feel abrupt.
      -------------------------------------------------------------------- */
   --ease: cubic-bezier(0.16, 1, 0.3, 1);
   --dur-press: 160ms; /* button :active */
-  --dur-focus: 120ms; /* focus ring — instant reads as a glitch */
+  --dur-focus: 120ms; /* focus ring; instant reads as a glitch */
   --dur-chip: 180ms; /* status chip outline->fill */
   --dur-row: 200ms; /* scan row entrance */
   --dur-micro: 240ms;

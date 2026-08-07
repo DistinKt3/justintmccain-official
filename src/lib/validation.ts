@@ -2,13 +2,13 @@ import type { Identity } from "./types";
 
 /**
  * Validation messages are written to the product's voice: plain, specific, and
- * about the user's situation — never "Invalid input". Design spec §3.2.
+ * about the user's situation, never "Invalid input". Design spec §3.2.
  */
 
 export type FieldErrors = Partial<Record<keyof Identity, string>>;
 
 /** Deliberately permissive. This gate exists to catch typos, not to police
- *  address formats — a false rejection on a real email is worse than a
+ *  address formats. A false rejection on a real email is worse than a
  *  loose pattern, since the user's own email is where broker replies land. */
 const EMAIL = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
 
@@ -37,7 +37,7 @@ export function validateIdentity(identity: Identity): FieldErrors {
     errors.fullName = "We need this to search for you.";
   } else if (!identity.fullName.trim().includes(" ")) {
     errors.fullName =
-      "Add a last name too — brokers index by full name, so a first name alone returns everyone.";
+      "Add a last name too. Brokers index by full name, so a first name on its own returns everyone.";
   }
 
   if (!identity.city.trim()) {
@@ -57,7 +57,7 @@ export function validateIdentity(identity: Identity): FieldErrors {
   if (!identity.email.trim()) {
     errors.email = "We need this to search for you.";
   } else if (!EMAIL.test(identity.email.trim())) {
-    errors.email = "Doesn't look like a full email address — check for typos.";
+    errors.email = "Doesn't look like a full email address. Check for typos.";
   }
 
   return errors;

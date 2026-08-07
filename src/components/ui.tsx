@@ -7,12 +7,12 @@ export { s as ui };
 
 /* --- Wordmark -------------------------------------------------------------
    The mark is the node atom rendered as a left-to-right opacity fade:
-   erasure, not capture — the visual inverse of the JTM brand's solid node.
+   erasure rather than capture, the visual inverse of the JTM brand's node.
    -------------------------------------------------------------------------- */
 
 export function Wordmark({ href = "/" }: { href?: string }) {
   return (
-    <Link href={href} className={s.wordmark} aria-label="Vanish — home">
+    <Link href={href} className={s.wordmark} aria-label="Vanish, home">
       <span className={s.markFade} aria-hidden="true">
         <span className={s.markDot} />
         <span className={s.markDot} />
@@ -96,8 +96,8 @@ const scanChipLabel: Record<ScanOutcome | "searching", string> = {
   searching: "Searching",
   match: "Match found",
   "no-match": "No match",
-  error: "Error — skipped",
-  blocked: "Blocked — skipped",
+  error: "Error, skipped",
+  blocked: "Blocked, skipped",
 };
 
 export function ScanChip({ state }: { state: ScanOutcome | "searching" }) {

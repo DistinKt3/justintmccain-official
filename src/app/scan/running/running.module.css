@@ -12,7 +12,7 @@
 }
 
 /* Eased, not instant. Uneven broker timing reads as "still working"
-   instead of "stalled" — same principle as a spinner improving perceived
+   instead of "stalled", the same principle as a spinner improving perceived
    speed at identical real speed. */
 .fill {
   height: 100%;
@@ -26,7 +26,7 @@
   gap: 0.5rem;
 }
 
-/* Rows never reorder once placed — a list that reshuffles is disorienting
+/* Rows never reorder once placed. A list that reshuffles is disorienting
    for someone already anxious about what's being found. */
 .row {
   display: flex;
