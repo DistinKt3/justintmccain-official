@@ -184,6 +184,20 @@ async function scanBroker(
         reason: "This site blocks automated checks — open it yourself below.",
       };
     }
+
+    // A people-search site answers "we have no page for this person" with a
+    // 404. That's a clean negative, not a failure — reporting it as an error
+    // would tell the user something went wrong and send them off to check a
+    // site by hand for no reason. "No match" is both accurate and the
+    // reassuring answer.
+    if (res.status === 404 || res.status === 410) {
+      return {
+        brokerId: broker.id,
+        brokerName: broker.name,
+        outcome: "no-match",
+      };
+    }
+
     if (!res.ok) {
       return {
         brokerId: broker.id,

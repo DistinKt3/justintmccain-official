@@ -52,11 +52,28 @@
   line-height: 1.5;
 }
 
+.brokerNote {
+  margin-top: 0.625rem;
+  color: var(--slate);
+  font-size: 0.8125rem;
+  line-height: 1.55;
+}
+
 .actions {
   display: flex;
   gap: 0.5rem;
   flex-wrap: wrap;
   margin-top: 1rem;
+}
+
+.phoneNote {
+  margin-top: 0.75rem;
+  color: var(--slate);
+  font-size: 0.8125rem;
+}
+.phoneNote a {
+  color: var(--mint);
+  white-space: nowrap;
 }
 
 .bodyBlock {

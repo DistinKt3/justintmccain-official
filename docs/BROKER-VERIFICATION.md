@@ -3,10 +3,30 @@
 Adding or enabling a broker is a **data** task, not a code task. `src/data/brokers.json`
 is the whole registry; the opt-out engine dispatches purely on `optOutMethod`.
 
+## Start here: the authoritative source
+
+Before opening any broker's website, check the **California Privacy Protection
+Agency Data Broker Registry**:
+
+> https://cppa.ca.gov/data_broker_registry/complete-reg-data-brokers.csv
+
+Under the Delete Act (SB 362), a data broker doing business in California must
+register annually and disclose in writing how consumers opt out. It's a legal
+filing, published as machine-readable CSV covering ~550 brokers, with name, email,
+website and opt-out instructions per record.
+
+Prefer it over a broker's own page. It's a declaration rather than marketing copy,
+it can't be quietly reworded, and it's reachable without fighting bot detection.
+When the registry and a broker's own page disagree, **the registry wins** — that
+has already happened twice here (see `BROKER-WORKSHEET.md`).
+
+A broker that isn't in the registry at all is a signal in itself: no filing plus no
+reachable page means there's no authoritative opt-out address to hand a user.
+
 ## The rule
 
 **Never set `enabled: true` on a broker whose `optOutUrl` / `emailTo` you have not
-read off that broker's own live page.**
+read off an authoritative source.**
 
 A wrong opt-out address doesn't fail loudly. The user sends their removal request,
 it goes nowhere, and they walk away believing they're protected. That is worse than
@@ -18,23 +38,20 @@ Record the date you checked in `verifiedAt`.
 
 ## Current state (as of 2026-08-06)
 
-| Broker | Enabled | Why |
-|---|---|---|
-| Spokeo | ✅ | Opt-out flow and `privacy@spokeo.com` read off `spokeo.com/optout`. Form needs the exact profile URL + email, then a confirmation link. |
-| BeenVerified | ✅ | `privacy@beenverified.com` and the opt-out form path read off their published privacy policy. §19.6 expressly accepts authorized-agent requests. |
-| Whitepages | ❌ | Returns HTTP 403 to automated requests — could not be verified. |
-| Radaris | ❌ | Returns HTTP 403 to automated requests — could not be verified. |
-| TruePeopleSearch | ❌ | Returns HTTP 403 to automated requests — could not be verified. |
+Nine brokers enabled, all verified against the CPPA registry: Spokeo, BeenVerified,
+Whitepages, TruthFinder, Instant Checkmate, PeopleSearcher, Intelius, Nuwber,
+PeopleFinders. Full detail and provenance in `BROKER-WORKSHEET.md`.
 
-The three disabled records are staged with a plausible `optOutUrl` so the shape is
-right, but they are **guesses** and are marked as such in the JSON. They do not
-appear anywhere in the product while `enabled: false`.
+Radaris and TruePeopleSearch are **excluded** — absent from the registry under any
+name, and unreachable. No authoritative opt-out address exists to give a user.
 
 ## How to verify one
 
-1. Open the broker's site in a normal browser (not a script — see below).
-2. Find their opt-out / "do not sell my info" / suppression page. It is usually
-   linked from the footer or the privacy policy, often as "Do Not Sell or Share My
+1. Look it up in the CPPA CSV first. If it's registered, the filing gives you the
+   opt-out URL, email and phone directly — you may be done.
+2. Only if it isn't registered, open the broker's site in a normal browser (not a
+   script — see below) and find their opt-out / "do not sell my info" /
+   suppression page. It's usually in the footer, often as "Do Not Sell or Share My
    Personal Information" (the CCPA-mandated link).
 3. Record, exactly:
    - `optOutUrl` — the page a user actually starts from.

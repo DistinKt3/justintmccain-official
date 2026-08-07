@@ -72,15 +72,30 @@ src/
 `src/data/brokers.json` is the whole registry. Adding coverage is a data change,
 not a code change.
 
-**Two of five seed brokers ship enabled.** Spokeo and BeenVerified were verified
-against their live pages. Whitepages, Radaris and TruePeopleSearch return HTTP 403
-to automated requests, so their opt-out details could not be confirmed and they
-ship `enabled: false` rather than shipping a guess.
+**Nine brokers ship enabled**, each verified against the California Privacy
+Protection Agency's Data Broker Registry — the annual filing the Delete Act
+(SB 362) requires, published as machine-readable CSV:
+
+> https://cppa.ca.gov/data_broker_registry/complete-reg-data-brokers.csv
+
+That source is preferred over the brokers' own opt-out pages: it's a legal
+declaration rather than marketing copy, it can't be quietly reworded, and it's
+reachable without fighting anyone's bot detection (7 of the 9 return HTTP 403 to
+automated requests). It also corrected two records originally taken from broker
+pages — see `docs/BROKER-WORKSHEET.md`.
+
+Coverage is wider than nine sites: BeenVerified's opt-out also covers PeopleLooker,
+NeighborWho and NumberGuru; Intelius also covers US Search.
+
+**Radaris and TruePeopleSearch are deliberately absent.** Neither appears anywhere
+in the California registry under any name, and both block automated access — so
+there is no authoritative opt-out address to give a user. Guessing one produces
+exactly the silent failure this project exists to prevent.
 
 Read `docs/BROKER-VERIFICATION.md` before touching the registry. The short version:
-never enable a broker whose opt-out address you haven't read off their own page — a
-wrong address means the user's request silently goes nowhere while they believe
-they're done.
+never enable a broker whose opt-out address you haven't read off an authoritative
+source — a wrong address means the user's request silently goes nowhere while they
+believe they're done.
 
 ### Assisted checks
 

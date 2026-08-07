@@ -149,6 +149,15 @@ function RequestRow({ match }: { match: Match }) {
         </p>
       ) : null}
 
+      {broker?.manualStep === "find-footer-link" && status !== "DONE" ? (
+        <p className={d.manualNote}>
+          {match.brokerName} doesn&rsquo;t publish a direct opt-out link. Look
+          for &ldquo;Do Not Sell My Info&rdquo; in the footer of their site.
+        </p>
+      ) : null}
+
+      {broker?.note ? <p className={d.brokerNote}>{broker.note}</p> : null}
+
       <div className={d.actions}>
         {status !== "DONE" ? (
           <>
@@ -206,6 +215,19 @@ function RequestRow({ match }: { match: Match }) {
           </button>
         ) : null}
       </div>
+
+      {/* A phone line the broker filed with California. Worth surfacing: if
+          someone's mail client won't open and their form submission fails,
+          this is the route that still works. */}
+      {broker?.optOutPhone && status !== "DONE" ? (
+        <p className={d.phoneNote}>
+          Stuck? {match.brokerName} takes removal requests by phone at{" "}
+          <a href={`tel:${broker.optOutPhone.replace(/[^\d+]/g, "")}`}>
+            {broker.optOutPhone}
+          </a>
+          .
+        </p>
+      ) : null}
 
       {showBody ? (
         <div className={d.bodyBlock}>

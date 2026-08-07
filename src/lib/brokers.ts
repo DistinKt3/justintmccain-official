@@ -18,6 +18,9 @@ export interface BrokerRecord {
   optOutMethod: "email" | "link";
   optOutUrl: string;
   emailTo?: string;
+  /** CCPA phone line, where the broker filed one. Shown as a fallback for a
+   *  user whose email or the broker's form isn't working for them. */
+  optOutPhone?: string;
   requiredFields: string[];
   manualStep: string | null;
   legalBasis: string;
