@@ -1,0 +1,132 @@
+.list {
+  display: grid;
+  gap: 0.75rem;
+  margin-top: 2rem;
+}
+
+.matchCard {
+  padding: 1.125rem 1.25rem;
+}
+
+.matchMain {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.875rem;
+}
+
+.matchBody {
+  flex: 1;
+  min-width: 0;
+}
+
+.matchLabel {
+  display: block;
+  font-size: 1rem;
+  font-weight: 500;
+  color: var(--daylight);
+  cursor: pointer;
+}
+
+.matchFields {
+  margin-top: 0.2rem;
+  color: var(--slate);
+  font-size: 0.8125rem;
+}
+
+.matchMeta {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 0.5rem;
+  flex: none;
+}
+
+.viewLink {
+  font-size: 0.8125rem;
+  color: var(--mint);
+  text-decoration: none;
+  white-space: nowrap;
+  /* 44px touch target without visually inflating the link */
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+}
+@media (hover: hover) and (pointer: fine) {
+  .viewLink:hover {
+    text-decoration: underline;
+  }
+}
+
+/* --- Assisted (blocked-broker) section ------------------------------------ */
+
+.assisted {
+  margin-top: 3rem;
+  padding-top: 2rem;
+  border-top: 1px solid var(--grid);
+}
+
+.assistedCard {
+  padding: 1.125rem 1.25rem;
+}
+
+.cardHead {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.brokerName {
+  font-size: 1rem;
+  font-weight: 500;
+  color: var(--daylight);
+}
+
+.brokerNote {
+  margin-top: 0.5rem;
+  color: var(--slate);
+  font-size: 0.8125rem;
+  line-height: 1.5;
+}
+
+.pasteRow {
+  display: flex;
+  gap: 0.5rem;
+  margin-top: 0.875rem;
+  flex-wrap: wrap;
+}
+.pasteRow input {
+  flex: 1 1 14rem;
+  min-width: 0;
+}
+
+.addedNote {
+  margin-top: 0.75rem;
+  color: var(--mint);
+  font-size: 0.875rem;
+}
+
+/* --- Empty state ----------------------------------------------------------
+   Zero matches is a GOOD outcome. Calm, neutral, no warning styling.
+   -------------------------------------------------------------------------- */
+
+.empty {
+  padding: 2rem 0 1rem;
+}
+
+.emptyMark {
+  display: block;
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: var(--slate);
+  margin-bottom: 1.5rem;
+}
+
+.emptyActions {
+  margin-top: 2rem;
+  display: flex;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}

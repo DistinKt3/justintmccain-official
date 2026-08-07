@@ -1,0 +1,21 @@
+.form {
+  margin-top: 2rem;
+  max-width: var(--maxw-form);
+}
+
+/* fieldset/legend reset — used for semantic grouping, not the browser's box */
+.form fieldset {
+  border: 0;
+  padding: 0;
+  margin: 0 0 2rem;
+}
+
+.form fieldset:last-of-type {
+  margin-bottom: 1.75rem;
+}
+
+.form legend {
+  display: block;
+  width: 100%;
+  padding: 0;
+}

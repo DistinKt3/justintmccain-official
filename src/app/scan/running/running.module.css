@@ -1,0 +1,57 @@
+.progressHead {
+  margin: 1.5rem 0 2rem;
+  display: grid;
+  gap: 0.75rem;
+}
+
+.track {
+  height: 6px;
+  background: var(--grid);
+  border-radius: var(--radius-chip);
+  overflow: hidden;
+}
+
+/* Eased, not instant. Uneven broker timing reads as "still working"
+   instead of "stalled" — same principle as a spinner improving perceived
+   speed at identical real speed. */
+.fill {
+  height: 100%;
+  background: var(--mint);
+  border-radius: inherit;
+  transition: width 600ms var(--ease);
+}
+
+.list {
+  display: grid;
+  gap: 0.5rem;
+}
+
+/* Rows never reorder once placed — a list that reshuffles is disorienting
+   for someone already anxious about what's being found. */
+.row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 0.875rem 1rem;
+  background: var(--deck);
+  border: 1px solid var(--grid);
+  border-radius: var(--radius);
+  opacity: 0.55;
+  transform: translateY(8px);
+  /* CSS transition, not keyframes: rows arrive unpredictably and a second
+     arrival mid-animation must retarget smoothly, not restart. */
+  transition:
+    opacity var(--dur-row) var(--ease),
+    transform var(--dur-row) var(--ease);
+}
+
+.rowIn {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.brokerName {
+  font-size: 0.9375rem;
+  color: var(--daylight);
+}

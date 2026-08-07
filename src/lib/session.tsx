@@ -39,6 +39,7 @@ export type SessionAction =
   | { type: "START_SCAN" }
   | { type: "SCAN_COMPLETE"; results: BrokerScanResult[] }
   | { type: "SCAN_FAILED"; message: string }
+  | { type: "ADD_MANUAL_MATCH"; match: Match }
   | { type: "TOGGLE_MATCH"; matchId: string }
   | { type: "SET_ALL_MATCHES"; selected: boolean }
   | { type: "ATTACH_REQUESTS"; requests: Record<string, GeneratedRequest> }
@@ -93,6 +94,23 @@ function sessionReducer(
 
     case "SCAN_FAILED":
       return { ...state, status: "intake", scanError: action.message };
+
+    case "ADD_MANUAL_MATCH": {
+      // A listing the user found themselves on a broker that blocks automated
+      // checks. Their own eyes are the strongest confirmation this product
+      // has, so it lands as a normal match and flips that broker's scan
+      // result from "blocked" to "match" for the report's audit trail.
+      if (state.matches.some((m) => m.id === action.match.id)) return state;
+      return {
+        ...state,
+        matches: [...state.matches, action.match],
+        scanResults: state.scanResults.map((r) =>
+          r.brokerId === action.match.brokerId
+            ? { ...r, outcome: "match", match: action.match, reason: undefined }
+            : r,
+        ),
+      };
+    }
 
     case "TOGGLE_MATCH":
       return {
