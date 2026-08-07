@@ -44,6 +44,20 @@ export const maxDuration = 30;
 /** Per-broker network timeout. One slow broker must never stall the scan. */
 const BROKER_TIMEOUT_MS = 8000;
 
+/**
+ * Minimum server-rendered text before we're willing to call a page "no match".
+ *
+ * This guard exists because of a real false negative found in testing: several
+ * people-search sites return HTTP 200 with a JavaScript shell containing zero
+ * rendered text. Parsing that finds no name and would report "no match" —
+ * telling the user they aren't listed when the page never actually rendered.
+ *
+ * A silent false "you're clean" is the worst failure this product can produce.
+ * Below this threshold we report that we couldn't read the site and hand it to
+ * the user to check, which is honest about what we don't know.
+ */
+const MIN_RENDERED_TEXT = 1200;
+
 /** Maximum identity payload we will even look at, as a crude abuse guard. */
 const MAX_FIELD_LEN = 200;
 
@@ -210,7 +224,19 @@ async function scanBroker(
     const html = await res.text();
     const $ = cheerio.load(html);
     $("script, style, noscript").remove();
-    const text = $("body").text().replace(/\s+/g, " ");
+    const text = $("body").text().replace(/\s+/g, " ").trim();
+
+    // A 200 that renders nothing server-side tells us nothing. Do NOT let it
+    // fall through to "no match" — see MIN_RENDERED_TEXT above.
+    if (text.length < MIN_RENDERED_TEXT) {
+      return {
+        brokerId: broker.id,
+        brokerName: broker.name,
+        outcome: "blocked",
+        reason:
+          "This site didn't return readable results — open it yourself below.",
+      };
+    }
 
     const scored = scoreMatch(text, identity);
     if (!scored) {

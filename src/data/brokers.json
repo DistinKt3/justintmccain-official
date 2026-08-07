@@ -135,7 +135,7 @@
       "name": "PeopleSearcher",
       "category": "people-search",
       "searchUrl": "https://www.peoplesearcher.com/name/{name}",
-      "scanStrategy": "html-parse",
+      "scanStrategy": "assisted",
       "matchStrategy": "html-parse",
       "optOutMethod": "link",
       "optOutUrl": "https://www.peoplesearcher.com/optOut/name/landing",
@@ -147,7 +147,7 @@
       "rateLimitMs": 2000,
       "enabled": true,
       "verifiedAt": "2026-08-06",
-      "note": "Also reachable from their homepage as \"Do Not Sell My Info\"."
+      "note": "Also reachable from their homepage as \"Do Not Sell My Info\". Their search page returns a JavaScript shell with no server-rendered text, so Vanish can't read it — see docs/SCAN-VIABILITY.md."
     },
     {
       "id": "intelius",

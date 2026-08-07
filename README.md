@@ -97,13 +97,29 @@ never enable a broker whose opt-out address you haven't read off an authoritativ
 source — a wrong address means the user's request silently goes nowhere while they
 believe they're done.
 
-### Assisted checks
+### Assisted checks, and what the "scan" really is
 
 Most of this industry blocks automated requests. Vanish does **not** try to get
 around that (no header spoofing, no proxy rotation, no CAPTCHA solving — explicitly
 out of scope per PRD §4.2). Brokers marked `scanStrategy: "assisted"` are handed to
 the user as a search link they open themselves; they paste the listing URL back and
 get the same removal request as any scanned match.
+
+**Only one broker of the nine is genuinely scannable: Spokeo.** That was measured,
+not assumed — every consumer people-search host in the 528-host registry was probed
+and differential-tested. 84% of registry hosts are reachable, but almost all are
+B2B/adtech brokers with no consumer lookup to scan; the people-search segment blocks
+hardest because scraped listings are their product.
+
+So Vanish v1 is honestly a **guided self-search** with one automatable site, not a
+scanner with a manual fallback. The full data and methodology are in
+`docs/SCAN-VIABILITY.md` — read it before adding any broker as `html-parse`.
+
+One rule from that work is load-bearing: **never let an unreadable response become a
+"no match."** A 200 carrying a JavaScript shell renders no text, finds no name, and
+would otherwise report "you're not listed" about a page that never loaded. That
+exact false negative shipped briefly and is now guarded by `MIN_RENDERED_TEXT` in
+the scan route.
 
 ## Deploying
 
