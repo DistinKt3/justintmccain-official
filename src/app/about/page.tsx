@@ -99,10 +99,10 @@ export default function AboutPage() {
         <h2 className={a.h2}>Why some sites show you and some don&rsquo;t</h2>
         <p className={a.body}>
           {freeToView.length} of the {brokers.length} let you see your own record
-          for free. The others confirm a record exists and then charge to open it
-          That&rsquo;s unpleasant, but your data is there either way, and the
-          opt-out works whether or not you pay to look. That&rsquo;s why the paywalled
-          ones are still on the list, just further down it.
+          for free. The others confirm a record exists and then charge to open
+          it. That&rsquo;s unpleasant, but your data is there either way, and the
+          opt-out works whether or not you pay to look. It&rsquo;s why the
+          paywalled ones are still on the list, just further down it.
         </p>
       </section>
 
