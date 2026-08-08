@@ -67,7 +67,10 @@
    -------------------------------------------------------------------------- */
 
 .plainly {
-  padding: 2.5rem 0 0.5rem;
+  /* The bottom padding used to be 0.5rem because the links row that sat here
+     carried its own 1.75rem margin before the divider. That row is gone, so
+     the space it was providing has to come from here instead. */
+  padding: 2.5rem 0 2rem;
 }
 
 .plainlyTitle {
@@ -128,26 +131,6 @@
 .plainlyList strong {
   color: var(--daylight);
   font-weight: 500;
-}
-
-.plainlyMore {
-  margin-top: 1.75rem;
-  padding-top: 1rem;
-  border-top: 1px solid var(--grid);
-  font-size: 0.875rem;
-  color: var(--grid);
-}
-.plainlyMore a {
-  color: var(--slate);
-  text-decoration: none;
-  display: inline-flex;
-  align-items: center;
-  min-height: 44px;
-}
-@media (hover: hover) and (pointer: fine) {
-  .plainlyMore a:hover {
-    color: var(--mint);
-  }
 }
 
 .trustSection {

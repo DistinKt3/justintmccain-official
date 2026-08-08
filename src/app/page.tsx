@@ -1,7 +1,6 @@
 import Link from "next/link";
 import { Footer, Wordmark, ui as s } from "@/components/ui";
 import { activeBrokers } from "@/lib/brokers";
-import registry from "@/data/registry.json";
 import p from "./landing.module.css";
 
 export default function LandingPage() {
@@ -116,13 +115,6 @@ export default function LandingPage() {
           </div>
         </div>
 
-        <p className={p.plainlyMore}>
-          <Link href="/about">The longer version</Link>
-          <span aria-hidden="true"> · </span>
-          <Link href="/brokers">
-            All {registry.counts.total} registered brokers
-          </Link>
-        </p>
       </section>
 
       <section className={p.trustSection}>

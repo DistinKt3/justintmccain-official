@@ -68,7 +68,7 @@ export function Footer() {
         us.
       </p>
       <p>
-        A SIGNAL project by{" "}
+        A project by{" "}
         <a
           href="https://justintmccain.com"
           target="_blank"
