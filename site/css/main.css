@@ -1,0 +1,917 @@
+/* ==========================================================================
+   Justin T. McCain — SIGNAL
+   Built to brand/01-brand-guidelines.md. Dark-primary is canonical;
+   Evidence Paper is deployed semantically for the proof/ledger section only.
+
+   Structure:
+     1. Fonts
+     2. Tokens
+     3. Reset & base
+     4. A11y primitives (skip link, focus)
+     5. The mark (node atom, monogram)
+     6. Motion layer
+     7. Nav
+     8. Sections
+     9. Components
+    10. Footer
+    11. Reveal / motion choreography
+    12. Reduced motion & degradation
+   ========================================================================== */
+
+/* 1. FONTS — self-hosted, subset Latin, no CDN (brand/07 privacy posture) ---- */
+@font-face {
+  font-family: "Space Grotesk";
+  src: url("../assets/fonts/space-grotesk-var.woff2") format("woff2-variations");
+  font-weight: 400 700;
+  font-display: swap;
+  font-style: normal;
+}
+@font-face {
+  font-family: "Inter";
+  src: url("../assets/fonts/inter-var.woff2") format("woff2-variations");
+  font-weight: 100 900;
+  font-display: swap;
+  font-style: normal;
+}
+@font-face {
+  font-family: "IBM Plex Mono";
+  src: url("../assets/fonts/plex-mono-400.woff2") format("woff2");
+  font-weight: 400;
+  font-display: swap;
+  font-style: normal;
+}
+@font-face {
+  font-family: "IBM Plex Mono";
+  src: url("../assets/fonts/plex-mono-500.woff2") format("woff2");
+  font-weight: 500;
+  font-display: swap;
+  font-style: normal;
+}
+
+/* 2. TOKENS ---------------------------------------------------------------- */
+:root {
+  /* Palette — the ONLY accents are Signal Mint and Seal Amber. Never a third hue. */
+  --signal-black: #0a0f14;
+  --deck:         #131a22;
+  --grid:         #212b35;
+  --daylight:     #eef2f6;
+  --slate:        #a6b2bf;
+  --mint:         #5fe3c4;
+  --amber:        #e9b44c;
+  --paper:        #f5f3ed;
+  --ink:          #14181d;
+  --mint-ink:     #0b6b58;   /* REQUIRED for mint on Evidence Paper (contrast) */
+
+  /* Type */
+  --font-display: "Space Grotesk", ui-sans-serif, system-ui, sans-serif;
+  --font-body:    "Inter", ui-sans-serif, system-ui, -apple-system, sans-serif;
+  --font-mono:    "IBM Plex Mono", ui-monospace, "SF Mono", Menlo, monospace;
+
+  --t-display-xl: clamp(3rem, 6vw, 6.5rem);
+  --t-h2:         clamp(1.75rem, 3vw, 2.75rem);
+  --t-h3:         clamp(1.5rem, 2vw, 1.875rem);
+  --t-body-lg:    clamp(1.125rem, 1.4vw, 1.25rem);
+  --t-body:       1rem;
+  --t-mono:       0.8125rem;
+
+  /* Rhythm */
+  --gut:      clamp(1.25rem, 5vw, 2.5rem);
+  --section:  clamp(5rem, 12vh, 9rem);
+  --maxw:     72rem;
+  --maxw-text: 46rem;
+
+  /* Motion — confident expo-out. Calm and deliberate; privacy isn't frantic. */
+  --ease:     cubic-bezier(0.16, 1, 0.3, 1);
+  --dur-micro: 240ms;
+  --dur-scene: 800ms;
+
+  --ring: 2px solid var(--mint);
+}
+
+/* 3. RESET & BASE ---------------------------------------------------------- */
+*, *::before, *::after { box-sizing: border-box; }
+
+html {
+  scroll-behavior: smooth;
+  /* Anchor targets clear the sticky nav */
+  scroll-padding-top: 5rem;
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  margin: 0;
+  background: var(--signal-black);
+  color: var(--daylight);
+  font-family: var(--font-body);
+  font-size: var(--t-body);
+  line-height: 1.65;
+  font-synthesis-weight: none;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+  overflow-x: hidden;
+}
+
+h1, h2, h3 {
+  font-family: var(--font-display);
+  letter-spacing: -0.02em;
+  line-height: 1.06;
+  margin: 0;
+  font-weight: 500;
+  text-wrap: balance;
+}
+
+p { margin: 0; text-wrap: pretty; }
+
+/* <figure> and <blockquote> carry a UA default margin-inline of 40px. The
+   testimonial quotes and the About portrait are real <figure>s (correct
+   semantics), so without this they sit 40px in from their own grid cell. */
+figure, blockquote { margin: 0; }
+
+a { color: var(--mint); text-underline-offset: 0.22em; text-decoration-thickness: 1px; }
+a:hover { text-decoration-thickness: 2px; }
+
+img, video, canvas { display: block; max-width: 100%; }
+img, video { height: auto; }
+
+strong { font-weight: 600; color: var(--daylight); }
+
+::selection { background: var(--mint); color: var(--signal-black); }
+
+/* Layout helpers */
+.wrap { width: 100%; max-width: var(--maxw); margin-inline: auto; padding-inline: var(--gut); }
+.measure { max-width: var(--maxw-text); }
+
+/* 4. A11Y PRIMITIVES ------------------------------------------------------- */
+.skip {
+  position: absolute;
+  left: var(--gut);
+  top: -100%;
+  z-index: 999;
+  background: var(--mint);
+  color: var(--signal-black);
+  font-family: var(--font-mono);
+  font-size: var(--t-mono);
+  padding: 0.75rem 1.25rem;
+  border-radius: 2px;
+  text-decoration: none;
+  transition: top var(--dur-micro) var(--ease);
+}
+.skip:focus { top: 1rem; }
+
+:focus-visible {
+  outline: var(--ring);
+  outline-offset: 2px;
+  border-radius: 2px;
+}
+/* On the light Evidence Paper surface the mint ring loses contrast — use Mint Ink */
+.ledger :focus-visible { outline-color: var(--mint-ink); }
+
+.visually-hidden {
+  position: absolute; width: 1px; height: 1px;
+  margin: -1px; padding: 0; overflow: hidden;
+  clip: rect(0 0 0 0); clip-path: inset(50%); white-space: nowrap;
+}
+
+/* 5. THE MARK — node atom + JTM monogram. CSS/SVG only, no image dependency. */
+.node {
+  display: inline-block;
+  width: 0.5em; height: 0.5em;
+  border-radius: 50%;
+  background: var(--mint);
+  vertical-align: 0.06em;
+  flex: none;
+}
+.node--amber { background: var(--amber); }
+.node--seal {
+  position: relative;
+  background: var(--amber);
+}
+.node--seal::after {
+  content: "";
+  position: absolute; inset: -0.55em;
+  border: 1px solid var(--amber);
+  border-radius: 50%;
+  opacity: 0.35;
+}
+
+.monogram { display: flex; align-items: center; gap: 0.5rem; text-decoration: none; }
+.monogram svg { display: block; overflow: visible; }
+.monogram:hover .monogram__seal { r: 4.2; }
+.monogram__seal { transition: r var(--dur-micro) var(--ease); }
+
+/* 6. MOTION LAYER ---------------------------------------------------------
+   ONE fixed full-viewport layer for the WHOLE page. The signal is a single
+   continuous element; content scrolls over it. This is why the motion cannot
+   fragment into per-section clips — structurally there is only one.
+   -------------------------------------------------------------------------- */
+.signal {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background: var(--signal-black);
+  overflow: hidden;
+}
+.signal__media {
+  position: absolute;
+  inset: 0;
+  width: 100%; height: 100%;
+  object-fit: cover;
+  opacity: 0;
+  transition: opacity 900ms var(--ease);
+}
+.signal__media.is-ready { opacity: 1; }
+
+/* Poster is the LCP element; it paints first and stays until motion is ready. */
+.signal__poster { z-index: 1; opacity: 1; }
+.signal__poster.is-superseded { opacity: 0; }
+.signal__film   { z-index: 2; }
+.signal__canvas { z-index: 2; }
+
+/* Vignette keeps text legible over the brightest moments of the film. */
+.signal::after {
+  content: "";
+  position: absolute; inset: 0; z-index: 3;
+  background:
+    radial-gradient(120% 90% at 50% 45%, transparent 40%, rgba(10,15,20,0.72) 100%),
+    linear-gradient(to bottom, rgba(10,15,20,0.55) 0%, transparent 22%, transparent 72%, rgba(10,15,20,0.75) 100%);
+}
+
+/* All page content rides above the single motion layer. */
+.page { position: relative; z-index: 1; }
+
+/* 7. NAV ------------------------------------------------------------------- */
+.nav {
+  position: sticky; top: 0; z-index: 50;
+  display: flex; align-items: center; justify-content: space-between;
+  gap: 1rem;
+  padding: 0.875rem var(--gut);
+  background: transparent;
+  transition: background var(--dur-scene) var(--ease),
+              border-color var(--dur-scene) var(--ease),
+              backdrop-filter var(--dur-scene) var(--ease);
+  border-bottom: 1px solid transparent;
+}
+.nav.is-stuck {
+  background: rgba(10, 15, 20, 0.82);
+  backdrop-filter: blur(14px) saturate(1.2);
+  -webkit-backdrop-filter: blur(14px) saturate(1.2);
+  border-bottom-color: var(--grid);
+}
+
+.nav__links { display: flex; align-items: center; gap: 0.25rem; }
+.nav__link {
+  font-family: var(--font-mono);
+  font-size: var(--t-mono);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--slate);
+  text-decoration: none;
+  padding: 0.7rem 0.8rem;
+  min-height: 44px;
+  display: inline-flex; align-items: center;
+  transition: color var(--dur-micro) var(--ease);
+}
+.nav__link:hover, .nav__link:focus-visible { color: var(--daylight); }
+
+.nav__li {
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 44px; height: 44px;
+  color: var(--slate);
+  transition: color var(--dur-micro) var(--ease);
+}
+.nav__li:hover, .nav__li:focus-visible { color: var(--mint); }
+.nav__li svg { width: 18px; height: 18px; fill: currentColor; }
+
+/* Mobile: the anchor links collapse; monogram + LinkedIn always reachable.
+
+   The tightening below is sized for FIVE links, not four. Adding Tools pushed
+   the row to 449px inside a 420px header — and because <body> is overflow-x
+   hidden, that did not produce a scrollbar, it silently clipped "Contact" off
+   the right edge. A nav item that is invisible and unreachable is worse than a
+   cramped one, and the clipping is easy to miss precisely because nothing
+   scrolls. Trimming the horizontal padding, the tracking and the gap buys back
+   ~43px, which clears the worst case (417px, just above the collapse point)
+   with room to spare.
+
+   If a sixth link is ever added, re-measure this band before shipping —
+   nav.scrollWidth vs nav.clientWidth between 417px and 640px. */
+@media (max-width: 40rem) {
+  .nav__links { gap: 0.1rem; }
+  .nav__link { padding: 0.7rem 0.35rem; font-size: 0.75rem; letter-spacing: 0.04em; }
+}
+@media (max-width: 26rem) {
+  .nav__links .nav__link { display: none; }
+  .nav__links .nav__link--proof { display: inline-flex; }
+}
+
+/* 8. SECTIONS -------------------------------------------------------------- */
+.section { padding-block: var(--section); position: relative; }
+
+.label {
+  font-family: var(--font-mono);
+  font-size: var(--t-mono);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--slate);
+  display: flex; align-items: center; gap: 0.6rem;
+  margin-bottom: 1.5rem;
+}
+
+/* --- Hero --------------------------------------------------------------- */
+/* Vertical rhythm is tuned so the primary CTA stays above the fold at 1280×720
+   — the laptop viewport a hiring manager is most likely to open this on. */
+.hero {
+  min-height: 100svh;
+  display: flex; align-items: center;
+  padding-block: clamp(5rem, 12vh, 9rem) clamp(3rem, 7vh, 6rem);
+}
+/* The wordmark (brand/01 §3.1): Space Grotesk, tight tracking, the node as
+   terminal punctuation. Sized to sit clearly above the eyebrow and clearly
+   below the Display-XL headline, so it reads as identity without competing
+   with the POV line, which is the actual hook. */
+.hero__name {
+  font-family: var(--font-display);
+  font-size: clamp(1.25rem, 2.1vw, 1.75rem);
+  font-weight: 500;
+  letter-spacing: -0.01em;
+  color: var(--daylight);
+  display: flex;
+  align-items: baseline;
+  gap: 0.28em;
+  margin-bottom: clamp(0.5rem, 1.2vh, 0.8rem);
+}
+.hero__name .node { width: 0.3em; height: 0.3em; }
+
+.hero__eyebrow {
+  font-family: var(--font-mono);
+  font-size: clamp(0.6875rem, 1.4vw, var(--t-mono));
+  letter-spacing: 0.08em;
+  color: var(--slate);
+  margin-bottom: clamp(0.875rem, 2.2vh, 1.75rem);
+}
+.hero__title {
+  font-size: var(--t-display-xl);
+  font-weight: 500;
+  margin-bottom: clamp(1rem, 2.2vh, 1.75rem);
+}
+.hero__title span { display: block; }
+.hero__sub {
+  font-size: var(--t-body-lg);
+  color: var(--slate);
+  max-width: 40rem;
+  margin-bottom: clamp(1.1rem, 2.4vh, 2rem);
+}
+.hero__proof {
+  font-family: var(--font-mono);
+  font-size: var(--t-mono);
+  line-height: 1.65;
+  color: var(--daylight);
+  display: flex; gap: 0.7rem;
+  align-items: baseline;
+  max-width: 40rem;
+  margin-bottom: clamp(1.5rem, 3vh, 2.5rem);
+  border-left: 1px solid var(--grid);
+  padding-left: 1rem;
+}
+.hero__proof .node { margin-top: 0.35em; }
+
+/* --- Thesis ------------------------------------------------------------- */
+.thesis__body p {
+  font-family: var(--font-display);
+  font-size: clamp(1.375rem, 2.8vw, 2.125rem);
+  line-height: 1.32;
+  letter-spacing: -0.02em;
+  color: var(--daylight);
+  margin-bottom: 1.4em;
+}
+.thesis__body p:last-child { margin-bottom: 0; }
+.thesis__body em {
+  font-style: normal;
+  color: var(--mint);
+}
+
+/* --- Work --------------------------------------------------------------- */
+.work__head { margin-bottom: clamp(2.5rem, 6vh, 4rem); }
+.work__head h2 { font-size: var(--t-h2); max-width: 26ch; }
+
+.cards { display: grid; gap: 1px; background: var(--grid); border-block: 1px solid var(--grid); }
+@media (min-width: 52rem) {
+  .cards { grid-template-columns: 1fr 1fr; }
+  /* An odd number of cards would strand the last one in a half-empty row.
+     Let it span instead, so five cards read as 2 + 2 + 1 by design. */
+  .cards > .card:last-child:nth-child(odd) { grid-column: 1 / -1; }
+}
+
+.card {
+  background: var(--deck);
+  padding: clamp(1.5rem, 3.5vw, 2.5rem);
+  display: flex; flex-direction: column; gap: 1.15rem;
+  transition: background var(--dur-scene) var(--ease);
+}
+.card:hover { background: #16202a; }
+.card__top { display: flex; align-items: baseline; justify-content: space-between; gap: 1rem; }
+.card__title { font-size: var(--t-h3); font-weight: 500; }
+.card__tag {
+  font-family: var(--font-mono);
+  font-size: 0.6875rem;
+  letter-spacing: 0.08em;
+  color: var(--slate);
+  text-align: right;
+  flex: none;
+  max-width: 45%;
+}
+.card__row { display: grid; grid-template-columns: 4.5rem 1fr; gap: 0.9rem; align-items: baseline; }
+.card__k {
+  font-family: var(--font-mono);
+  font-size: 0.6875rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--slate);
+}
+.card__v { color: var(--slate); font-size: 0.9375rem; }
+.card__row--moved .card__k { color: var(--amber); }
+.card__row--moved .card__v { color: var(--daylight); }
+.card__row--moved .card__v strong { color: var(--amber); font-weight: 500; }
+
+/* --- Ledger (Evidence Paper — the recruiter's block, as a printed record) - */
+.ledger {
+  /* Veiled rather than opaque: the signal stays faintly visible travelling
+     behind the record, so the ledger reads as pressed ONTO the motion instead
+     of cutting a hole in it.
+
+     0.90 is not a taste number — it is the floor set by contrast. The binding
+     pair here is Mint Ink (#0B6B58) on this surface; as the paper thins over
+     the near-black film the effective background darkens and that ratio falls.
+     0.90 measures ~4.7:1 (AA passes at 4.5). Do not go lower without either
+     re-measuring or darkening Mint Ink — and Mint Ink is a locked token. */
+  background: rgba(245, 243, 237, 0.90);
+  color: var(--ink);
+  position: relative;
+  z-index: 2;
+}
+.ledger .label { color: var(--mint-ink); }
+.ledger .label .node { background: var(--mint-ink); }
+.ledger h2 { color: var(--ink); font-size: var(--t-h2); max-width: 22ch; margin-bottom: clamp(2rem, 5vh, 3rem); }
+
+.ledger__table { width: 100%; border-collapse: collapse; font-size: 0.9375rem; }
+.ledger__table th { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); }
+.ledger__table td { padding: 0.95rem 0.5rem; border-bottom: 1px solid rgba(20, 24, 29, 0.14); vertical-align: baseline; }
+.ledger__table tr:first-child td { border-top: 1px solid rgba(20, 24, 29, 0.28); }
+.ledger__mark { width: 1.75rem; padding-right: 0 !important; }
+.ledger__mark .node { background: var(--mint-ink); width: 0.45rem; height: 0.45rem; }
+.ledger__record { color: var(--ink); }
+.ledger__proof {
+  font-family: var(--font-mono);
+  font-size: 0.8125rem;
+  text-align: right;
+  color: rgba(20, 24, 29, 0.72);
+}
+.ledger__proof strong { color: var(--ink); font-weight: 500; }
+/* The amber seal reads on paper as a stamp behind the figure, never as text colour. */
+.ledger__proof strong { background: linear-gradient(transparent 62%, rgba(233, 180, 76, 0.42) 62%); }
+
+@media (max-width: 40rem) {
+  .ledger__table td { display: block; padding: 0.35rem 0; border: 0; }
+  .ledger__table tr { display: block; padding: 0.85rem 0; border-bottom: 1px solid rgba(20,24,29,0.14); }
+  .ledger__mark { display: none !important; }
+  .ledger__proof { text-align: left; }
+}
+
+.scope {
+  margin-top: clamp(2rem, 5vh, 3rem);
+  padding-top: 1.5rem;
+  border-top: 1px solid rgba(20, 24, 29, 0.28);
+  display: flex; flex-wrap: wrap; gap: 0.5rem 1.5rem;
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  letter-spacing: 0.04em;
+  color: rgba(20, 24, 29, 0.72);
+}
+
+/* --- Capabilities ------------------------------------------------------- */
+.pillars { display: grid; gap: 1px; background: var(--grid); border-block: 1px solid var(--grid); }
+@media (min-width: 46rem) { .pillars { grid-template-columns: repeat(3, 1fr); } }
+
+.pillar {
+  background: rgba(19, 26, 34, 0.86);
+  padding: clamp(1.5rem, 3vw, 2rem);
+  display: flex; flex-direction: column; gap: 0.75rem;
+}
+.pillar__n {
+  font-family: var(--font-mono);
+  font-size: 0.6875rem;
+  letter-spacing: 0.08em;
+  color: var(--mint);
+}
+.pillar__name { font-size: 1.1875rem; font-weight: 500; font-family: var(--font-display); letter-spacing: -0.01em; }
+.pillar__claim { color: var(--daylight); font-size: 0.9375rem; }
+.pillar__detail { color: var(--slate); font-size: 0.875rem; font-family: var(--font-mono); line-height: 1.6; }
+
+.emerging {
+  margin-top: 1px;
+  background: rgba(19, 26, 34, 0.86);
+  border-bottom: 1px solid var(--grid);
+  padding: clamp(1.5rem, 3vw, 2rem);
+  display: flex; flex-direction: column; gap: 0.75rem;
+}
+.emerging .pillar__n { color: var(--amber); }
+.emerging .pillar__name { color: var(--amber); }
+
+.competencies {
+  margin-top: clamp(2rem, 4vh, 2.5rem);
+  font-family: var(--font-mono);
+  font-size: 0.8125rem;
+  line-height: 1.9;
+  color: var(--slate);
+}
+
+/* --- About -------------------------------------------------------------- */
+.about__grid { display: grid; gap: clamp(2rem, 5vw, 3.5rem); align-items: start; }
+@media (min-width: 54rem) { .about__grid { grid-template-columns: 20rem 1fr; } }
+
+.portrait {
+  aspect-ratio: 4 / 5;
+  /* Below the 54rem two-column breakpoint the About grid stacks, and without a
+     cap the portrait stretches to the full container: ~740px wide at tablet
+     sizes, which is an entire screen of face before a word of copy. The cap
+     matches the desktop column, so nothing changes in the two-column layout. */
+  max-width: 20rem;
+  background: var(--deck);
+  border: 1px solid var(--grid);
+  position: relative;
+  overflow: hidden;
+}
+/* The real portrait is graded with a vignette that fades into Signal Black.
+   A panel edge around a fading image draws a rectangle exactly where the
+   image is trying to dissolve, so the frame comes off once it is in. */
+.portrait:not(.portrait--placeholder) {
+  background: transparent;
+  border-color: transparent;
+}
+.portrait img { width: 100%; height: 100%; object-fit: cover; }
+/* Placeholder state: an abstracted node-lattice, never a grey box or stock face. */
+.portrait--placeholder::before {
+  content: "";
+  position: absolute; inset: 0;
+  background:
+    radial-gradient(60% 45% at 30% 22%, rgba(95, 227, 196, 0.16), transparent 70%),
+    radial-gradient(50% 40% at 78% 82%, rgba(233, 180, 76, 0.10), transparent 70%);
+}
+.portrait--placeholder::after {
+  content: "";
+  position: absolute; inset: 0;
+  background-image:
+    linear-gradient(var(--grid) 1px, transparent 1px),
+    linear-gradient(90deg, var(--grid) 1px, transparent 1px);
+  background-size: 2.25rem 2.25rem;
+  opacity: 0.5;
+  mask-image: radial-gradient(70% 60% at 50% 45%, #000 20%, transparent 78%);
+}
+.portrait__cap {
+  position: absolute; left: 0; right: 0; bottom: 0;
+  padding: 0.85rem 1rem;
+  font-family: var(--font-mono);
+  font-size: 0.6875rem;
+  letter-spacing: 0.06em;
+  color: var(--slate);
+  background: linear-gradient(transparent, rgba(10, 15, 20, 0.9));
+}
+
+.about__body p { color: var(--slate); font-size: var(--t-body-lg); margin-bottom: 1.35em; }
+.about__body p:first-child { color: var(--daylight); }
+
+.pull {
+  font-family: var(--font-display);
+  font-size: clamp(1.375rem, 2.4vw, 1.875rem);
+  line-height: 1.28;
+  letter-spacing: -0.02em;
+  color: var(--daylight);
+  border-left: 1px solid var(--amber);
+  padding-left: 1.25rem;
+  margin: clamp(2rem, 4vh, 2.5rem) 0;
+  display: flex; gap: 0.75rem; align-items: flex-start;
+}
+.pull .node { margin-top: 0.5em; }
+
+.credential {
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  letter-spacing: 0.04em;
+  color: var(--slate);
+  line-height: 1.9;
+  padding-top: 1.25rem;
+  border-top: 1px solid var(--grid);
+}
+
+/* --- Testimonials (§6b) --------------------------------------------------
+   The human counterpart to the Ledger. Boxed panels would echo the Work cards
+   and re-assert structure exactly where the journey is supposed to be quieting,
+   so these are open, left-ruled blocks instead — the same hairline vocabulary
+   as the hero proof line, at rest.
+   -------------------------------------------------------------------------- */
+/* Local scrim. The film blooms warm right through this stretch, and measured
+   worst-case contrast over the raw frame fell to 2.85:1 on the heading and
+   3.83:1 on the first quote — under the 3:1 / 4.5:1 floors. The global vignette
+   does not help here: at this point on screen both of its gradient stops
+   evaluate to transparent.
+
+   0.42 restores ~4.3:1 and ~5.5:1 while leaving ~58% of the motion visible.
+   It also happens to be the right picture: this is the beat where the signal
+   is supposed to quiet down. Re-measure if the film is ever swapped. */
+.thesis, .about, .contact, .testimonials, .tools { position: relative; }
+.thesis::before, .about::before, .contact::before, .testimonials::before, .tools::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;                      /* stays inside .page, so it never hides the film from other sections */
+  background: rgba(10, 15, 20, 0.42);
+  pointer-events: none;
+}
+/* The hero is deliberately NOT veiled — it is the one place the film should be
+   at full strength, and it measures clean because the copy sits in the upper
+   band where the signal has not arrived yet. */
+
+.testimonials__head { font-size: var(--t-h2); max-width: 20ch; margin-bottom: 0.85rem; }
+.testimonials__note {
+  font-family: var(--font-mono);
+  font-size: var(--t-mono);
+  letter-spacing: 0.05em;
+  color: var(--slate);
+  margin-bottom: clamp(2.5rem, 6vh, 3.5rem);
+}
+
+.quotes { display: grid; gap: clamp(2.25rem, 4vw, 3rem) clamp(2rem, 5vw, 4rem); align-items: start; }
+@media (min-width: 58rem) { .quotes { grid-template-columns: 1fr 1fr; } }
+
+.quote {
+  border-left: 1px solid var(--grid);
+  padding-left: clamp(1.1rem, 2vw, 1.6rem);
+  display: flex; flex-direction: column; gap: 1.1rem;
+  transition: border-color var(--dur-scene) var(--ease);
+}
+.quote:hover { border-left-color: var(--mint); }
+
+.quote__body { margin: 0; }
+.quote__body p { font-size: 1.0625rem; line-height: 1.72; color: var(--daylight); }
+
+.quote__by { display: flex; gap: 0.7rem; align-items: baseline; }
+.quote__by .node { margin-top: 0.35em; }
+.quote__by > span:last-child { display: flex; flex-direction: column; gap: 0.2rem; }
+.quote__name {
+  display: block;
+  font-family: var(--font-display);
+  font-style: normal;               /* <cite> defaults to italic */
+  font-size: 0.9375rem;
+  letter-spacing: -0.01em;
+  color: var(--daylight);
+}
+.quote__title {
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  letter-spacing: 0.05em;
+  line-height: 1.5;
+  color: var(--slate);
+}
+
+/* Hand-off cell: sends people to the source, and squares off a 5-item grid. */
+.quote--more {
+  flex-direction: row; align-items: center; justify-content: center;
+  gap: 0.6rem;
+  min-height: 5.5rem;
+  text-decoration: none;
+  color: var(--mint);
+  font-family: var(--font-mono);
+  font-size: var(--t-mono);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  text-align: center;
+}
+.quote--more:hover { border-left-color: var(--mint); }
+.quote--more .quote__more-go { transition: transform var(--dur-micro) var(--ease); }
+.quote--more:hover .quote__more-go { transform: translateX(4px); }
+
+/* --- Tools -------------------------------------------------------------- */
+/* Deliberately NOT the testimonial treatment. Those are quiet left-ruled blocks
+   because they are someone else's voice and should feel overheard. These are
+   working software: solid panels with a real border and one button each, so
+   they read as objects you can pick up rather than more things being said.
+
+   This lands late in the film, in the stretch where the signal is brightest
+   just before the amber seal, so the panels carry their own translucent deck
+   fill on top of the section scrim.
+
+   Measured, not guessed: 34,560 samples of the composited frame across the
+   whole tools stretch, worst case being the brightest amber pixel the seal
+   produces (255,213,113), which resolves the panel to rgb(56,55,45):
+
+     daylight claim text   10.63:1
+     slate detail + stack   5.55:1
+     mint tag               7.56:1
+
+   All clear of the 4.5:1 floor. The 0.42 section scrim alone does NOT carry
+   this stretch — it is the 0.72 panel fill doing the work, which is why the
+   panels are opaque-ish and the heading above them is not. Re-measure if the
+   film is ever swapped. */
+.tools__head { font-size: var(--t-h2); max-width: 24ch; margin-bottom: 0.85rem; }
+.tools__note {
+  font-family: var(--font-mono);
+  font-size: var(--t-mono);
+  letter-spacing: 0.05em;
+  color: var(--slate);
+  margin-bottom: clamp(2.5rem, 6vh, 3.5rem);
+}
+
+/* One tool left, one tool right. Collapses at the same 58rem breakpoint as the
+   quote grid so the two adjacent sections break to a single column together —
+   staggering them would make the page look like it changed its mind. */
+.tools__grid { display: grid; gap: clamp(1.5rem, 3vw, 2rem); align-items: stretch; }
+@media (min-width: 58rem) { .tools__grid { grid-template-columns: 1fr 1fr; } }
+
+.tool {
+  position: relative;                 /* anchors the stretched CTA overlay */
+  display: flex;
+  flex-direction: column;
+  gap: 0.8rem;
+  padding: clamp(1.5rem, 3vw, 2.25rem);
+  background: rgba(19, 26, 34, 0.72); /* --deck, held back so the film breathes */
+  border: 1px solid var(--grid);
+  border-radius: 2px;
+  transition: border-color var(--dur-micro) var(--ease),
+              background   var(--dur-micro) var(--ease);
+}
+.tool:hover { border-color: var(--mint); background: rgba(19, 26, 34, 0.88); }
+
+.tool__tag {
+  font-family: var(--font-mono);
+  font-size: var(--t-mono);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--mint);
+}
+.tool__name { font-size: var(--t-h3); }
+.tool__claim { font-size: 1.0625rem; line-height: 1.6; color: var(--daylight); }
+.tool__detail { font-size: 0.9375rem; line-height: 1.72; color: var(--slate); }
+
+/* The checkable fact. Amber because it is the same promise the contact seal
+   makes: this one is settled, go verify it. */
+.tool__proof { display: flex; gap: 0.7rem; align-items: baseline; font-size: 0.9375rem; }
+.tool__proof .node { flex: none; margin-top: 0.35em; }
+
+/* margin-top:auto pins the stack line and button to the bottom, so two panels
+   of unequal copy length still present their buttons on one line. */
+.tool__stack {
+  margin-top: auto;
+  padding-top: 1.1rem;
+  border-top: 1px solid var(--grid);
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  letter-spacing: 0.05em;
+  line-height: 1.6;
+  color: var(--slate);
+}
+
+.tool__go { align-self: flex-start; margin-top: 0.35rem; }
+/* The whole panel is the click target, but only this button is in the a11y
+   tree — see the markup note in build.mjs. */
+.tool__go::after { content: ""; position: absolute; inset: 0; border-radius: 2px; }
+.tool:hover .tool__go { border-color: var(--mint); color: var(--mint); }
+.tool__go-arrow { transition: transform var(--dur-micro) var(--ease); }
+.tool:hover .tool__go-arrow { transform: translateX(4px); }
+
+/* Focus belongs on the panel, since the panel is what the button covers. Guarded
+   by @supports so browsers without :has() keep the button's own default ring
+   rather than losing the indicator entirely. */
+@supports selector(:has(*)) {
+  .tool:has(.tool__go:focus-visible) { outline: var(--ring); outline-offset: 3px; }
+  .tool:has(.tool__go:focus-visible) .tool__go { outline: none; }
+}
+
+/* --- Contact ------------------------------------------------------------ */
+.contact { text-align: center; padding-block: clamp(6rem, 16vh, 11rem); }
+.contact h2 { font-size: var(--t-h2); margin-bottom: 1rem; }
+.contact__sub { color: var(--slate); font-size: var(--t-body-lg); max-width: 34rem; margin: 0 auto clamp(2rem, 4vh, 2.75rem); }
+.contact__seal { margin: 0 auto clamp(2rem, 5vh, 3rem); width: 0.75rem; height: 0.75rem; }
+
+/* 9. COMPONENTS — buttons -------------------------------------------------- */
+.ctas { display: flex; flex-wrap: wrap; gap: 0.75rem; }
+.contact .ctas { justify-content: center; }
+
+.btn {
+  display: inline-flex; align-items: center; gap: 0.6rem;
+  min-height: 48px;
+  padding: 0.8rem 1.4rem;
+  font-family: var(--font-mono);
+  font-size: var(--t-mono);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  text-decoration: none;
+  border: 1px solid transparent;
+  border-radius: 2px;
+  transition: background var(--dur-micro) var(--ease),
+              color var(--dur-micro) var(--ease),
+              border-color var(--dur-micro) var(--ease);
+}
+.btn--primary { background: var(--mint); color: var(--signal-black); font-weight: 500; }
+.btn--primary:hover { background: #7cebd2; }
+.btn--ghost { border-color: var(--grid); color: var(--daylight); }
+.btn--ghost:hover { border-color: var(--mint); color: var(--mint); }
+
+/* 10. FOOTER --------------------------------------------------------------- */
+.footer {
+  border-top: 1px solid var(--grid);
+  padding-block: clamp(2.5rem, 6vh, 4rem);
+  background: rgba(10, 15, 20, 0.9);
+  position: relative; z-index: 2;
+}
+.footer__top { display: flex; flex-wrap: wrap; gap: 1.25rem 2rem; align-items: baseline; justify-content: space-between; margin-bottom: 2rem; }
+.footer__id { display: flex; flex-direction: column; gap: 0.3rem; }
+.footer__name { font-family: var(--font-display); font-size: 1.0625rem; letter-spacing: -0.01em; }
+.footer__role { font-family: var(--font-mono); font-size: var(--t-mono); letter-spacing: 0.06em; color: var(--slate); }
+.footer__links { display: flex; flex-wrap: wrap; gap: 1.25rem; }
+.footer__links a { font-family: var(--font-mono); font-size: var(--t-mono); letter-spacing: 0.04em; }
+
+.footer__privacy {
+  font-size: 0.8125rem;
+  color: var(--slate);
+  max-width: 52rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid var(--grid);
+  line-height: 1.75;
+}
+.footer__copy { margin-top: 1.25rem; font-family: var(--font-mono); font-size: 0.75rem; color: var(--slate); opacity: 0.75; }
+
+/* 11. REVEAL CHOREOGRAPHY -------------------------------------------------- */
+[data-reveal] {
+  opacity: 0;
+  transform: translateY(18px);
+  transition: opacity var(--dur-scene) var(--ease), transform var(--dur-scene) var(--ease);
+}
+[data-reveal].is-in { opacity: 1; transform: none; }
+[data-reveal-delay="1"] { transition-delay: 90ms; }
+[data-reveal-delay="2"] { transition-delay: 180ms; }
+[data-reveal-delay="3"] { transition-delay: 270ms; }
+
+/* Ledger rows stamp in rather than drift — a record being pressed. */
+.ledger__table tr[data-reveal] { transform: translateY(8px); }
+
+/* 12. PRIVACY PAGE --------------------------------------------------------- */
+.doc { padding-block: clamp(4rem, 10vh, 7rem); }
+.doc h1 { font-size: clamp(2rem, 4vw, 3.25rem); margin-bottom: 0.75rem; }
+.doc__meta { font-family: var(--font-mono); font-size: var(--t-mono); color: var(--slate); letter-spacing: 0.06em; margin-bottom: 2.5rem; }
+.doc__intro { font-size: var(--t-body-lg); color: var(--daylight); margin-bottom: 2.5rem; }
+.doc h2 { font-size: 1.25rem; margin: 2.5rem 0 0.85rem; }
+.doc p { color: var(--slate); margin-bottom: 1rem; }
+.doc__closing { margin-top: 3rem; padding-top: 1.5rem; border-top: 1px solid var(--grid); color: var(--daylight); }
+.doc__back { display: inline-flex; align-items: center; gap: 0.5rem; margin-top: 2.5rem; font-family: var(--font-mono); font-size: var(--t-mono); }
+
+/* 13. REDUCED MOTION & DEGRADATION ---------------------------------------- *
+   Non-negotiable (brand/04). Content is IDENTICAL either way — only the
+   enhancement is removed. A privacy leader's site that respects this is
+   on-brand proof, not compliance overhead.
+   -------------------------------------------------------------------------- */
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+
+  /* Reveals must never leave content invisible if the observer never fires. */
+  [data-reveal] { opacity: 1 !important; transform: none !important; }
+
+  /* The film and the procedural canvas are both suppressed; the poster stays. */
+  .signal__film, .signal__canvas { display: none !important; }
+  .signal__poster { opacity: 1 !important; }
+}
+
+/* No-JS: reveals must not hide content. */
+.no-js [data-reveal] { opacity: 1; transform: none; }
+
+/* Optional light theme as progressive enhancement (brand/01 §3.3).
+   Dark remains canonical; this is a courtesy, not a coin-flip. */
+@media (prefers-color-scheme: light) {
+  :root.auto-theme {
+    --signal-black: #f7f6f2;
+    --deck: #ffffff;
+    --grid: #e2e0d8;
+    --daylight: #14181d;
+    --slate: #4d5761;
+    --mint: var(--mint-ink);
+  }
+  :root.auto-theme .signal::after {
+    background: linear-gradient(to bottom, rgba(247,246,242,0.7), rgba(247,246,242,0.92));
+  }
+  :root.auto-theme .btn--primary { color: #ffffff; }
+}
+
+/* Print: the ledger is already a printed record; make the whole page behave. */
+@media print {
+  .signal, .nav, .ctas { display: none !important; }
+  body { background: #fff; color: #000; }
+  .ledger { background: #fff; }
+  [data-reveal] { opacity: 1 !important; transform: none !important; }
+}

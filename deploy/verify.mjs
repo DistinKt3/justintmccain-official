@@ -1,0 +1,208 @@
+#!/usr/bin/env node
+/**
+ * ============================================================================
+ * Post-deploy verification
+ * ============================================================================
+ *
+ *   node deploy/verify.mjs https://<site-host> [https://<vanish-host>]
+ *
+ * Checks the things that are invisible until they are wrong in production:
+ * routing, the CSP split between the static site and the SPA, whether the
+ * basePath survived the deploy, and whether anything private shipped.
+ *
+ * Zero dependencies, Node built-ins only — same discipline as build.mjs.
+ *
+ * Exits non-zero if any REQUIRED check fails. Warnings do not fail the run:
+ * a staging deploy legitimately has no Worker, so /vanish 404ing there is
+ * expected rather than broken, and the script says which is which.
+ */
+
+const [, , SITE, VANISH] = process.argv;
+
+if (!SITE) {
+  console.error("usage: node deploy/verify.mjs https://<site-host> [https://<vanish-host>]");
+  process.exit(1);
+}
+
+const strip = (u) => u.replace(/\/+$/, "");
+const site = strip(SITE);
+const vanish = VANISH ? strip(VANISH) : null;
+
+let failures = 0;
+let warnings = 0;
+
+const C = { ok: "\x1b[32m", bad: "\x1b[31m", warn: "\x1b[33m", dim: "\x1b[2m", off: "\x1b[0m" };
+
+function report(level, label, detail) {
+  const mark = level === "ok" ? `${C.ok}✓${C.off}` : level === "warn" ? `${C.warn}!${C.off}` : `${C.bad}✗${C.off}`;
+  if (level === "bad") failures++;
+  if (level === "warn") warnings++;
+  console.log(`  ${mark} ${label}${detail ? `  ${C.dim}${detail}${C.off}` : ""}`);
+}
+
+async function head(url) {
+  try {
+    const r = await fetch(url, { redirect: "manual" });
+    return { status: r.status, headers: r.headers, ok: true };
+  } catch (e) {
+    return { ok: false, error: e.message };
+  }
+}
+
+async function text(url) {
+  try {
+    const r = await fetch(url, { redirect: "follow" });
+    return { status: r.status, body: await r.text(), headers: r.headers };
+  } catch (e) {
+    return { status: 0, body: "", error: e.message };
+  }
+}
+
+console.log(`\n\x1b[1mVerifying ${site}\x1b[0m\n`);
+
+/* -- routing -------------------------------------------------------------- */
+console.log("Routing");
+for (const [path, want, required] of [
+  ["/", 200, true],
+  ["/privacy.html", 200, true],
+  ["/scrubber/", 200, true],
+  ["/scrubber", 301, true],
+  ["/sitemap.xml", 200, true],
+  ["/robots.txt", 200, true],
+]) {
+  const r = await head(site + path);
+  if (!r.ok) { report("bad", `${path}`, r.error); continue; }
+  const good = r.status === want;
+  report(good ? "ok" : required ? "bad" : "warn", `${path}`, `${r.status}${good ? "" : ` (expected ${want})`}`);
+}
+
+/* -- the Scrubber actually works ------------------------------------------ */
+console.log("\nScrubber");
+{
+  const page = await text(`${site}/scrubber/`);
+  const assets = [...page.body.matchAll(/(?:src|href)="([^"]*\/scrubber\/[^"]+)"/g)].map((m) => m[1]);
+  report(assets.length ? "ok" : "bad", "assets carry the /scrubber/ prefix", `${assets.length} refs`);
+
+  const bare = [...page.body.matchAll(/(?:src|href)="(\/assets\/[^"]+)"/g)];
+  report(bare.length === 0 ? "ok" : "bad", "no root-absolute asset URLs", bare.length ? bare[0][1] : "");
+
+  // Every referenced asset must actually resolve, or the SPA is a white page.
+  let broken = 0;
+  for (const a of assets.slice(0, 6)) {
+    const r = await head(a.startsWith("http") ? a : site + a);
+    if (!r.ok || r.status >= 400) broken++;
+  }
+  report(broken === 0 ? "ok" : "bad", "referenced assets resolve", broken ? `${broken} broken` : "");
+}
+
+/* -- CSP ------------------------------------------------------------------ */
+console.log("\nContent-Security-Policy");
+{
+  const root = await head(`${site}/`);
+  const rootCsp = root.headers?.get("content-security-policy") ?? "";
+  report(rootCsp.includes("default-src 'none'") ? "ok" : "bad", "root is default-src 'none'");
+  report(rootCsp.includes("connect-src 'none'") ? "ok" : "bad", "root makes no outbound connections");
+
+  const scr = await head(`${site}/scrubber/`);
+  const scrCsp = scr.headers?.get("content-security-policy") ?? "";
+  report(scrCsp.includes("default-src 'self'") ? "ok" : "bad", "/scrubber/ has its own scoped policy");
+  report(
+    scrCsp.includes("connect-src 'self'") ? "ok" : "bad",
+    "/scrubber/ cannot reach a third party",
+    "backs the \"nothing is uploaded\" claim"
+  );
+  // If these ever match, the scoped override stopped applying and the SPA is
+  // running under a policy that cannot load its own hash-named bundle.
+  report(rootCsp && scrCsp && rootCsp !== scrCsp ? "ok" : "bad", "the two policies are distinct");
+}
+
+/* -- hardening ------------------------------------------------------------ */
+console.log("\nHeaders");
+{
+  const r = await head(`${site}/`);
+  const h = r.headers;
+  for (const [name, want] of [
+    ["strict-transport-security", "max-age="],
+    ["referrer-policy", "no-referrer"],
+    ["x-content-type-options", "nosniff"],
+    ["x-frame-options", "DENY"],
+  ]) {
+    const v = h?.get(name) ?? "";
+    report(v.includes(want) ? "ok" : "bad", name, v || "missing");
+  }
+  const perms = h?.get("permissions-policy") ?? "";
+  report(perms.includes("browsing-topics=()") ? "ok" : "warn", "permissions-policy opts out of Topics");
+}
+
+/* -- nothing private shipped ---------------------------------------------- */
+console.log("\nLeakage");
+for (const path of [
+  "/vanish/Vanish_PRD.docx",
+  "/tools/vanish/src/lib/brokers.ts",
+  "/scrubber/src/App.tsx",
+  "/metadata-scrubber/package.json",
+  "/.DS_Store",
+  "/.claude/settings.local.json",
+]) {
+  const r = await head(site + path);
+  const gone = !r.ok || r.status === 404;
+  report(gone ? "ok" : "bad", `${path}`, gone ? "404" : `EXPOSED (${r.status})`);
+}
+
+/* -- sitemap -------------------------------------------------------------- */
+console.log("\nSitemap");
+{
+  const sm = await text(`${site}/sitemap.xml`);
+  const locs = [...sm.body.matchAll(/<loc>([^<]+)<\/loc>/g)].map((m) => m[1]);
+  report(locs.length >= 4 ? "ok" : "bad", "lists the landing page, both tools and privacy", `${locs.length} URLs`);
+  const offDomain = locs.filter((l) => !l.startsWith("https://justintmccain.com"));
+  report(
+    offDomain.length === 0 ? "ok" : "bad",
+    "every URL is canonical",
+    offDomain.length ? offDomain.join(", ") : ""
+  );
+}
+
+/* -- Vanish --------------------------------------------------------------- */
+console.log("\nVanish");
+{
+  const onDomain = await head(`${site}/vanish`);
+  if (onDomain.ok && onDomain.status === 200) {
+    report("ok", "/vanish on the main domain", "the Worker route is live");
+  } else {
+    report(
+      "warn",
+      "/vanish on the main domain",
+      `${onDomain.status ?? "unreachable"} — expected on a staging host, where no Worker route exists`
+    );
+  }
+
+  if (!vanish) {
+    report("warn", "direct Vanish host not checked", "pass it as the 2nd argument");
+  } else {
+    for (const [path, want] of [["/vanish", 200], ["/vanish/about", 200], ["/vanish/brokers", 200]]) {
+      const r = await head(vanish + path);
+      report(r.ok && r.status === want ? "ok" : "bad", `${path}`, `${r.status ?? "unreachable"}`);
+    }
+    const home = await text(`${vanish}/vanish`);
+    const bare = (home.body.match(/"\/_next\//g) || []).length;
+    report(bare === 0 ? "ok" : "bad", "no bare /_next/ URLs", bare ? `${bare} found — basePath did not apply` : "");
+    const prefixed = (home.body.match(/\/vanish\/_next\//g) || []).length;
+    report(prefixed > 0 ? "ok" : "bad", "assets carry the /vanish prefix", `${prefixed} refs`);
+
+    // The scan endpoint must exist and must refuse a GET. A 405/400 proves the
+    // route is mounted; a 404 means the Node runtime did not attach and every
+    // scan will fail once someone actually tries one.
+    const api = await head(`${vanish}/vanish/api/scan`);
+    const mounted = api.ok && api.status !== 404;
+    report(mounted ? "ok" : "bad", "/vanish/api/scan is mounted", `${api.status} on GET`);
+  }
+}
+
+/* -- summary -------------------------------------------------------------- */
+console.log("");
+if (failures) {
+  console.log(`\x1b[31m\x1b[1m${failures} check(s) failed\x1b[0m${warnings ? `, ${warnings} warning(s)` : ""}\n`);
+  process.exit(1);
+}
+console.log(`\x1b[32m\x1b[1mAll checks passed\x1b[0m${warnings ? ` (${warnings} warning(s) — see above)` : ""}\n`);

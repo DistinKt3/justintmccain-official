@@ -1,0 +1,13 @@
+{
+  "name": "Justin T. McCain — Privacy Product Leader",
+  "short_name": "J.T. McCain",
+  "description": "Consumer privacy infrastructure: the systems that capture the signal, enforce the opt-out, and keep the receipts.",
+  "start_url": "/",
+  "display": "standalone",
+  "theme_color": "#0A0F14",
+  "background_color": "#0A0F14",
+  "icons": [
+    { "src": "/favicon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any" },
+    { "src": "/apple-touch-icon.png", "sizes": "180x180", "type": "image/png" }
+  ]
+}

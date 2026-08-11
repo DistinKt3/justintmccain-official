@@ -1,0 +1,68 @@
+# ============================================================================
+# justintmccain.com — monorepo
+# ============================================================================
+# THIS REPO IS PUBLIC. Anything not excluded here is world-readable, and git
+# history is permanent — a file committed once and deleted later is still in
+# the history. Check this list before adding anything to the tree.
+
+# --- Dependencies & build caches --------------------------------------------
+node_modules/
+.next/
+.turbo/
+*.tsbuildinfo
+tools/metadata-scrubber/dist/
+
+# --- Generated site output ---------------------------------------------------
+# Cloudflare Pages runs the build (see docs/LAUNCH.md), so these are produced in
+# CI rather than committed. Everything ELSE in site/ — fonts, images, the master
+# film, css/, js/, _headers, favicons — is hand-authored source and IS tracked.
+#
+# Consequence worth knowing: a fresh clone has no index.html until you run
+# `node build/build.mjs`. That is expected, not a broken checkout.
+site/index.html
+site/privacy.html
+site/sitemap.xml
+site/scrubber/
+
+# --- Not for a public repo ---------------------------------------------------
+# Internal planning docs and a personal document. None of these help anyone
+# reading the code, and the resume is a document you want to hand out
+# deliberately rather than have scraped from a repo.
+Justin_T_McCain_Resume_2026.docx
+PHASE-2-PROMPT.md
+tools/vanish/Vanish_PRD.docx
+tools/metadata-scrubber/metadata-scrubber-PRD.md
+
+# Superseded v1 assets, including a 2.3 MB backup of the old master film. 17 MB
+# of history nobody needs. NOTE: build/ASSET-LOG.md references
+# site-v1-archive/signal-master-v1.mp4 — that path will not exist in a clone.
+site-v1-archive/
+
+# --- Local tooling -----------------------------------------------------------
+# launch.json is genuinely useful to a contributor (it starts the preview
+# server), so it stays. settings.local.json is a per-machine permission grant
+# and is not.
+**/.claude/settings.local.json
+
+# --- Secrets -----------------------------------------------------------------
+# Nothing here uses env vars today. This is a guard against the day something
+# does, not documentation that something exists.
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+
+# --- macOS -------------------------------------------------------------------
+# Found inside site/ during a deploy pre-flight, where it was serving 200 at
+# https://justintmccain.com/.DS_Store and leaking a directory listing. Finder
+# recreates it on every folder view, so build.mjs also sweeps site/ on each
+# build — belt and braces, because this one already got through once.
+.DS_Store
+**/.DS_Store
+
+# --- Local scratch -----------------------------------------------------------
+*.bak
+*.bak.mp4
+*.log
+npm-debug.log*

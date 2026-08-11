@@ -1,0 +1,130 @@
+# ============================================================================
+# Justin T. McCain — SIGNAL · Cloudflare Pages headers
+# ============================================================================
+#
+# Cloudflare Pages applies every matching rule in order, so later rules override
+# earlier ones for the same header name. `/*` sets the baseline; the specific
+# paths below tighten or relax it.
+#
+# THE POINT OF THE CSP HERE:
+#   privacy.html tells visitors this site makes no third-party requests. That
+#   claim is currently a property of how the site was built, which means it
+#   holds only as long as nobody pastes in a snippet. `connect-src 'none'` plus
+#   `default-src 'none'` makes the browser enforce it. A reviewer can read this
+#   file and verify the promise without auditing the JavaScript. For a privacy
+#   engineer's own site that is the difference between a claim and a control.
+#
+#   There is deliberately NO report-uri / report-to. A violation report is an
+#   outbound request to a collection endpoint, which is exactly the thing this
+#   site does not do. The policy fails closed and silently.
+
+/*
+  # --- Content Security Policy ---------------------------------------------
+  # default-src 'none' means every fetch type must be named explicitly below.
+  # Verified against the built output: no inline styles, no data: URIs, and one
+  # 51-byte inline script (the no-js class removal), pinned by hash rather than
+  # allowed via 'unsafe-inline'. The JSON-LD block is type=application/ld+json,
+  # a data block the browser never executes, so it needs no hash.
+  # If you add a script, add its hash here or the browser will refuse to run it.
+  Content-Security-Policy: default-src 'none'; script-src 'self' 'sha256-tuKyZn/3ycw/MNMDii/kvSPrelo6SCsJSecqb1n2neg='; style-src 'self'; img-src 'self'; font-src 'self'; media-src 'self'; manifest-src 'self'; connect-src 'none'; form-action 'none'; base-uri 'none'; object-src 'none'; frame-ancestors 'none'; upgrade-insecure-requests
+
+  # --- Transport ------------------------------------------------------------
+  # Two years, subdomains included. `preload` is intentionally omitted: joining
+  # the browser preload list is slow to reverse and binds every future
+  # subdomain to HTTPS. Add it once the domain is settled, not on day one.
+  Strict-Transport-Security: max-age=63072000; includeSubDomains
+
+  # --- Leakage --------------------------------------------------------------
+  # no-referrer, not the usual strict-origin-when-cross-origin: when a visitor
+  # clicks through to LinkedIn, LinkedIn learns nothing about where they came
+  # from. There is no analytics here that would miss the referrer anyway.
+  Referrer-Policy: no-referrer
+
+  # Opt out of browser features this site has no use for, including the Topics
+  # API and its FLoC predecessor. Saying no in a header is cheap and explicit.
+  Permissions-Policy: accelerometer=(), autoplay=(), browsing-topics=(), camera=(), display-capture=(), encrypted-media=(), fullscreen=(self), geolocation=(), gyroscope=(), interest-cohort=(), magnetometer=(), microphone=(), midi=(), payment=(), usb=(), xr-spatial-tracking=()
+
+  # --- Hardening ------------------------------------------------------------
+  X-Content-Type-Options: nosniff
+  X-Frame-Options: DENY
+  Cross-Origin-Opener-Policy: same-origin
+  Cross-Origin-Resource-Policy: same-origin
+
+  # --- Caching --------------------------------------------------------------
+  # HTML must revalidate, or a content fix would sit behind a stale cache.
+  Cache-Control: public, max-age=0, must-revalidate
+
+# Versioned assets. Every reference from the HTML carries ?v=<ASSET_VERSION>,
+# and browsers cache per full URL including the query, so a version bump is a
+# guaranteed cache miss. This is safe ONLY while that discipline holds: bump
+# ASSET_VERSION in build/build.mjs whenever CSS or JS changes, or clients will
+# hold the old file for a year.
+/css/*
+  Cache-Control: public, max-age=31536000, immutable
+/js/*
+  Cache-Control: public, max-age=31536000, immutable
+
+# Fonts, images and the master film. These change by replacement, never in
+# place, so they are safely immutable.
+/assets/*
+  Cache-Control: public, max-age=31536000, immutable
+
+# ============================================================================
+# /scrubber/* — Metadata Scrubber (React SPA, built from tools/metadata-scrubber)
+# ============================================================================
+#
+# The baseline above is `default-src 'none'` with ONE pinned script hash. That
+# is correct for a hand-built static page and fatal for a bundled SPA: the
+# Scrubber's module bundle has a different hash on every build, so under the
+# baseline it would be refused and the tool would render an empty white page.
+# Hence a scoped override rather than a loosening of `/*`.
+#
+# WHY THIS POLICY AND NOT A TIGHTER ONE:
+#   The app also ships its own <meta http-equiv="Content-Security-Policy">.
+#   When both are present the browser enforces the INTERSECTION, so the
+#   effective policy is only ever as permissive as the stricter of the two.
+#   This header is written to mirror that meta tag directive-for-directive.
+#   That is deliberate: it means adding this header cannot change the app's
+#   runtime behaviour from what it already does today. Writing something
+#   tighter here would silently break a code path that currently works, and
+#   the failure would only appear in production.
+#
+#   If you want to tighten the Scrubber, tighten the meta tag in
+#   tools/metadata-scrubber/index.html and mirror the change here. One policy,
+#   two enforcement points, no drift.
+#
+# connect-src 'self' — NOT 'none'. It is what the app declares, and the
+#   bundle contains fetch/XHR call sites inside the HEIC decoder's asm.js
+#   runtime. 'self' is still the load-bearing guarantee for "nothing is
+#   uploaded": there is no endpoint under /scrubber/ to upload to, so the only
+#   reachable origin is a bucket of static files. A third party is unreachable
+#   by construction, which is the claim the section on the landing page makes.
+#
+# worker-src blob: — the HEIC decoder constructs a worker from a Blob. Listed
+#   so this header is not the thing standing in its way; note the meta tag has
+#   no worker-src and therefore falls back to its own default-src 'self', so
+#   the meta tag is the binding constraint on that path. Verify HEIC end to end
+#   before claiming it works.
+/scrubber/*
+  Content-Security-Policy: default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; font-src 'self'; connect-src 'self'; worker-src 'self' blob:; form-action 'none'; base-uri 'none'; object-src 'none'; frame-ancestors 'none'; upgrade-insecure-requests
+
+# Vite emits content-hashed filenames, so these are immutable by construction:
+# a change to either produces a new filename rather than new bytes at the same
+# one. This needs no ASSET_VERSION discipline, unlike /css/* and /js/* above.
+/scrubber/assets/*
+  Cache-Control: public, max-age=31536000, immutable
+/scrubber/fonts/*
+  Cache-Control: public, max-age=31536000, immutable
+
+# The share card must stay fetchable by crawlers that render link previews, so
+# it opts out of the same-origin resource policy set above. Without this the
+# card can fail to display in some embedding contexts.
+/og/*
+  Cross-Origin-Resource-Policy: cross-origin
+  Cache-Control: public, max-age=604800
+
+# Crawler-facing files: short cache so a change to either is picked up quickly.
+/robots.txt
+  Cache-Control: public, max-age=3600
+/sitemap.xml
+  Cache-Control: public, max-age=3600
