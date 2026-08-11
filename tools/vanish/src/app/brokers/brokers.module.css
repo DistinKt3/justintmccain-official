@@ -1,0 +1,316 @@
+.provenance {
+  margin-top: 2rem;
+  padding: 1.5rem;
+  background: var(--deck);
+  border: 1px solid var(--grid);
+  border-radius: var(--radius);
+  max-width: 46rem;
+}
+
+.provTitle {
+  font-family: var(--font-mono);
+  font-size: var(--t-mono);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--slate);
+  margin-bottom: 0.875rem;
+}
+
+.provBody {
+  color: var(--daylight);
+  font-size: 0.9375rem;
+  line-height: 1.65;
+  margin-bottom: 0.875rem;
+}
+
+.provNote {
+  color: var(--slate);
+  font-size: 0.8125rem;
+  line-height: 1.6;
+  padding-top: 0.875rem;
+  border-top: 1px solid var(--grid);
+}
+
+/* --- Controls -------------------------------------------------------------- */
+
+.tableSection {
+  margin-top: 2.5rem;
+}
+
+.controls {
+  display: flex;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+  align-items: center;
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  padding: 0.875rem 0;
+  background: var(--signal-black);
+}
+
+.searchWrap {
+  flex: 1 1 18rem;
+  min-width: 0;
+}
+
+.filters {
+  display: flex;
+  gap: 0.375rem;
+  flex-wrap: wrap;
+}
+
+.filterBtn {
+  min-height: 44px;
+  padding: 0 0.875rem;
+  background: transparent;
+  border: 1px solid var(--grid);
+  border-radius: var(--radius-sm);
+  color: var(--slate);
+  font-size: 0.8125rem;
+  transition:
+    border-color var(--dur-micro) var(--ease),
+    color var(--dur-micro) var(--ease),
+    background-color var(--dur-micro) var(--ease);
+}
+@media (hover: hover) and (pointer: fine) {
+  .filterBtn:hover {
+    color: var(--daylight);
+    border-color: var(--slate);
+  }
+}
+
+.filterOn {
+  background: var(--mint);
+  border-color: var(--mint);
+  color: var(--signal-black);
+  font-weight: 500;
+}
+
+.countLine {
+  font-family: var(--font-mono);
+  font-size: var(--t-mono);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--slate);
+  margin-bottom: 0.75rem;
+}
+
+.kindHint {
+  color: var(--slate);
+  font-size: 0.8125rem;
+  line-height: 1.6;
+  max-width: 44rem;
+  margin-bottom: 1.25rem;
+  padding-left: 0.75rem;
+  border-left: 2px solid var(--grid);
+}
+
+.empty {
+  color: var(--slate);
+  padding: 2rem 0;
+}
+.empty code {
+  font-family: var(--font-mono);
+  font-size: 0.8125rem;
+  color: var(--daylight);
+}
+
+/* --- Rows ------------------------------------------------------------------ */
+
+.list {
+  display: grid;
+  gap: 0.5rem;
+}
+
+.row {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 0.875rem 1rem;
+  background: var(--deck);
+  border: 1px solid var(--grid);
+  border-radius: var(--radius-sm);
+  flex-wrap: wrap;
+}
+
+.rowMain {
+  flex: 1 1 20rem;
+  min-width: 0;
+}
+
+.rowName {
+  font-size: 0.9375rem;
+  color: var(--daylight);
+  line-height: 1.4;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.tagPeople {
+  font-family: var(--font-mono);
+  font-size: 0.625rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--mint);
+  border: 1px solid var(--mint);
+  border-radius: var(--radius-chip);
+  padding: 0.1rem 0.4rem;
+  flex: none;
+}
+
+.rowSite {
+  display: inline-block;
+  margin-top: 0.2rem;
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  color: var(--slate);
+  text-decoration: none;
+  word-break: break-all;
+}
+@media (hover: hover) and (pointer: fine) {
+  .rowSite:hover {
+    color: var(--mint);
+  }
+}
+
+.rowText {
+  margin-top: 0.4rem;
+  color: var(--slate);
+  font-size: 0.8125rem;
+  line-height: 1.5;
+}
+
+.rowActions {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 0.35rem;
+  flex: none;
+}
+
+.optBtn {
+  min-height: 38px;
+  padding: 0.35rem 0.875rem;
+  font-size: 0.8125rem;
+}
+
+.rowEmail {
+  font-family: var(--font-mono);
+  font-size: 0.6875rem;
+  color: var(--slate);
+  word-break: break-all;
+  display: inline-flex;
+  align-items: center;
+  min-height: 20px;
+}
+
+.copyBtn {
+  background: none;
+  border: 0;
+  padding: 0.25rem 0;
+  color: var(--slate);
+  font-size: 0.75rem;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  min-height: 32px;
+}
+@media (hover: hover) and (pointer: fine) {
+  .copyBtn:hover {
+    color: var(--mint);
+  }
+}
+
+.deadNote {
+  margin-top: 0.5rem;
+  color: var(--alert);
+  font-size: 0.75rem;
+  line-height: 1.5;
+}
+
+.fixedNote {
+  margin-top: 0.4rem;
+  color: var(--slate);
+  font-size: 0.6875rem;
+  line-height: 1.5;
+  font-style: italic;
+}
+
+/* --- Personalisation ------------------------------------------------------- */
+
+.personalPrompt {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  flex-wrap: wrap;
+  padding: 1rem 1.25rem;
+  margin-bottom: 1.25rem;
+  background: var(--deck);
+  border: 1px solid var(--grid);
+  border-radius: var(--radius);
+}
+
+.personalCopy {
+  flex: 1 1 22rem;
+  color: var(--slate);
+  font-size: 0.875rem;
+  line-height: 1.6;
+}
+
+.personalOn {
+  margin-bottom: 1.25rem;
+  color: var(--slate);
+  font-size: 0.875rem;
+}
+.personalOn strong {
+  color: var(--daylight);
+  font-weight: 500;
+}
+
+.linkBtn {
+  background: none;
+  border: 0;
+  padding: 0;
+  color: var(--mint);
+  font-size: 0.875rem;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.personalForm {
+  padding: 1.25rem;
+  margin-bottom: 1.25rem;
+  background: var(--deck);
+  border: 1px solid var(--grid);
+  border-radius: var(--radius);
+}
+
+.personalRow {
+  display: grid;
+  gap: 0.5rem;
+  grid-template-columns: 1fr;
+}
+
+@media (min-width: 44rem) {
+  .personalRow {
+    grid-template-columns: 1.4fr 1fr 5rem 1.4fr;
+  }
+}
+
+.personalActions {
+  display: flex;
+  gap: 0.5rem;
+  margin-top: 0.75rem;
+  flex-wrap: wrap;
+}
+
+@media (max-width: 34rem) {
+  .rowActions {
+    align-items: flex-start;
+    width: 100%;
+  }
+}

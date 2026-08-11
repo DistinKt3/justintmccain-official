@@ -1,0 +1,148 @@
+.hero {
+  padding: 2rem 0 3.5rem;
+}
+
+.ctaRow {
+  margin-top: 2rem;
+  display: flex;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+
+.steps {
+  padding: 2.5rem 0;
+  border-top: 1px solid var(--grid);
+  border-bottom: 1px solid var(--grid);
+}
+
+.stepList {
+  display: grid;
+  gap: 2rem;
+}
+
+@media (min-width: 44rem) {
+  .stepList {
+    grid-template-columns: repeat(3, 1fr);
+    gap: 2rem;
+  }
+}
+
+.stepItem {
+  position: relative;
+  padding-top: 1rem;
+}
+
+/* Node atom as a static step marker, the same primitive used for required
+   fields and the DONE state. Static, not animated: this is a functional
+   readout, not a branded moment. */
+.stepMark {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--mint);
+  opacity: 0.85;
+}
+
+.stepTitle {
+  display: flex;
+  align-items: baseline;
+  gap: 0.5rem;
+  font-size: 1.0625rem;
+  margin-bottom: 0.4rem;
+}
+
+.stepNum {
+  font-family: var(--font-mono);
+  font-size: var(--t-mono);
+  color: var(--slate);
+}
+
+/* --- "Plainly, before you start" ------------------------------------------
+   Deliberately above the fold-ish and not tucked into a footer link. A privacy
+   tool that oversells its own reach is doing the same thing to the reader that
+   the brokers do, just in a friendlier voice.
+   -------------------------------------------------------------------------- */
+
+.plainly {
+  /* The bottom padding used to be 0.5rem because the links row that sat here
+     carried its own 1.75rem margin before the divider. That row is gone, so
+     the space it was providing has to come from here instead. */
+  padding: 2.5rem 0 2rem;
+}
+
+.plainlyTitle {
+  font-family: var(--font-mono);
+  font-size: var(--t-mono);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--slate);
+  margin-bottom: 1.25rem;
+}
+
+.plainlyGrid {
+  display: grid;
+  gap: 2rem;
+}
+
+@media (min-width: 44rem) {
+  .plainlyGrid {
+    grid-template-columns: 1fr 1fr;
+    gap: 2.5rem;
+  }
+}
+
+.plainlyLabel {
+  font-size: 0.9375rem;
+  font-weight: 500;
+  color: var(--daylight);
+  margin-bottom: 0.75rem;
+  padding-bottom: 0.5rem;
+  border-bottom: 1px solid var(--grid);
+}
+
+.plainlyList {
+  display: grid;
+  gap: 0.75rem;
+}
+
+.plainlyList li {
+  position: relative;
+  padding-left: 1.05rem;
+  color: var(--slate);
+  font-size: 0.875rem;
+  line-height: 1.6;
+}
+
+.plainlyList li::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0.58em;
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: var(--slate);
+  opacity: 0.6;
+}
+
+.plainlyList strong {
+  color: var(--daylight);
+  font-weight: 500;
+}
+
+.trustSection {
+  padding: 2rem 0 1rem;
+  display: grid;
+  gap: 0.875rem;
+  border-top: 1px solid var(--grid);
+}
+
+.trustDetail {
+  color: var(--slate);
+  font-size: 0.875rem;
+  line-height: 1.6;
+  max-width: 42rem;
+}

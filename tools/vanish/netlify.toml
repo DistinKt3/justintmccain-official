@@ -1,0 +1,43 @@
+# Netlify build config.
+#
+# Vanish is NOT a static site. /api/scan is a server function, so there is no
+# folder to drag and drop. Netlify detects Next.js from package.json and applies
+# its own runtime, which turns that route into a Netlify Function during the
+# build.
+#
+# The @netlify/plugin-nextjs plugin is deliberately NOT declared here. Netlify's
+# own docs say not to install it yourself: it ships as part of the platform, and
+# pinning it in this file can leave the build on an older runtime than the one
+# Netlify would otherwise use.
+#
+# Security headers deliberately live in next.config.ts, not here. One source of
+# truth avoids two CSP headers reaching the browser, where they get intersected
+# and fail in ways that are miserable to debug. Verify they survived the deploy
+# with the curl in docs/DEPLOY.md.
+
+[build]
+  command = "npm run build"
+  publish = ".next"
+
+[build.environment]
+  # Next.js 16 requires >= 20.9. Pinned so a change to Netlify's default can't
+  # quietly move the runtime under a privacy tool.
+  NODE_VERSION = "22"
+
+  # Vanish is served at justintmccain.com/vanish, not at a domain root, so every
+  # bundle URL and every route must carry that prefix. next.config.ts reads this
+  # into `basePath` and re-exports it for the one fetch() Next does not rewrite.
+  #
+  # This makes the Netlify URL serve the app at <site>.netlify.app/vanish too,
+  # which is intentional: the proxy can then forward the path through unchanged
+  # instead of rewriting it, so what you test on Netlify is what visitors get.
+  #
+  # The value is inlined into the client bundle at build time. Changing it needs
+  # a REBUILD — clearing the Netlify cache and redeploying is not enough.
+  NEXT_PUBLIC_BASE_PATH = "/vanish"
+
+# There are no environment variables and no secrets. If this app ever needs one,
+# it belongs in Netlify's env UI, never in this file.
+#
+# Do not enable Netlify Analytics here or in the dashboard, and do not add an
+# error monitor. The zero-log promise is the product, not a setting.

@@ -1,0 +1,117 @@
+/* ============================================================================
+   VANISH: Design tokens
+   ----------------------------------------------------------------------------
+   SOURCE OF TRUTH: ../../../career-planning-tools/site/css/main.css (SIGNAL)
+   These values are reused VERBATIM from the JTM brand system. Do not fork,
+   do not "improve", do not add a third chromatic accent.
+
+   If a token changes in the brand site's main.css, mirror it here manually.
+   There is no shared package between the two repos at this scale.
+   (A matching pointer comment should live in the brand site's main.css.)
+   ========================================================================== */
+
+/* --- Fonts: self-hosted, no CDN ------------------------------------------
+   Deliberate privacy decision, not just performance: a Google Fonts request
+   would leak every visitor's IP to a third party on a tool whose entire
+   promise is that nothing about them is transmitted or retained.
+   Font files copied from the brand site's assets/fonts/.
+   ------------------------------------------------------------------------ */
+@font-face {
+  font-family: "Space Grotesk";
+  src: url("/fonts/space-grotesk-var.woff2") format("woff2-variations");
+  font-weight: 400 700;
+  font-display: swap;
+  font-style: normal;
+}
+@font-face {
+  font-family: "Inter";
+  src: url("/fonts/inter-var.woff2") format("woff2-variations");
+  font-weight: 100 900;
+  font-display: swap;
+  font-style: normal;
+}
+@font-face {
+  font-family: "IBM Plex Mono";
+  src: url("/fonts/plex-mono-400.woff2") format("woff2");
+  font-weight: 400;
+  font-display: swap;
+  font-style: normal;
+}
+@font-face {
+  font-family: "IBM Plex Mono";
+  src: url("/fonts/plex-mono-500.woff2") format("woff2");
+  font-weight: 500;
+  font-display: swap;
+  font-style: normal;
+}
+
+:root {
+  /* --- Palette ---------------------------------------------------------
+     The ONLY brand accents are Signal Mint and Seal Amber. Never a third hue.
+     Amber is rationed: it renders solid in exactly one place in this product,
+     the dashboard DONE state. See design spec §3.4 / §3.5.
+     -------------------------------------------------------------------- */
+  --signal-black: #0a0f14;
+  --deck: #131a22;
+  --grid: #212b35;
+  --daylight: #eef2f6;
+  --slate: #a6b2bf;
+  --mint: #5fe3c4;
+  --amber: #e9b44c;
+  --paper: #f5f3ed; /* Evidence Paper, /report only */
+  --ink: #14181d; /* text on Evidence Paper */
+  --mint-ink: #0b6b58; /* REQUIRED for mint on Evidence Paper (contrast) */
+
+  /* --- Error tone -------------------------------------------------------
+     Resolves the item deferred by design spec §4.2 / implementation spec §6.
+     The spec PROPOSED #8B4A42, but that measures 2.89:1 on Signal Black and
+     2.63:1 on Deck, below the 3.0 floor for borders and well below 4.5 for
+     text. It fails AA and cannot ship.
+
+     #C4726A measured: 5.46:1 on Signal Black, 4.97:1 on Deck, so AA for body
+     text on both surfaces. Same desaturated warm-brick family the spec asked
+     for (reads "attention needed", tonally adjacent to Amber's warmth without
+     competing with Amber's rationed "honored" meaning). Not a brand accent:
+     used only for validation errors, never for status or decoration.
+     -------------------------------------------------------------------- */
+  --alert: #c4726a;
+
+  /* --- Type ------------------------------------------------------------ */
+  --font-display: "Space Grotesk", ui-sans-serif, system-ui, sans-serif;
+  --font-body: "Inter", ui-sans-serif, system-ui, -apple-system, sans-serif;
+  --font-mono: "IBM Plex Mono", ui-monospace, "SF Mono", Menlo, monospace;
+
+  --t-display-xl: clamp(3rem, 6vw, 6.5rem);
+  --t-h1: clamp(2rem, 4vw, 3.25rem);
+  --t-h2: clamp(1.75rem, 3vw, 2.75rem);
+  --t-h3: clamp(1.5rem, 2vw, 1.875rem);
+  --t-body-lg: clamp(1.125rem, 1.4vw, 1.25rem);
+  --t-body: 1rem;
+  --t-mono: 0.8125rem;
+
+  /* --- Rhythm ---------------------------------------------------------- */
+  --gut: clamp(1.25rem, 5vw, 2.5rem);
+  --section: clamp(5rem, 12vh, 9rem);
+  --maxw: 72rem;
+  --maxw-text: 46rem;
+  --maxw-form: 40rem;
+
+  /* --- Motion ----------------------------------------------------------
+     Confident expo-out. Calm and deliberate; privacy isn't frantic.
+     Durations are per-element (design spec §2), not one blanket value, so
+     small things feel fast, big things don't feel abrupt.
+     -------------------------------------------------------------------- */
+  --ease: cubic-bezier(0.16, 1, 0.3, 1);
+  --dur-press: 160ms; /* button :active */
+  --dur-focus: 120ms; /* focus ring; instant reads as a glitch */
+  --dur-chip: 180ms; /* status chip outline->fill */
+  --dur-row: 200ms; /* scan row entrance */
+  --dur-micro: 240ms;
+  --dur-screen: 260ms; /* screen-to-screen */
+  --dur-honored: 220ms; /* the one DONE payoff moment */
+
+  --ring: 2px solid var(--mint);
+  --radius: 10px;
+  --radius-sm: 6px;
+  --radius-chip: 999px;
+}

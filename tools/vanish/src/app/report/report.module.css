@@ -1,0 +1,257 @@
+/* ============================================================================
+   /report: Evidence Paper
+   The one light surface in the product. This is the payoff: the moment of
+   worry resolves into a printed, keepable fact.
+   ========================================================================== */
+
+.paper {
+  flex: 1;
+  background: var(--paper);
+  color: var(--ink);
+  min-height: 100dvh;
+  padding: var(--gut);
+}
+
+.sheet {
+  max-width: 46rem;
+  margin: 0 auto;
+  padding-bottom: 4rem;
+}
+
+.masthead {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 1.5rem 0 1.25rem;
+  border-bottom: 1px solid rgba(20, 24, 29, 0.15);
+  flex-wrap: wrap;
+}
+
+.wordmark {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 1.5rem;
+  letter-spacing: -0.02em;
+  color: var(--ink);
+}
+
+.subtitle {
+  font-family: var(--font-mono);
+  font-size: var(--t-mono);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  /* mint-ink, not raw mint. Raw mint fails contrast on paper */
+  color: var(--mint-ink);
+  margin-top: 0.2rem;
+}
+
+.backLink {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  color: var(--mint-ink);
+  font-size: 0.875rem;
+  text-decoration: none;
+}
+.backLink:hover {
+  text-decoration: underline;
+}
+
+.callout {
+  margin-top: 1.75rem;
+  font-family: var(--font-display);
+  font-size: 1.25rem;
+  line-height: 1.4;
+  color: var(--ink);
+  text-wrap: balance;
+}
+
+.actions {
+  margin-top: 1.25rem;
+}
+
+.primaryBtn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 44px;
+  padding: 0.625rem 1.375rem;
+  background: var(--ink);
+  color: var(--paper);
+  border: 1px solid var(--ink);
+  border-radius: var(--radius);
+  font-weight: 600;
+  font-size: 0.9375rem;
+  transition:
+    transform var(--dur-press) ease-out,
+    opacity var(--dur-micro) var(--ease);
+}
+.primaryBtn:active:not(:disabled) {
+  transform: scale(0.97);
+}
+.primaryBtn:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+/* Focus ring must be visible on paper too. Mint disappears here */
+.primaryBtn:focus-visible {
+  outline: 2px solid var(--mint-ink);
+  outline-offset: 2px;
+}
+
+.error {
+  margin-top: 1rem;
+  padding: 0.75rem 0.875rem;
+  border: 1px solid #a33; /* on paper, not the dark-surface --alert */
+  border-radius: var(--radius-sm);
+  color: #8b2d2d;
+  font-size: 0.875rem;
+}
+
+.section {
+  margin-top: 2.5rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid rgba(20, 24, 29, 0.15);
+}
+
+.h2 {
+  font-family: var(--font-display);
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: var(--ink);
+  margin-bottom: 1rem;
+}
+
+.h3 {
+  font-family: var(--font-display);
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--ink);
+  margin-bottom: 0.625rem;
+}
+
+/* --- Ledger rows: the receipt texture ------------------------------------- */
+
+.ledger {
+  display: grid;
+  gap: 0.4rem;
+}
+
+.ledgerRow {
+  display: grid;
+  grid-template-columns: 9rem 1fr;
+  gap: 0.75rem;
+  align-items: baseline;
+}
+
+@media (max-width: 34rem) {
+  .ledgerRow {
+    grid-template-columns: 1fr;
+    gap: 0.1rem;
+  }
+}
+
+.ledgerLabel {
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: rgba(20, 24, 29, 0.6);
+}
+
+.ledgerValue {
+  font-family: var(--font-mono);
+  font-size: 0.8125rem;
+  color: var(--ink);
+  word-break: break-word;
+}
+
+.checkList {
+  display: grid;
+  gap: 0.35rem;
+}
+
+.checkRow {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 0.4rem 0;
+  border-bottom: 1px dotted rgba(20, 24, 29, 0.18);
+  font-family: var(--font-mono);
+  font-size: 0.8125rem;
+}
+
+.outcomeMatch {
+  color: var(--mint-ink);
+  font-weight: 500;
+}
+
+.outcomeMuted {
+  color: rgba(20, 24, 29, 0.55);
+}
+
+.request {
+  margin-bottom: 2rem;
+  padding-bottom: 1.5rem;
+  border-bottom: 1px dotted rgba(20, 24, 29, 0.2);
+}
+.request:last-child {
+  border-bottom: 0;
+}
+
+.snippetLabel {
+  margin-top: 1rem;
+  font-family: var(--font-mono);
+  font-size: 0.6875rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: rgba(20, 24, 29, 0.6);
+  margin-bottom: 0.4rem;
+}
+
+.snippet {
+  margin: 0;
+  padding: 0.875rem 1rem;
+  background: rgba(20, 24, 29, 0.04);
+  border-left: 2px solid rgba(20, 24, 29, 0.25);
+  border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  line-height: 1.65;
+  color: var(--ink);
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+.muted {
+  color: rgba(20, 24, 29, 0.7);
+  font-size: 0.9375rem;
+  line-height: 1.65;
+  margin-bottom: 0.75rem;
+  max-width: 40rem;
+}
+
+.footer {
+  margin-top: 3rem;
+  padding-top: 1.25rem;
+  border-top: 1px solid rgba(20, 24, 29, 0.15);
+  font-family: var(--font-mono);
+  font-size: 0.6875rem;
+  letter-spacing: 0.06em;
+  color: rgba(20, 24, 29, 0.55);
+}
+
+/* Print: the record should print cleanly if the user hits Cmd-P instead */
+@media print {
+  .paper {
+    padding: 0;
+  }
+  .actions,
+  .backLink {
+    display: none;
+  }
+  .snippet {
+    break-inside: avoid;
+  }
+}
