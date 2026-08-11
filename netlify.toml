@@ -24,6 +24,18 @@
   # quietly move the runtime under a privacy tool.
   NODE_VERSION = "22"
 
+  # Vanish is served at justintmccain.com/vanish, not at a domain root, so every
+  # bundle URL and every route must carry that prefix. next.config.ts reads this
+  # into `basePath` and re-exports it for the one fetch() Next does not rewrite.
+  #
+  # This makes the Netlify URL serve the app at <site>.netlify.app/vanish too,
+  # which is intentional: the proxy can then forward the path through unchanged
+  # instead of rewriting it, so what you test on Netlify is what visitors get.
+  #
+  # The value is inlined into the client bundle at build time. Changing it needs
+  # a REBUILD — clearing the Netlify cache and redeploying is not enough.
+  NEXT_PUBLIC_BASE_PATH = "/vanish"
+
 # There are no environment variables and no secrets. If this app ever needs one,
 # it belongs in Netlify's env UI, never in this file.
 #

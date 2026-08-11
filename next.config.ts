@@ -55,8 +55,32 @@ const securityHeaders = [
   },
 ];
 
+/**
+ * Sub-path deployment.
+ *
+ * In production Vanish is not the root of its domain — it answers at
+ * justintmccain.com/vanish, proxied from Netlify by Cloudflare, so that the
+ * tool lives inside the portfolio rather than beside it. Without a basePath,
+ * Next emits its bundles at /_next/… which resolves against the ROOT of
+ * justintmccain.com, where the static portfolio lives and no such files exist.
+ * The app would render an unstyled shell and every route would 404.
+ *
+ * Read from the environment rather than hardcoded so this same tree still runs
+ * at the root during `next dev` and on a bare *.netlify.app URL. Netlify sets
+ * it in netlify.toml. Note the docs' warning: the value is INLINED into the
+ * client bundle at build time, so changing it requires a rebuild, not a redeploy.
+ */
+const BASE_PATH = process.env.NEXT_PUBLIC_BASE_PATH ?? "";
+
 const nextConfig: NextConfig = {
   poweredByHeader: false,
+  basePath: BASE_PATH || undefined,
+
+  /* Re-exported so client code can build absolute-from-root URLs that Next does
+     NOT rewrite for us. basePath covers <Link>, the router and asset URLs; it
+     does not touch fetch(). See the /api/scan call in scan/running/page.tsx. */
+  env: { NEXT_PUBLIC_BASE_PATH: BASE_PATH },
+
   async headers() {
     return [{ source: "/:path*", headers: securityHeaders }];
   },

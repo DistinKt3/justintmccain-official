@@ -45,6 +45,38 @@ export function TopBar({
   );
 }
 
+/**
+ * Footer identity block.
+ *
+ * Mirrors the three tiers of the portfolio footer on justintmccain.com, below
+ * this app's own resources nav, so Vanish, the Metadata Scrubber and the
+ * landing page read as one system instead of three separate projects:
+ *
+ *   0. resources nav      — Vanish only
+ *   1. identity · elsewhere-links
+ *   2. the note specific to THIS surface (here: where the broker data is from)
+ *   3. copyright
+ *
+ * The canonical wording lives in the portfolio's `build/content.mjs`
+ * (IDENTITY + FOOTER). This app builds independently, so those strings are
+ * duplicated here by necessity. Change the name, role or copyright line and
+ * you must change it in all three places — here, `build/content.mjs`, and the
+ * Scrubber's `src/components/Footer.tsx`.
+ *
+ * The CPPA provenance line stays because it is a real attribution obligation,
+ * not decoration: the registry is public data republished here, and saying so
+ * is the difference between citing a source and quietly passing it off.
+ */
+
+const PORTFOLIO = "https://justintmccain.com";
+const LINKEDIN = "https://www.linkedin.com/in/justintmccain/";
+const EMAIL = "JustinTMcCain@protonmail.com";
+
+/* Constant, not new Date().getFullYear(). This footer is server-rendered, and
+   a runtime year can disagree between server and client across a New Year
+   boundary — a hydration mismatch for the sake of a number nobody reads. */
+const YEAR = "2026";
+
 export function Footer() {
   return (
     <footer className={s.siteFooter}>
@@ -55,6 +87,43 @@ export function Footer() {
         </span>
         <Link href="/about">What Vanish is &amp; isn&rsquo;t</Link>
       </nav>
+
+      <div className={s.footerTop}>
+        <p className={s.footerId}>
+          <span className={s.footerName}>Justin T. McCain</span>
+          <span className={s.footerDot} aria-hidden="true">
+            ·
+          </span>
+          <span>Privacy Product Leader</span>
+        </p>
+
+        <nav className={s.footerElsewhere} aria-label="Elsewhere">
+          <a href={PORTFOLIO} target="_blank" rel="noopener noreferrer">
+            Portfolio
+          </a>
+          <span className={s.footerDot} aria-hidden="true">
+            ·
+          </span>
+          <a href={LINKEDIN} target="_blank" rel="noopener noreferrer">
+            LinkedIn
+          </a>
+          <span className={s.footerDot} aria-hidden="true">
+            ·
+          </span>
+          {/* The address itself, not the word "Email" — matching the portfolio
+              footer. A visible address can be copied without clicking. */}
+          <a href={`mailto:${EMAIL}`}>{EMAIL}</a>
+        </nav>
+      </div>
+
+      <p className={s.footerCredit}>
+        Also built:{" "}
+        <a href={`${PORTFOLIO}/scrubber/`} target="_blank" rel="noopener noreferrer">
+          Metadata Scrubber
+        </a>{" "}
+        — see what your photos say about you, then strip it.
+      </p>
+
       <p className={s.footerCredit}>
         Broker data from the{" "}
         <a
@@ -64,19 +133,13 @@ export function Footer() {
         >
           California Privacy Protection Agency
         </a>{" "}
-        registry, published under the Delete Act. Reorganised, not authored by
+        registry, published under the Delete Act. Reorganized, not authored by
         us.
       </p>
-      <p>
-        A project by{" "}
-        <a
-          href="https://justintmccain.com"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Justin T. McCain
-        </a>
-        .
+
+      <p className={s.footerCopy}>
+        © {YEAR} Justin T. McCain. Built with respect for your attention and
+        your data.
       </p>
     </footer>
   );

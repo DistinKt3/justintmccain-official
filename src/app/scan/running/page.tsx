@@ -45,7 +45,12 @@ export default function ScanRunningPage() {
 
     (async () => {
       try {
-        const res = await fetch("/api/scan", {
+        /* basePath rewrites <Link>, the router and asset URLs — it does NOT
+           rewrite fetch(). In production this app is mounted at /vanish, so a
+           bare "/api/scan" would post the user's identity to the ROOT of
+           justintmccain.com, which is a static site with no such route. The
+           scan would fail on every run outside local dev. */
+        const res = await fetch(`${process.env.NEXT_PUBLIC_BASE_PATH ?? ""}/api/scan`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           // Identity travels in the BODY only, never a query string, so it

@@ -545,9 +545,42 @@
   color: var(--grid);
 }
 
+/* Tier 1 — identity on the left, elsewhere-links on the right. Same shape as
+   the portfolio footer's .footer__top, so the three surfaces line up. */
+.footerTop {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 0.5rem 1.5rem;
+}
+.footerId,
+.footerElsewhere {
+  display: flex;
+  align-items: baseline;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin: 0;
+}
+.footerName {
+  color: var(--daylight);
+}
+/* The links in this row are secondary to the resources nav above, so they take
+   the body colour rather than .footerLinks' daylight, and they do not need its
+   44px tap target — they sit in a text row, not a nav bar. */
+.footerElsewhere a {
+  min-height: 0;
+}
+
 .footerCredit {
   line-height: 1.6;
   max-width: 44rem;
+}
+
+/* Least important line on the page; present for completeness, never competing
+   with the tool. Matches the Scrubber's .footer__copy. */
+.footerCopy {
+  opacity: 0.6;
 }
 .siteFooter a {
   color: var(--slate);
