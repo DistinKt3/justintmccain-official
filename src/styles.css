@@ -1,5 +1,21 @@
 @import './tokens.css';
 
+/* ============================================================================
+   METADATA SCRUBBER -- SIGNAL treatment
+   ----------------------------------------------------------------------------
+   The app's state machine already IS the brand spine, so nothing here forces
+   a metaphor onto the product:
+
+     dropzone   signal not yet captured    Signal Black
+     analyzing  signal captured            Deck
+     report     exposure                   Signal Black, ledger typography
+     scrubbing  enforcement                Signal Black, mint action
+     done       evidence                   Evidence Paper -- the one flip
+
+   Accent discipline: mint = live/interactive, amber = the single DONE seal,
+   --alert = validation errors only (ErrorBanner, nowhere else).
+   ========================================================================== */
+
 *, *::before, *::after {
   box-sizing: border-box;
   margin: 0;
@@ -11,11 +27,12 @@ html, body {
 }
 
 body {
-  font-family: var(--font-sans);
-  font-size: var(--text-md);
-  line-height: 1.5;
-  color: var(--ink-1);
-  background: var(--surface);
+  font-family: var(--font-body);
+  font-size: var(--t-body);
+  line-height: 1.55;
+  color: var(--daylight);
+  background: var(--signal-black);
+  color-scheme: dark;
   -webkit-font-smoothing: antialiased;
   text-rendering: optimizeLegibility;
 }
@@ -29,24 +46,20 @@ button {
 }
 
 a {
-  color: var(--accent);
+  color: var(--mint);
   text-decoration: none;
 }
 
-
-/* Focus ring -- single token, applied via :focus-visible */
+/* Focus ring -- mint, never instant (instant reads as a glitch) */
 :focus-visible {
-  outline: 2px solid var(--focus-ring);
+  outline: var(--ring);
   outline-offset: 2px;
-  border-radius: 4px;
+  border-radius: var(--radius-sm);
+  transition: outline-offset var(--dur-focus) var(--ease);
 }
 
-/* Hover gate -- no :hover rules outside this query */
 @media (hover: hover) and (pointer: fine) {
-  a:hover {
-    text-decoration: underline;
-  }
-  /* component-level :hover rules live under this in their own files */
+  a:hover { text-decoration: underline; text-underline-offset: 4px; }
 }
 
 /* Reduced motion -- disable transforms; keep opacity/color transitions */
@@ -70,256 +83,499 @@ a {
   border: 0;
 }
 
-/* --- Masthead --- */
-.masthead {
+/* ============================================================================
+   Node atom
+   ----------------------------------------------------------------------------
+   One primitive, several jobs: category-label bullets, receipt-row bullets,
+   the wordmark gate, the favicon. Rendered as ::before rather than markup so
+   it never lands in an element's accessible name.
+   ========================================================================== */
+.report-section__label::before,
+.done__check {
+  content: '';
+  display: inline-block;
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: var(--mint);
+  flex-shrink: 0;
+}
+
+/* ============================================================================
+   Shell -- Wordmark / TopBar / Footer
+   ========================================================================== */
+.wordmark {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  color: var(--mint);
+}
+.wordmark__glyph {
+  display: block;
+  overflow: visible;
+}
+.wordmark__text {
+  font-family: var(--font-display);
+  font-size: 0.9375rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--daylight);
+}
+
+.topbar {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 8px;
+  gap: 16px;
+  padding-bottom: 20px;
+  border-bottom: 1px solid var(--grid);
 }
-.masthead__name {
-  font-size: var(--text-xs);
-  font-weight: 500;
-  color: var(--ink-1);
-  letter-spacing: 0.06em;
-  text-transform: lowercase;
-}
-.masthead__sep {
-  color: var(--ink-3);
-}
-.masthead__version {
-  color: var(--ink-3);
-  font-variant-numeric: tabular-nums;
-}
-@media (max-width: 639px) {
-  .masthead {
+/* The wordmark and the trust line together exceed a 375px viewport, and the
+   trust line must never be the thing that gets clipped -- it is the promise.
+   Stack rather than shrink. */
+@media (max-width: 460px) {
+  .topbar {
     flex-direction: column;
     align-items: flex-start;
-    gap: 4px;
+    gap: 12px;
   }
 }
 
-/* --- PrivacyBadge --- */
-.privacy-badge {
-  font-size: var(--text-xs);
-  color: var(--ink-3);
-  margin: 0;
+/* Three tiers, matching the portfolio footer on justintmccain.com:
+   identity + links / surface-specific note / copyright. The shared shape is
+   what makes the two tools and the landing page read as one system. */
+.footer {
+  display: grid;
+  gap: 10px;
+  margin-top: var(--gut);
+  padding-top: 20px;
+  border-top: 1px solid var(--grid);
+  font-size: var(--t-mono);
+  font-family: var(--font-mono);
+  color: var(--slate);
 }
-
-/* --- FileHeader --- */
-.file-header {
+.footer__top {
   display: flex;
   align-items: baseline;
-  gap: 1rem;
-  padding: 1rem 0;
-  border-bottom: 1px solid var(--surface-3);
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 8px 24px;
 }
-.file-header__name {
-  font-size: var(--text-md);
-  color: var(--ink-1);
-  font-weight: 500;
-  letter-spacing: -0.01em;
-  flex: 1;
-  word-break: break-word;
+.footer__id,
+.footer__links {
+  display: flex;
+  align-items: baseline;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 0;
 }
-.file-header__size {
-  font-size: var(--text-sm);
-  color: var(--ink-3);
-  font-variant-numeric: tabular-nums;
-}
-.file-header__reset {
-  color: var(--ink-2);
-  font-size: var(--text-sm);
+.footer__name { color: var(--daylight); }
+.footer__credit,
+.footer__sibling,
+.footer__copy { margin: 0; }
+/* The copyright is the least important line on the page and should read that
+   way — present for completeness, never competing with the tool itself. */
+.footer__copy { opacity: 0.6; }
+.footer__link {
+  color: var(--slate);
   text-decoration: underline;
   text-underline-offset: 4px;
-  transition: transform var(--dur-fast) var(--ease-out);
+  text-decoration-color: var(--grid);
+  transition: color var(--dur-micro) var(--ease);
 }
-.file-header__reset:active { transform: scale(0.97); }
+@media (hover: hover) and (pointer: fine) {
+  .footer__link:hover { color: var(--mint); text-decoration-color: var(--mint); }
+}
+.footer__sep,
+.footer__note { color: var(--grid); }
+.footer__note { color: var(--slate); opacity: 0.7; }
 
-/* --- Skeleton --- */
-.skeleton {
+/* ============================================================================
+   App shell
+   ----------------------------------------------------------------------------
+   The old asymmetric column (margin-left 22vw / max-width 56vw) read as an
+   accident. A centered measure reads as a decision, and it matches Vanish.
+   ========================================================================== */
+.app {
   display: flex;
   flex-direction: column;
-  gap: 12px;
-  padding: 32px 0;
+  min-height: 100dvh;
+  width: 100%;
+  max-width: var(--maxw-text);
+  margin: 0 auto;
+  padding: var(--gut);
 }
-.skeleton__row {
-  height: 16px;
-  background: var(--surface-2);
-  border-radius: 4px;
+.app__header { padding-bottom: 24px; }
+.app__content { flex: 1; }
+.app__actions {
+  padding: 28px 0 8px;
+  display: flex;
+  justify-content: flex-start;
 }
 
-/* --- DropZone --- */
+/* ============================================================================
+   PrivacyBadge -- the trust chip, promoted to permanent chrome
+   ========================================================================== */
+.privacy-badge {
+  margin: 0;
+  font-family: var(--font-mono);
+  font-size: var(--t-mono);
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--mint);
+  white-space: nowrap;
+}
+
+/* ============================================================================
+   Intro -- what it does, why it matters. Empty state only.
+   ----------------------------------------------------------------------------
+   Sits above the dropzone and stays quieter than it: the prompt inside the
+   zone is the instruction, this is only the reason. Two weights of the same
+   ink carry the why/what split, so no new color enters for a copy block.
+   ========================================================================== */
+.intro {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  max-width: 54ch;
+  margin: 0 0 24px;
+}
+.intro__why,
+.intro__what {
+  font-size: 0.9375rem;
+  line-height: 1.6;
+  margin: 0;
+}
+.intro__why { color: var(--slate); }
+.intro__what { color: var(--daylight); }
+
+/* ============================================================================
+   DropZone -- signal not yet captured
+   ========================================================================== */
 .dropzone {
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 4px;
+  gap: 10px;
   padding: 64px 24px;
-  min-height: 60dvh;
-  background: var(--surface-2);
-  border: 2px dashed var(--surface-3);
-  border-radius: 8px;
+  /* Clamped rather than a bare dvh: the intro block now sits above this, and
+     at 58dvh the pair overflowed a laptop viewport and left the zone reading
+     as dead space. */
+  min-height: clamp(16rem, 42dvh, 28rem);
+  background: transparent;
+  border: 1.5px dashed var(--grid);
+  border-radius: var(--radius);
   cursor: pointer;
+  text-align: center;
   transition:
-    transform var(--dur-fast) var(--ease-out),
-    filter var(--dur-fast) var(--ease-out),
-    border-color var(--dur-base) var(--ease-out),
-    background var(--dur-base) var(--ease-out);
+    border-color var(--dur-micro) var(--ease),
+    background var(--dur-micro) var(--ease),
+    transform var(--dur-press) var(--ease);
 }
 @media (hover: hover) and (pointer: fine) {
-  .dropzone:hover { border-color: var(--ink-3); }
+  .dropzone:hover {
+    border-color: color-mix(in srgb, var(--mint) 40%, var(--grid));
+    background: var(--deck);
+  }
 }
 .dropzone--active {
-  border-color: var(--ink-2);
-  transform: scale(1.005);
-  filter: brightness(1.02);
+  border-color: var(--mint);
+  border-style: solid;
+  background: var(--deck);
+  transform: scale(1.004);
 }
 .dropzone__prompt {
-  font-size: var(--text-xl);
+  font-family: var(--font-display);
+  font-size: var(--t-h3);
   font-weight: 500;
-  color: var(--ink-1);
+  line-height: 1.25;
+  letter-spacing: -0.02em;
+  color: var(--daylight);
+  max-width: 22ch;
   margin: 0;
 }
 .dropzone__hint {
-  font-size: var(--text-xs);
-  color: var(--ink-3);
-  margin: 0 0 2px;
+  font-family: var(--font-mono);
+  font-size: var(--t-mono);
+  color: var(--slate);
+  margin: 6px 0 0;
 }
 .dropzone__promise {
-  font-size: var(--text-xs);
-  color: var(--ink-3);
-  letter-spacing: 0.06em;
+  font-family: var(--font-mono);
+  font-size: var(--t-mono);
+  color: var(--slate);
+  letter-spacing: 0.08em;
   text-transform: uppercase;
+  opacity: 0.65;
   margin: 0;
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .dropzone, .dropzone--active { transform: none; filter: none; }
+  .dropzone, .dropzone--active { transform: none; }
 }
 
-/* --- MetadataReport --- */
-.report { margin: 24px 0; }
-.report-empty { color: var(--ink-2); padding: 32px 0; }
+/* ============================================================================
+   Skeleton -- signal captured, being read
+   ----------------------------------------------------------------------------
+   Class names and row count are asserted in tests/unit/components/basics --
+   do not rename .skeleton or .skeleton__row, and keep five rows.
+   The status line is decorative and lives inside the aria-hidden wrapper;
+   the real announcement comes from .app__content[aria-live].
+   ========================================================================== */
+.skeleton {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  padding: 40px 0;
+}
+.skeleton::before {
+  content: 'Reading';
+  align-self: flex-start;
+  font-family: var(--font-mono);
+  font-size: var(--t-mono);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--mint);
+  margin-bottom: 6px;
+  animation: pulse-dot 1400ms var(--ease) infinite;
+}
+.skeleton__row {
+  height: 14px;
+  background: var(--deck);
+  border-radius: var(--radius-sm);
+  animation: pulse-dot 1400ms var(--ease) infinite;
+}
+.skeleton__row:nth-child(1) { width: 92%; animation-delay: 0ms; }
+.skeleton__row:nth-child(2) { width: 78%; animation-delay: 90ms; }
+.skeleton__row:nth-child(3) { width: 85%; animation-delay: 180ms; }
+.skeleton__row:nth-child(4) { width: 64%; animation-delay: 270ms; }
+.skeleton__row:nth-child(5) { width: 71%; animation-delay: 360ms; }
+
+@keyframes pulse-dot {
+  0%, 100% { opacity: 0.45; }
+  50%      { opacity: 1; }
+}
+
+/* ============================================================================
+   FileHeader
+   ========================================================================== */
+.file-header {
+  display: flex;
+  align-items: baseline;
+  gap: 16px;
+  padding: 20px 0;
+  border-bottom: 1px solid var(--grid);
+}
+.file-header__name {
+  font-family: var(--font-mono);
+  font-size: 0.875rem;
+  color: var(--daylight);
+  letter-spacing: -0.01em;
+  flex: 1;
+  word-break: break-all;
+}
+.file-header__size {
+  font-family: var(--font-mono);
+  font-size: var(--t-mono);
+  color: var(--slate);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+.file-header__reset {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  padding: 0 2px;
+  color: var(--slate);
+  font-size: var(--t-mono);
+  font-family: var(--font-mono);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  text-decoration: underline;
+  text-underline-offset: 4px;
+  text-decoration-color: var(--grid);
+  white-space: nowrap;
+  transition:
+    color var(--dur-micro) var(--ease),
+    transform var(--dur-press) var(--ease);
+}
+@media (hover: hover) and (pointer: fine) {
+  .file-header__reset:hover { color: var(--mint); }
+}
+.file-header__reset:active { transform: scale(0.97); }
+
+/* ============================================================================
+   MetadataReport -- exposure, rendered as a ledger
+   ----------------------------------------------------------------------------
+   Plex Mono on the values is the highest-leverage move in the whole pass:
+   these rows literally ARE ledger rows, and the brand names that exact case.
+   ========================================================================== */
+.report { margin: 8px 0 0; }
+.report-empty {
+  font-family: var(--font-display);
+  font-size: var(--t-body-lg);
+  color: var(--daylight);
+  padding: 48px 0;
+}
 .report-note {
-  color: var(--ink-3);
-  font-size: var(--text-sm);
-  padding: 8px 0;
+  font-family: var(--font-mono);
+  font-size: var(--t-mono);
+  color: var(--slate);
+  padding: 16px 0 0;
 }
 .report-section {
-  padding: 32px 0;
-  border-top: 1px solid var(--surface-3);
+  padding: 28px 0;
+  border-top: 1px solid var(--grid);
   opacity: 0;
   transform: translateY(4px);
-  animation: report-section-enter var(--dur-slow) var(--ease-out) forwards;
+  animation: report-section-enter var(--dur-row) var(--ease) forwards;
 }
 .report-section:first-of-type { border-top: none; }
 @keyframes report-section-enter {
   to { opacity: 1; transform: translateY(0); }
 }
 .report-section__label {
-  font-size: var(--text-xs);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-family: var(--font-mono);
+  font-size: var(--t-mono);
   font-weight: 500;
-  letter-spacing: 0.02em;
+  letter-spacing: 0.08em;
   text-transform: uppercase;
-  color: var(--ink-3);
-  margin: 0 0 12px;
+  color: var(--slate);
+  padding-bottom: 10px;
+  margin: 0 0 14px;
+  border-bottom: 1px solid var(--grid);
 }
-.report-section__rows { display: grid; gap: 6px; margin: 0; }
+.report-section__rows { display: grid; gap: 10px; margin: 0; }
 .report-row {
   display: grid;
-  grid-template-columns: minmax(140px, 1fr) 2fr;
-  gap: 16px;
+  grid-template-columns: minmax(130px, 1fr) 1.6fr;
+  gap: 8px 20px;
   align-items: baseline;
   margin: 0;
 }
 .report-row dt {
-  color: var(--ink-2);
-  font-size: var(--text-sm);
+  color: var(--slate);
+  font-size: 0.875rem;
   margin: 0;
 }
 .report-row dd {
-  color: var(--ink-1);
-  font-size: var(--text-sm);
+  color: var(--daylight);
+  font-family: var(--font-mono);
+  font-size: var(--t-mono);
   font-variant-numeric: tabular-nums;
   word-break: break-word;
   margin: 0;
 }
 
+@media (max-width: 520px) {
+  .report-row { grid-template-columns: 1fr; gap: 2px; }
+}
+
 @media (prefers-reduced-motion: reduce) {
   .report-section { animation: none; opacity: 1; transform: none; }
+  .skeleton::before, .skeleton__row { animation: none; opacity: 0.75; }
 }
 
-/* --- GpsCallout --- */
-@keyframes gps-enter {
-  to { opacity: 1; transform: scale(1); }
-}
-@keyframes gps-fade-in {
-  to { opacity: 1; }
-}
+/* ============================================================================
+   GpsCallout -- the exposure peak
+   ----------------------------------------------------------------------------
+   No new color. Mint reads safe/go and amber is spent on the DONE seal, so
+   neither can carry a threat, and --alert is reserved for validation errors.
+   The peak is carried by surface lift and scale instead: the panel rises off
+   Signal Black onto Deck and the coordinates are set larger than anything
+   else on the page.
+   ========================================================================== */
+@keyframes gps-enter { to { opacity: 1; transform: scale(1); } }
+@keyframes gps-fade-in { to { opacity: 1; } }
 
 .gps-callout {
-  background: var(--warn-bg);
-  border: 1px solid var(--warn-border);
-  border-radius: 8px;
-  padding: 24px;
+  background: var(--deck);
+  border: 1px solid var(--grid);
+  border-radius: var(--radius);
+  padding: 28px;
   margin: 24px 0 8px;
   transform-origin: top left;
   opacity: 0;
-  transform: scale(0.97);
-  animation: gps-enter var(--dur-hero) var(--ease-out) 80ms forwards;
+  transform: scale(0.985);
+  animation: gps-enter var(--dur-screen) var(--ease) 80ms forwards;
 }
 .gps-callout__heading {
-  font-size: var(--text-2xl);
-  color: var(--warn-strong);
-  font-weight: 600;
-  margin: 0 0 12px;
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  font-family: var(--font-display);
+  font-size: var(--t-h3);
+  line-height: 1.2;
+  letter-spacing: -0.02em;
+  color: var(--daylight);
+  font-weight: 500;
+  margin: 0 0 20px;
   opacity: 0;
-  animation: gps-fade-in 200ms var(--ease-out) 200ms forwards;
+  animation: gps-fade-in var(--dur-micro) var(--ease) 200ms forwards;
+}
+.gps-callout__heading::before {
+  content: '';
+  flex-shrink: 0;
+  width: 6px;
+  height: 6px;
+  margin-top: 0.55em;
+  border-radius: 50%;
+  background: var(--daylight);
 }
 .gps-callout__coords {
   display: flex;
   flex-direction: column;
-  gap: 4px;
-  margin: 0 0 12px;
+  gap: 8px;
+  margin: 0 0 20px;
   font-variant-numeric: tabular-nums;
 }
 .gps-callout__pair {
   display: grid;
   grid-template-columns: max-content 1fr;
-  gap: 0 16px;
+  gap: 0 20px;
+  align-items: baseline;
   opacity: 0;
 }
-.gps-callout__pair--lat {
-  animation: gps-fade-in 160ms var(--ease-out) 320ms forwards;
-}
-.gps-callout__pair--lng {
-  animation: gps-fade-in 160ms var(--ease-out) 380ms forwards;
-}
+.gps-callout__pair--lat { animation: gps-fade-in 160ms var(--ease) 320ms forwards; }
+.gps-callout__pair--lng { animation: gps-fade-in 160ms var(--ease) 380ms forwards; }
 .gps-callout__coords dt {
-  color: var(--warn-ink);
-  font-size: var(--text-sm);
+  font-family: var(--font-mono);
+  font-size: var(--t-mono);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--slate);
   margin: 0;
 }
 .gps-callout__coords dd {
-  color: var(--warn-strong);
+  font-family: var(--font-mono);
+  font-size: 1.125rem;
   font-weight: 500;
-  font-size: var(--text-sm);
+  color: var(--daylight);
   margin: 0;
 }
 .gps-callout__link {
-  color: var(--warn-strong);
-  font-weight: 500;
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  font-family: var(--font-mono);
+  font-size: var(--t-mono);
+  letter-spacing: 0.06em;
+  color: var(--mint);
   text-decoration: underline;
   text-underline-offset: 4px;
   opacity: 0;
-  animation: gps-fade-in 160ms var(--ease-out) 520ms forwards;
+  animation: gps-fade-in 160ms var(--ease) 520ms forwards;
 }
 
 @media (prefers-reduced-motion: reduce) {
   .gps-callout {
-    animation: gps-fade-in var(--dur-base) var(--ease-out) forwards;
+    animation: gps-fade-in var(--dur-micro) var(--ease) forwards;
     transform: none;
   }
   .gps-callout__heading,
@@ -331,39 +587,42 @@ a {
   }
 }
 
-/* --- ScrubButton --- */
+/* ============================================================================
+   ScrubButton -- enforcement
+   ========================================================================== */
 .scrub-button {
   display: inline-flex;
   align-items: center;
-  gap: 8px;
-  padding: 12px 20px;
-  background: var(--accent);
-  color: var(--accent-ink);
-  font-weight: 500;
-  font-size: var(--text-md);
-  border-radius: 6px;
+  justify-content: center;
+  gap: 10px;
+  min-height: 44px;
+  padding: 12px 24px;
+  background: var(--mint);
+  color: var(--signal-black);
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 0.9375rem;
+  letter-spacing: 0.02em;
+  border-radius: var(--radius-sm);
   border: none;
   cursor: pointer;
   transition:
-    transform var(--dur-fast) var(--ease-out),
-    opacity var(--dur-fast) var(--ease-out);
+    transform var(--dur-press) var(--ease),
+    opacity var(--dur-press) var(--ease),
+    filter var(--dur-press) var(--ease);
 }
 .scrub-button:disabled {
-  opacity: 0.6;
+  opacity: 0.55;
   cursor: not-allowed;
 }
 @media (hover: hover) and (pointer: fine) {
-  .scrub-button:not(:disabled):hover {
-    transform: translateY(-1px);
-  }
+  .scrub-button:not(:disabled):hover { filter: brightness(1.08); }
 }
-.scrub-button:active:not(:disabled) {
-  transform: scale(0.97);
-}
+.scrub-button:active:not(:disabled) { transform: scale(0.97); }
 .scrub-button__spinner {
   display: inline-block;
-  width: 14px;
-  height: 14px;
+  width: 13px;
+  height: 13px;
   border: 2px solid transparent;
   border-top-color: currentColor;
   border-radius: 50%;
@@ -373,84 +632,178 @@ a {
 
 @media (prefers-reduced-motion: reduce) {
   .scrub-button__spinner { animation-duration: 2000ms; }
-  .scrub-button:not(:disabled):hover { transform: none; }
+  .scrub-button:not(:disabled):hover { filter: none; }
   .scrub-button:active:not(:disabled) { transform: none; }
   .file-header__reset:active { transform: none; }
 }
 
-/* --- DoneSummary --- */
-.done { padding: 32px 0; }
-.done__heading {
-  font-size: var(--text-lg);
-  color: var(--ink-1);
-  margin: 0 0 24px;
-  font-weight: 600;
+/* ============================================================================
+   DoneSummary -- evidence, on Evidence Paper
+   ----------------------------------------------------------------------------
+   The only light surface in the app. It is a light island inside
+   color-scheme: dark, so every color here is stated explicitly rather than
+   inherited. Mint must be --mint-ink (5.81:1 on paper); raw --mint fails.
+   ========================================================================== */
+.done { padding: 32px 0 8px; }
+
+.done__receipt {
+  background: var(--paper);
+  color: var(--ink);
+  border-radius: var(--radius);
+  padding: 32px;
+  box-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.04),
+    0 18px 40px -24px rgba(0, 0, 0, 0.8);
+  opacity: 0;
+  transform: translateY(6px);
+  animation: receipt-enter var(--dur-honored) var(--ease) forwards;
 }
+@keyframes receipt-enter {
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.done__masthead {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding-bottom: 20px;
+  margin-bottom: 20px;
+  border-bottom: 1px solid color-mix(in srgb, var(--ink) 15%, var(--paper));
+}
+/* The one solid amber in the product. Fill, not text: amber ON paper is
+   1.72:1 and fails AA; ink on amber is 9.45:1. */
+.done__seal {
+  background: var(--amber);
+  color: var(--ink);
+  font-family: var(--font-mono);
+  font-size: var(--t-mono);
+  font-weight: 500;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  padding: 5px 12px;
+  border-radius: var(--radius-chip);
+  white-space: nowrap;
+}
+.done__kicker {
+  font-family: var(--font-mono);
+  font-size: var(--t-mono);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: color-mix(in srgb, var(--ink) 55%, var(--paper));
+}
+
+.done__heading {
+  /* inline-block so the programmatic focus ring hugs the words. As a block
+     it spanned the full column and read as a text input. */
+  display: inline-block;
+  font-family: var(--font-display);
+  font-size: var(--t-h3);
+  line-height: 1.15;
+  letter-spacing: -0.025em;
+  color: var(--ink);
+  margin: 0 0 24px;
+  font-weight: 500;
+}
+.done__heading:focus-visible {
+  outline: 2px solid var(--mint-ink);
+  outline-offset: 6px;
+  border-radius: 2px;
+}
+
 .done__list {
   list-style: none;
   display: flex;
   flex-direction: column;
-  gap: 12px;
   padding: 0;
-  margin: 0 0 32px;
+  margin: 0 0 28px;
+  border-top: 1px solid color-mix(in srgb, var(--ink) 12%, var(--paper));
 }
 .done__row {
   display: flex;
-  align-items: center;
+  align-items: baseline;
   gap: 10px;
+  padding: 11px 0;
+  border-bottom: 1px solid color-mix(in srgb, var(--ink) 12%, var(--paper));
   opacity: 0;
   transform: translateY(6px);
-  animation: done-row-enter var(--dur-slow) var(--ease-out)
-    calc(var(--stagger-i, 0) * 60ms) forwards;
+  animation: done-row-enter var(--dur-row) var(--ease)
+    calc(var(--stagger-i, 0) * 60ms + 120ms) forwards;
 }
 @keyframes done-row-enter {
   to { opacity: 1; transform: translateY(0); }
 }
+/* Node atom, paper variant. Inherits shape from the atom block above;
+   only the color and alignment change. */
 .done__check {
-  color: var(--accent);
-  font-size: var(--text-md);
-  font-weight: 700;
+  background: var(--mint-ink);
+  align-self: center;
   opacity: 0;
   transform: scale(0.5);
-  animation: done-check-pop var(--dur-fast) var(--ease-out)
-    calc(var(--stagger-i, 0) * 60ms + 80ms) forwards;
+  animation: done-check-pop var(--dur-press) var(--ease)
+    calc(var(--stagger-i, 0) * 60ms + 200ms) forwards;
 }
 @keyframes done-check-pop {
   to { opacity: 1; transform: scale(1); }
 }
 .done__label {
-  color: var(--ink-1);
-  font-size: var(--text-sm);
-  flex-wrap: wrap;
+  font-family: var(--font-mono);
+  font-size: var(--t-mono);
+  line-height: 1.5;
+  color: color-mix(in srgb, var(--ink) 70%, var(--paper));
 }
+.done__label > span:first-child { color: var(--ink); }
+.done__label > span:last-child { color: color-mix(in srgb, var(--ink) 60%, var(--paper)); }
+
 .done__nothing {
-  color: var(--ink-2);
-  font-size: var(--text-sm);
-  margin: 0 0 32px;
+  font-family: var(--font-mono);
+  font-size: var(--t-mono);
+  color: color-mix(in srgb, var(--ink) 70%, var(--paper));
+  margin: 0 0 28px;
 }
+
 .done__reset {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
   background: none;
   border: none;
   padding: 0;
   cursor: pointer;
-  color: var(--accent);
-  font-size: var(--text-sm);
+  color: var(--mint-ink);
+  font-family: var(--font-mono);
+  font-size: var(--t-mono);
   font-weight: 500;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
   text-decoration: underline;
   text-underline-offset: 4px;
-  transition: transform var(--dur-fast) var(--ease-out);
+  transition:
+    opacity var(--dur-micro) var(--ease),
+    transform var(--dur-press) var(--ease);
+}
+.done__reset:focus-visible {
+  outline: 2px solid var(--mint-ink);
+  outline-offset: 3px;
 }
 .done__reset:active { transform: scale(0.97); }
 @media (hover: hover) and (pointer: fine) {
-  .done__reset:hover { opacity: 0.8; }
+  .done__reset:hover { opacity: 0.75; }
+}
+
+@media (max-width: 520px) {
+  .done__receipt { padding: 24px 20px; }
+  .done__masthead { flex-wrap: wrap; gap: 8px; }
 }
 
 @media (prefers-reduced-motion: reduce) {
+  .done__receipt { animation: none; opacity: 1; transform: none; }
   .done__row { animation: none; opacity: 1; transform: none; }
   .done__check { animation: none; transform: scale(1); opacity: 1; }
 }
 
-/* --- ErrorBanner --- */
+/* ============================================================================
+   ErrorBanner -- the ONLY --alert surface in this app
+   ========================================================================== */
 .error-banner {
   position: sticky;
   top: 0;
@@ -458,69 +811,45 @@ a {
   display: flex;
   align-items: center;
   gap: 16px;
-  padding: 12px 24px;
-  background: var(--surface-2);
-  border-top: 1px solid var(--ink-2);
-  border-bottom: 1px solid var(--surface-3);
+  padding: 12px 16px;
+  margin-bottom: 8px;
+  background: var(--deck);
+  border: 1px solid var(--alert);
+  border-radius: var(--radius-sm);
   opacity: 0;
   transform: translateY(-4px);
-  animation: error-enter var(--dur-base) var(--ease-out) forwards;
+  animation: error-enter var(--dur-micro) var(--ease) forwards;
 }
 @keyframes error-enter {
   to { opacity: 1; transform: translateY(0); }
 }
 .error-banner__message {
   flex: 1;
-  color: var(--ink-1);
-  font-size: var(--text-sm);
+  color: var(--alert);
+  font-family: var(--font-mono);
+  font-size: var(--t-mono);
   margin: 0;
 }
 .error-banner__dismiss {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 44px;
+  min-height: 44px;
   background: none;
   border: none;
   cursor: pointer;
-  color: var(--ink-2);
-  font-size: var(--text-md);
-  padding: 4px 8px;
+  color: var(--slate);
+  font-size: 1rem;
   line-height: 1;
   flex-shrink: 0;
-  transition: opacity var(--dur-fast) var(--ease-out);
+  transition: color var(--dur-micro) var(--ease);
 }
 @media (hover: hover) and (pointer: fine) {
-  .error-banner__dismiss:hover { opacity: 0.7; }
+  .error-banner__dismiss:hover { color: var(--daylight); }
 }
 
 @media (prefers-reduced-motion: reduce) {
   .error-banner { animation-name: error-enter-reduced; transform: none; }
   @keyframes error-enter-reduced { to { opacity: 1; } }
-}
-
-/* --- App shell / layout --- */
-.app {
-  display: flex;
-  flex-direction: column;
-  min-height: 100dvh;
-  padding: 24px;
-}
-.app__header {
-  padding-bottom: 16px;
-}
-.app__content { flex: 1; }
-.app__actions {
-  padding: 24px 0;
-  display: flex;
-  justify-content: flex-start;
-}
-
-/* Asymmetric column on desktop */
-@media (min-width: 1024px) {
-  .app { padding: 40px 0; }
-  .app__header {
-    padding: 0 40px 24px;
-  }
-  .app__content {
-    margin-left: 22vw;
-    max-width: 56vw;
-    padding: 0 40px;
-  }
 }

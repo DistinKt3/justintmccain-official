@@ -1,5 +1,7 @@
 import { useReducer, useCallback, useEffect } from 'react';
-import { Masthead } from './components/Masthead';
+import { TopBar } from './components/TopBar';
+import { Footer } from './components/Footer';
+import { Intro } from './components/Intro';
 import { DropZone } from './components/DropZone';
 import { FileHeader } from './components/FileHeader';
 import { MetadataReport } from './components/MetadataReport';
@@ -134,10 +136,15 @@ export function App() {
     <main className="app">
       {errorMessage && <ErrorBanner message={errorMessage} onDismiss={onDismiss} />}
       <header className="app__header">
-        <Masthead />
+        <TopBar />
       </header>
       <div className="app__content" aria-live="polite">
-        {currentContent.kind === 'empty' && <DropZone onFile={onFile} />}
+        {currentContent.kind === 'empty' && (
+          <>
+            <Intro />
+            <DropZone onFile={onFile} />
+          </>
+        )}
 
         {currentContent.kind === 'analyzing' && (
           <>
@@ -194,6 +201,7 @@ export function App() {
           </>
         )}
       </div>
+      <Footer />
     </main>
   );
 }

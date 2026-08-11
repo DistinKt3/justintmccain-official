@@ -1,43 +1,117 @@
+/* ============================================================================
+   METADATA SCRUBBER: Design tokens
+   ----------------------------------------------------------------------------
+   SOURCE OF TRUTH: ../../career-planning-tools/site/css/main.css (SIGNAL)
+   LINEAGE:         brand site main.css -> vanish/src/styles/tokens.css -> here
+
+   These values are reused VERBATIM from the JTM brand system. Do not fork,
+   do not "improve", do not add a third chromatic accent. This file and
+   Vanish's tokens.css must stay identical below the header comment; the two
+   tools ship side by side on justintmccain.com, and any drift between them
+   shows up as two products that merely resemble each other.
+
+   If a token changes in the brand site's main.css, mirror it in BOTH apps.
+   There is no shared package between the repos at this scale.
+   ========================================================================== */
+
+/* --- Fonts: self-hosted, no CDN ------------------------------------------
+   Deliberate privacy decision, not just performance: a Google Fonts request
+   would leak every visitor's IP to a third party on a tool whose entire
+   promise is that nothing about them is transmitted or retained.
+   Font files copied from the brand site's assets/fonts/ (byte-identical).
+   Served from /public/fonts/, so they satisfy the page's `default-src 'self'`
+   CSP without needing a font-src exception.
+   ------------------------------------------------------------------------ */
+@font-face {
+  font-family: "Space Grotesk";
+  src: url("/fonts/space-grotesk-var.woff2") format("woff2-variations");
+  font-weight: 400 700;
+  font-display: swap;
+  font-style: normal;
+}
+@font-face {
+  font-family: "Inter";
+  src: url("/fonts/inter-var.woff2") format("woff2-variations");
+  font-weight: 100 900;
+  font-display: swap;
+  font-style: normal;
+}
+@font-face {
+  font-family: "IBM Plex Mono";
+  src: url("/fonts/plex-mono-400.woff2") format("woff2");
+  font-weight: 400;
+  font-display: swap;
+  font-style: normal;
+}
+@font-face {
+  font-family: "IBM Plex Mono";
+  src: url("/fonts/plex-mono-500.woff2") format("woff2");
+  font-weight: 500;
+  font-display: swap;
+  font-style: normal;
+}
+
 :root {
-  /* Neutrals -- cool-biased single-hue axis (h ~ 250) */
-  --surface:      oklch(0.99 0.005 250);
-  --surface-2:    oklch(0.97 0.006 250);
-  --surface-3:    oklch(0.94 0.008 250);
-  --ink-3:        oklch(0.62 0.010 250);
-  --ink-2:        oklch(0.42 0.012 250);
-  --ink-1:        oklch(0.22 0.014 250);
-  --ink-0:        oklch(0.15 0.014 250);
+  /* --- Palette ---------------------------------------------------------
+     The ONLY brand accents are Signal Mint and Seal Amber. Never a third hue.
+     Amber is rationed: it renders solid in exactly one place in this product,
+     the DONE receipt seal. Mint carries live/interactive.
+     -------------------------------------------------------------------- */
+  --signal-black: #0a0f14;
+  --deck: #131a22;
+  --grid: #212b35;
+  --daylight: #eef2f6;
+  --slate: #a6b2bf;
+  --mint: #5fe3c4;
+  --amber: #e9b44c;
+  --paper: #f5f3ed; /* Evidence Paper, DONE receipt only */
+  --ink: #14181d; /* text on Evidence Paper */
+  --mint-ink: #0b6b58; /* REQUIRED for mint on Evidence Paper (contrast) */
 
-  /* Accent */
-  --accent:       oklch(0.62 0.14 145);
-  --accent-hover: oklch(0.55 0.15 145);
-  --accent-ink:   oklch(0.99 0.01 145);
+  /* --- Error tone -------------------------------------------------------
+     #C4726A measured: 5.46:1 on Signal Black, 4.97:1 on Deck, so AA for body
+     text on both surfaces. Not a brand accent: used only for validation
+     errors, never for status or decoration. In this app that means exactly
+     one component, ErrorBanner.
+     -------------------------------------------------------------------- */
+  --alert: #c4726a;
 
-  /* Warn - GPS callout only */
-  --warn-bg:      oklch(0.96 0.04 30);
-  --warn-border:  oklch(0.85 0.10 30);
-  --warn-ink:     oklch(0.42 0.14 30);
-  --warn-strong:  oklch(0.32 0.16 30);
+  /* --- Type ------------------------------------------------------------ */
+  --font-display: "Space Grotesk", ui-sans-serif, system-ui, sans-serif;
+  --font-body: "Inter", ui-sans-serif, system-ui, -apple-system, sans-serif;
+  --font-mono: "IBM Plex Mono", ui-monospace, "SF Mono", Menlo, monospace;
 
-  /* Focus */
-  --focus-ring:   var(--accent);
+  --t-display-xl: clamp(3rem, 6vw, 6.5rem);
+  --t-h1: clamp(2rem, 4vw, 3.25rem);
+  --t-h2: clamp(1.75rem, 3vw, 2.75rem);
+  --t-h3: clamp(1.5rem, 2vw, 1.875rem);
+  --t-body-lg: clamp(1.125rem, 1.4vw, 1.25rem);
+  --t-body: 1rem;
+  --t-mono: 0.8125rem;
 
-  /* Type scale (ratio ~1.2) */
-  --text-xs:  0.75rem;
-  --text-sm:  0.875rem;
-  --text-md:  1rem;
-  --text-lg:  1.125rem;
-  --text-xl:  1.5rem;
-  --text-2xl: 2rem;
+  /* --- Rhythm ---------------------------------------------------------- */
+  --gut: clamp(1.25rem, 5vw, 2.5rem);
+  --section: clamp(5rem, 12vh, 9rem);
+  --maxw: 72rem;
+  --maxw-text: 46rem;
+  --maxw-form: 40rem;
 
-  /* Motion */
-  --ease-out:    cubic-bezier(0.22, 1, 0.36, 1);
-  --ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);
-  --dur-fast:    140ms;
-  --dur-base:    200ms;
-  --dur-slow:    240ms;
-  --dur-hero:    280ms;
+  /* --- Motion ----------------------------------------------------------
+     Confident expo-out. Calm and deliberate; privacy isn't frantic.
+     Durations are per-element, not one blanket value, so small things feel
+     fast and big things don't feel abrupt.
+     -------------------------------------------------------------------- */
+  --ease: cubic-bezier(0.16, 1, 0.3, 1);
+  --dur-press: 160ms; /* button :active */
+  --dur-focus: 120ms; /* focus ring; instant reads as a glitch */
+  --dur-chip: 180ms; /* status chip outline->fill */
+  --dur-row: 200ms; /* scan row entrance */
+  --dur-micro: 240ms;
+  --dur-screen: 260ms; /* screen-to-screen */
+  --dur-honored: 220ms; /* the one DONE payoff moment */
 
-  /* Font stack */
-  --font-sans: -apple-system, BlinkMacSystemFont, "Inter", "Segoe UI", system-ui, sans-serif;
+  --ring: 2px solid var(--mint);
+  --radius: 10px;
+  --radius-sm: 6px;
+  --radius-chip: 999px;
 }
