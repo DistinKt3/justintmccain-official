@@ -188,13 +188,6 @@ export const WORK = {
       moved:  "Proved a scalable path off brittle process for the entire partner ecosystem.",
     },
     {
-      title: "Evidence that outlives the account",
-      tag: "ROKU",
-      broken: "Consent evidence is only as good as its ability to survive the deletion it is meant to prove.",
-      built:  "Architected server-side, first-party consent enforcement and a <strong>durable, append-only evidence layer that survives account deletion</strong>, moving vendor collection onto systems we control.",
-      moved:  "Turned a compliance claim into a defensible record.",
-    },
-    {
       title: "A privacy program, stood up fast",
       tag: "CENGAGE",
       broken: "Enterprises this size often run privacy as a legal checklist rather than a product: no unified opt-out handling, no formal risk program, reactive by default.",
@@ -207,6 +200,17 @@ export const WORK = {
       broken: "A 100,000-person enterprise operating in more than 80 countries had no single way to capture or honor consent. Every region solved it locally, so no one could answer a basic question about what a person had agreed to.",
       built:  "Built the enterprise consent framework and the platform beneath it, integrating <strong>20+ source systems</strong> and harmonizing <strong>~40M user profiles</strong> into one record.",
       moved:  "One consent record, one answer, in every market.",
+    },
+    {
+      /* Title is deliberately short. "TD AMERITRADE" is the only two-word tag on
+         the page and always wraps to two lines against the 45% max-width on
+         .card__tag, which leaves .card__title ~85px. A longer title tips it to
+         five lines, past the four-line ceiling every other card holds. */
+      title: "CCPA across 55 sites",
+      tag: "TD AMERITRADE",
+      broken: "CCPA arrives with a fixed date and no partial credit. The consent platform had not been chosen, and the hard part turned out not to be the tool but the pixel governance and auditable process underneath it.",
+      built:  "Ran the enterprise RFP and led the project team from inception to launch. I owned the platform: consent management across <strong>55 front-facing websites</strong>, live to <strong>200,000 users on day one</strong>, and the data-subject-request solution beside it. Owned pixel governance jointly with the Chief Privacy Officer and MarTech.",
+      moved:  "<strong>This is how the enterprise met CCPA.</strong> The platform stayed mine to run and iterate after launch.",
     },
   ],
 };

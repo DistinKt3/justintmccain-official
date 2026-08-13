@@ -1,23 +1,49 @@
 # Netlify build config.
 #
 # Vanish is NOT a static site. /api/scan is a server function, so there is no
-# folder to drag and drop. Netlify detects Next.js from package.json and applies
-# its own runtime, which turns that route into a Netlify Function during the
-# build.
+# folder to drag and drop. Netlify's Next.js runtime (the OpenNext adapter,
+# @netlify/plugin-nextjs v5) turns that route into a server function during the
+# build and wires up routing for everything else.
 #
-# The @netlify/plugin-nextjs plugin is deliberately NOT declared here. Netlify's
-# own docs say not to install it yourself: it ships as part of the platform, and
-# pinning it in this file can leave the build on an older runtime than the one
-# Netlify would otherwise use.
+# ---------------------------------------------------------------------------
+# WHY THE PLUGIN IS DECLARED EXPLICITLY, AND WHY `publish` IS NOT SET
+# ---------------------------------------------------------------------------
+# An earlier version of this file did the opposite of both, on the reasoning
+# that Netlify auto-detects Next.js and that declaring the plugin yourself can
+# pin an older runtime. That reasoning produced a broken deploy, so it is
+# recorded here rather than quietly replaced.
 #
+# What happened: `publish = ".next"` told Netlify the site was a pile of static
+# files whose output directory happened to be `.next`. Netlify believed it. The
+# build succeeded, the adapter never ran, and the deploy served the RAW CONTENTS
+# of the .next directory at the site root — /BUILD_ID, /routes-manifest.json,
+# /server/app/index.html and /package.json all returned 200, while every real
+# route returned 404 and /.netlify/functions/___netlify-server-handler did not
+# exist. Publicly readable build internals and a completely non-functional app,
+# from a build that reported success.
+#
+# So:
+#   - The plugin is DECLARED. Declaring it in [[plugins]] is not the same as
+#     installing it as a dependency — that is the thing Netlify warns against.
+#     Declared here, Netlify supplies and updates the runtime itself, and the
+#     build no longer depends on framework auto-detection firing correctly
+#     inside a monorepo with a base directory.
+#   - `publish` is NOT set. The runtime computes it. Setting it by hand is what
+#     caused the failure above, and any value written here will either be
+#     ignored or break the deploy again.
+#
+# If you must debug this, the single fastest check is:
+#     curl -s -o /dev/null -w '%{http_code}' <site>/.netlify/functions/___netlify-server-handler
+# A 404 there means the adapter did not run, whatever the build log says.
+#
+# ---------------------------------------------------------------------------
 # Security headers deliberately live in next.config.ts, not here. One source of
 # truth avoids two CSP headers reaching the browser, where they get intersected
-# and fail in ways that are miserable to debug. Verify they survived the deploy
-# with the curl in docs/DEPLOY.md.
+# and fail in ways that are miserable to debug. A missing CSP on a response is
+# also a useful symptom: it means the request never went through Next at all.
 
 [build]
   command = "npm run build"
-  publish = ".next"
 
 [build.environment]
   # Next.js 16 requires >= 20.9. Pinned so a change to Netlify's default can't
@@ -35,6 +61,11 @@
   # The value is inlined into the client bundle at build time. Changing it needs
   # a REBUILD — clearing the Netlify cache and redeploying is not enough.
   NEXT_PUBLIC_BASE_PATH = "/vanish"
+
+# Netlify supplies and updates this runtime; it is not an npm dependency of the
+# project and must not be added to package.json.
+[[plugins]]
+  package = "@netlify/plugin-nextjs"
 
 # There are no environment variables and no secrets. If this app ever needs one,
 # it belongs in Netlify's env UI, never in this file.
