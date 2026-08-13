@@ -142,6 +142,42 @@ console.log("\nHeaders");
   report(perms.includes("browsing-topics=()") ? "ok" : "warn", "permissions-policy opts out of Topics");
 }
 
+/* -- duplicate headers ----------------------------------------------------- */
+/* Cloudflare's _headers INHERITS from every matching rule rather than
+   overriding, so a path matched by both `/*` and a specific rule gets TWO of
+   the same header unless the specific rule detaches first with `! Name`.
+   That failure is invisible in a browser and broke every cache rule and the
+   Scrubber's CSP once already, so it is asserted rather than trusted. */
+console.log("\nHeader hygiene (one value per header, not merged)");
+{
+  const cachePaths = [
+    ["/", "must-revalidate"],
+    ["/css/main.css", "immutable"],
+    ["/js/main.js", "immutable"],
+    ["/robots.txt", "3600"],
+    ["/sitemap.xml", "3600"],
+  ];
+  for (const [p, expect] of cachePaths) {
+    const r = await head(site + p);
+    const cc = r.headers?.get("cache-control") ?? "";
+    const n = (cc.match(/max-age/g) || []).length;
+    const good = n === 1 && cc.includes(expect);
+    report(good ? "ok" : "bad", `cache-control ${p}`, n > 1 ? `MERGED: ${cc}` : cc || "missing");
+  }
+
+  for (const p of ["/", "/scrubber/"]) {
+    const r = await head(site + p);
+    const csp = r.headers?.get("content-security-policy") ?? "";
+    const n = (csp.match(/default-src/g) || []).length;
+    report(n === 1 ? "ok" : "bad", `single CSP on ${p}`,
+      n > 1 ? "TWO policies — browser will intersect them and clamp the app" : `${n}`);
+  }
+
+  const og = await head(`${site}/og/og-image.png`);
+  const corp = og.headers?.get("cross-origin-resource-policy") ?? "";
+  report(corp === "cross-origin" ? "ok" : "bad", "share card CORP", corp || "missing");
+}
+
 /* -- nothing private shipped ---------------------------------------------- */
 console.log("\nLeakage");
 for (const path of [

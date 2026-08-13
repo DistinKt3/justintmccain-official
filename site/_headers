@@ -1,22 +1,39 @@
 # ============================================================================
-# Justin T. McCain — SIGNAL · Cloudflare Pages headers
+# Justin T. McCain — SIGNAL · static asset headers
 # ============================================================================
 #
-# Cloudflare Pages applies every matching rule in order, so later rules override
-# earlier ones for the same header name. `/*` sets the baseline; the specific
-# paths below tighten or relax it.
+# HOW THIS FILE ACTUALLY BEHAVES — read before editing.
 #
-# THE POINT OF THE CSP HERE:
-#   privacy.html tells visitors this site makes no third-party requests. That
-#   claim is currently a property of how the site was built, which means it
-#   holds only as long as nobody pastes in a snippet. `connect-src 'none'` plus
-#   `default-src 'none'` makes the browser enforce it. A reviewer can read this
-#   file and verify the promise without auditing the JavaScript. For a privacy
-#   engineer's own site that is the difference between a claim and a control.
+# A request that matches several rules INHERITS THE HEADERS FROM ALL OF THEM.
+# Matching a more specific path does NOT replace what a broader rule set. Two
+# rules that both set the same header name produce TWO headers on the response.
 #
-#   There is deliberately NO report-uri / report-to. A violation report is an
-#   outbound request to a collection endpoint, which is exactly the thing this
-#   site does not do. The policy fails closed and silently.
+# An earlier version of this file was written on the opposite assumption ("later
+# rules override earlier ones for the same header name"). Every override in it
+# was therefore silently broken, and none of it was visible without reading raw
+# response headers:
+#
+#   - /css/*, /js/*, /assets/*, /scrubber/assets/*, /og/*, /robots.txt and
+#     /sitemap.xml each returned `max-age=0, must-revalidate, max-age=31536000,
+#     immutable`. The first value wins, so the year-long immutable caching never
+#     applied — the fonts, the stylesheet and the 2.7 MB film revalidated on
+#     every single page load.
+#   - /og/* returned `Cross-Origin-Resource-Policy: same-origin, cross-origin`,
+#     so the share card kept the restrictive value it was meant to opt out of.
+#   - /scrubber/* returned BOTH content security policies. Browsers enforce the
+#     INTERSECTION of multiple CSP headers, so the baseline silently clamped the
+#     app: img-src lost `data:` and `blob:`, style-src lost `unsafe-inline`, and
+#     worker-src fell back to the baseline's `default-src 'none'`. The tool
+#     loaded and looked fine, while its image previews, its staggered reveals
+#     and its HEIC decoder were all being blocked.
+#
+# THE FIX, used on every override below: detach the inherited header first with
+# `! Header-Name`, then set the value you actually want. Detaching without
+# re-setting leaves the response with no such header at all, which for a CSP
+# means fail-open — so the two lines always travel together.
+#
+# When you add a rule here, verify it against a real deploy rather than reading
+# it back. `deploy/verify.mjs` asserts there is exactly one of each of these.
 
 /*
   # --- Content Security Policy ---------------------------------------------
@@ -52,6 +69,7 @@
 
   # --- Caching --------------------------------------------------------------
   # HTML must revalidate, or a content fix would sit behind a stale cache.
+  # Every rule below that wants a different value must DETACH this one first.
   Cache-Control: public, max-age=0, must-revalidate
 
 # Versioned assets. Every reference from the HTML carries ?v=<ASSET_VERSION>,
@@ -60,71 +78,76 @@
 # ASSET_VERSION in build/build.mjs whenever CSS or JS changes, or clients will
 # hold the old file for a year.
 /css/*
+  ! Cache-Control
   Cache-Control: public, max-age=31536000, immutable
 /js/*
+  ! Cache-Control
   Cache-Control: public, max-age=31536000, immutable
 
 # Fonts, images and the master film. These change by replacement, never in
 # place, so they are safely immutable.
 /assets/*
+  ! Cache-Control
   Cache-Control: public, max-age=31536000, immutable
 
 # ============================================================================
 # /scrubber/* — Metadata Scrubber (React SPA, built from tools/metadata-scrubber)
 # ============================================================================
 #
-# The baseline above is `default-src 'none'` with ONE pinned script hash. That
-# is correct for a hand-built static page and fatal for a bundled SPA: the
-# Scrubber's module bundle has a different hash on every build, so under the
-# baseline it would be refused and the tool would render an empty white page.
-# Hence a scoped override rather than a loosening of `/*`.
+# The baseline is `default-src 'none'` with ONE pinned script hash. That is
+# correct for a hand-built static page and fatal for a bundled SPA: the
+# Scrubber's module bundle has a different hash on every build, so it cannot be
+# pinned. Hence a scoped policy — and the detach above it, without which the
+# browser intersects the two and clamps the app.
 #
 # WHY THIS POLICY AND NOT A TIGHTER ONE:
 #   The app also ships its own <meta http-equiv="Content-Security-Policy">.
 #   When both are present the browser enforces the INTERSECTION, so the
-#   effective policy is only ever as permissive as the stricter of the two.
-#   This header is written to mirror that meta tag directive-for-directive.
-#   That is deliberate: it means adding this header cannot change the app's
-#   runtime behaviour from what it already does today. Writing something
-#   tighter here would silently break a code path that currently works, and
-#   the failure would only appear in production.
+#   effective policy is only ever as strict as the stricter of the two. This
+#   header mirrors that meta tag directive-for-directive, deliberately: it means
+#   adding this header cannot change the app's runtime behaviour. Writing
+#   something tighter here would break a working code path, and the failure
+#   would only appear in production.
 #
-#   If you want to tighten the Scrubber, tighten the meta tag in
+#   To tighten the Scrubber, tighten the meta tag in
 #   tools/metadata-scrubber/index.html and mirror the change here. One policy,
 #   two enforcement points, no drift.
 #
-# connect-src 'self' — NOT 'none'. It is what the app declares, and the
-#   bundle contains fetch/XHR call sites inside the HEIC decoder's asm.js
-#   runtime. 'self' is still the load-bearing guarantee for "nothing is
-#   uploaded": there is no endpoint under /scrubber/ to upload to, so the only
-#   reachable origin is a bucket of static files. A third party is unreachable
-#   by construction, which is the claim the section on the landing page makes.
+# connect-src 'self' — NOT 'none'. It is what the app declares, and the bundle
+#   contains fetch/XHR call sites inside the HEIC decoder's runtime. 'self' is
+#   still the load-bearing guarantee for "nothing is uploaded": there is no
+#   endpoint under /scrubber/ to upload to, so a third party is unreachable by
+#   construction, which is the claim the landing page makes.
 #
-# worker-src blob: — the HEIC decoder constructs a worker from a Blob. Listed
-#   so this header is not the thing standing in its way; note the meta tag has
-#   no worker-src and therefore falls back to its own default-src 'self', so
-#   the meta tag is the binding constraint on that path. Verify HEIC end to end
-#   before claiming it works.
+# worker-src blob: — the HEIC decoder constructs a worker from a Blob.
 /scrubber/*
+  ! Content-Security-Policy
   Content-Security-Policy: default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; font-src 'self'; connect-src 'self'; worker-src 'self' blob:; form-action 'none'; base-uri 'none'; object-src 'none'; frame-ancestors 'none'; upgrade-insecure-requests
 
 # Vite emits content-hashed filenames, so these are immutable by construction:
 # a change to either produces a new filename rather than new bytes at the same
 # one. This needs no ASSET_VERSION discipline, unlike /css/* and /js/* above.
 /scrubber/assets/*
+  ! Cache-Control
   Cache-Control: public, max-age=31536000, immutable
 /scrubber/fonts/*
+  ! Cache-Control
   Cache-Control: public, max-age=31536000, immutable
 
 # The share card must stay fetchable by crawlers that render link previews, so
-# it opts out of the same-origin resource policy set above. Without this the
-# card can fail to display in some embedding contexts.
+# it opts out of the same-origin resource policy set above. Without the detach
+# the response carried `same-origin, cross-origin` and kept the restrictive
+# value, which is the failure this rule existed to prevent.
 /og/*
+  ! Cross-Origin-Resource-Policy
   Cross-Origin-Resource-Policy: cross-origin
+  ! Cache-Control
   Cache-Control: public, max-age=604800
 
 # Crawler-facing files: short cache so a change to either is picked up quickly.
 /robots.txt
+  ! Cache-Control
   Cache-Control: public, max-age=3600
 /sitemap.xml
+  ! Cache-Control
   Cache-Control: public, max-age=3600

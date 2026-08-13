@@ -1,0 +1,56 @@
+{
+  // ==========================================================================
+  // justintmccain.com — Cloudflare Worker + static assets
+  // ==========================================================================
+  //
+  //   npx wrangler deploy          (or let the git integration deploy on push)
+  //
+  // This file exists so the deploy is reproducible from the repo rather than
+  // living only as clicks in the dashboard. `name` MUST match the existing
+  // Worker or a deploy creates a second one alongside it.
+  //
+  // The build command is NOT here: it stays a dashboard setting, because
+  // Workers Builds runs it before wrangler is invoked. It should be:
+  //
+  //   npm --prefix tools/metadata-scrubber ci \
+  //     && npm --prefix tools/metadata-scrubber run build \
+  //     && node build/build.mjs
+  //
+  // That produces site/index.html, site/privacy.html, site/sitemap.xml and
+  // site/scrubber/ — all gitignored, all required, all built fresh per deploy.
+
+  "$schema": "https://unpkg.com/wrangler/config-schema.json",
+  "name": "justintmccain-official",
+  "main": "worker/index.js",
+  "compatibility_date": "2026-08-13",
+
+  "assets": {
+    // The publish directory. Serves matching paths BEFORE the Worker runs, so
+    // the landing page and /scrubber/ never pay for a Worker invocation and
+    // keep their site/_headers response headers.
+    "directory": "./site",
+
+    // Lets worker/index.js hand non-Vanish misses back to the asset server so
+    // they 404 consistently.
+    "binding": "ASSETS",
+
+    // Left at the default (auto-trailing-slash) ON PURPOSE. It is what makes
+    // /privacy the canonical URL for privacy.html and /scrubber/ the canonical
+    // form for the directory. build.mjs emits links that match this exactly;
+    // changing it here silently breaks every internal link.
+    "html_handling": "auto-trailing-slash"
+  },
+
+  "vars": {
+    // The Netlify deployment that answers /vanish. Vanish is built with
+    // basePath=/vanish, so it serves at <origin>/vanish and the Worker can
+    // forward the path through unchanged.
+    "VANISH_ORIGIN": "https://justintmccain-vanish.netlify.app"
+  },
+
+  // Deliberately OFF. This Worker sits in front of an endpoint that receives
+  // names and addresses in a POST body; Worker logs would capture request
+  // metadata for it. Vanish's promise is that closing the tab is the purge, so
+  // nothing here gets a log sink or any storage binding to contradict that.
+  "observability": { "enabled": false }
+}
