@@ -233,7 +233,7 @@ export const WORK = {
       title: "Consent, rebuilt for a global enterprise",
       tag: "BAYER",
       broken: "A 100,000-person enterprise operating in more than 80 countries had no single way to capture or honor consent. Every region solved it locally, so no one could answer a basic question about what a person had agreed to.",
-      built:  "Built the enterprise consent framework and the platform beneath it, integrating <strong>20+ source systems</strong> and harmonizing <strong>~40M user profiles</strong> into one record.",
+      built:  "Built the enterprise consent framework and the platform beneath it, integrating <strong>20+ source systems</strong> and harmonizing <strong>~40M user profiles</strong> into one record. Owned <strong>350+ consent banners</strong> enterprise-wide.",
       moved:  "One consent record, one answer, in every market.",
     },
     {
