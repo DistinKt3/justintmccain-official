@@ -226,7 +226,7 @@ console.log("\nDiscovery suppression");
   }
 
   const home = await text(`${site}/`);
-  report(!/application\/ld\+json/.test(home.body), "no Person schema", "");
+  report(!/application\/ld\+json/.test(home.body) ? "ok" : "bad", "no Person schema", "");
   report(!/worksFor/.test(home.body) ? "ok" : "bad", "no employer in structured data", "");
 
   // OG must SURVIVE. It is what makes a shared link render a card, and it is
@@ -236,9 +236,9 @@ console.log("\nDiscovery suppression");
 
   const robots = await text(`${site}/robots.txt`);
   const blanketBlock = /User-agent:\s*\*[\s\S]{0,80}?Disallow:\s*\/\s*$/m.test(robots.body);
-  report(!blanketBlock, "robots.txt does NOT blanket-Disallow",
+  report(!blanketBlock ? "ok" : "bad", "robots.txt does NOT blanket-Disallow",
     blanketBlock ? "a blocked crawler can never read the noindex" : "crawl allowed so noindex is seen");
-  report(!/^Sitemap:/m.test(robots.body), "robots.txt advertises no sitemap", "");
+  report(!/^Sitemap:/m.test(robots.body) ? "ok" : "bad", "robots.txt advertises no sitemap", "");
   report(/GPTBot/.test(robots.body) ? "ok" : "warn", "AI crawlers named explicitly", "");
 }
 
