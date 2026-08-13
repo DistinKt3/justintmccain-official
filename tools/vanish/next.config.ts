@@ -27,6 +27,21 @@ const scriptSrc = isDev
   : "script-src 'self' 'unsafe-inline'";
 
 const securityHeaders = [
+  /**
+   * Shared, not found.
+   *
+   * This app answers on TWO public origins: justintmccain.com/vanish through
+   * the portfolio's Worker, and its own <site>.netlify.app directly. The
+   * Netlify origin has no robots.txt of its own, so before this it was fully
+   * crawlable — the portfolio could be perfectly suppressed and the same
+   * content would still be indexable one hostname over.
+   *
+   * A response header rather than a meta tag, because it has to cover the API
+   * route and the static assets too, and because the header survives the proxy
+   * hop to the main domain — one directive, both origins, every response.
+   */
+  { key: "X-Robots-Tag", value: "noindex, nofollow, noarchive, nosnippet" },
+
   { key: "X-Content-Type-Options", value: "nosniff" },
   { key: "X-Frame-Options", value: "DENY" },
   { key: "Referrer-Policy", value: "no-referrer" },

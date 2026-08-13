@@ -102,7 +102,7 @@ const head = ({ title, description, canonical, extraMeta = "", jsonld = "" }) =>
 <title>${esc(title)}</title>
 <meta name="description" content="${attr(description)}">
 <link rel="canonical" href="${attr(canonical)}">
-<meta name="robots" content="index, follow, max-image-preview:large">
+<meta name="robots" content="${FLAGS.ALLOW_INDEXING ? "index, follow, max-image-preview:large" : "noindex, nofollow, noarchive, nosnippet"}">
 <meta name="theme-color" content="${attr(META.themeColor)}">
 <meta name="color-scheme" content="dark light">
 <meta name="author" content="${attr(IDENTITY.name)}">
@@ -176,7 +176,23 @@ const ogMeta = `
 <meta name="twitter:image" content="${attr(IDENTITY.origin)}/og/og-image.png">
 <meta name="twitter:image:alt" content="${attr(META.ogImageAlt)}">`;
 
-const jsonld = `<script type="application/ld+json">
+/* Person schema — emitted ONLY when indexing is wanted.
+   ---------------------------------------------------------------------------
+   This block is not decoration; it is the single strongest discovery signal on
+   the page. It states, in a format built for machines to consume, that a named
+   person holds a named job at a named employer and is knowledgeable about ten
+   named subjects. That is exactly the query shape we are trying not to appear
+   in — employer plus "privacy" — and it is Knowledge-Panel-eligible input.
+
+   A noindex directive alone would very probably be enough. Withholding the
+   schema means not depending on "very probably". Flip FLAGS.ALLOW_INDEXING to
+   restore it; nothing else needs to change.
+
+   NOTE: this deliberately does NOT touch the Open Graph or Twitter tags above.
+   Those are read by LinkedIn, Slack and iMessage when a recipient opens a link
+   that was sent to them — a sharing feature, not a search signal. Removing
+   them would break the preview card and gain nothing. */
+const jsonld = !FLAGS.ALLOW_INDEXING ? "" : `<script type="application/ld+json">
 ${JSON.stringify(
   {
     "@context": "https://schema.org",
@@ -630,10 +646,15 @@ ${TOOLS.items
 `;
 
 /* -- emit ----------------------------------------------------------------- */
+/* sitemap.xml is emitted ONLY when indexing is wanted. A sitemap is an active
+   invitation — it hands a crawler the complete list of URLs including ones it
+   would otherwise have to discover. Shipping one alongside a noindex directive
+   would be arguing with itself. When ALLOW_INDEXING is false the file is not
+   written at all, and robots.txt does not advertise it. */
 const out = [
   ["index.html", indexHtml()],
   ["privacy.html", privacyHtml()],
-  ["sitemap.xml", sitemapXml()],
+  ...(FLAGS.ALLOW_INDEXING ? [["sitemap.xml", sitemapXml()]] : []),
 ];
 
 for (const [file, contents] of out) {

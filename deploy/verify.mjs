@@ -74,7 +74,7 @@ for (const [path, want, required] of [
   ["/privacy.html", [200, 307, 301], true],  // legacy filename: served or redirected
   ["/scrubber/", [200], true],
   ["/scrubber", [301, 307], true],
-  ["/sitemap.xml", [200], true],
+  ["/sitemap.xml", [404], true],   // withheld on purpose — see FLAGS.ALLOW_INDEXING
   ["/robots.txt", [200], true],
 ]) {
   const r = await head(site + path);
@@ -193,18 +193,53 @@ for (const path of [
   report(gone ? "ok" : "bad", `${path}`, gone ? "404" : `EXPOSED (${r.status})`);
 }
 
-/* -- sitemap -------------------------------------------------------------- */
-console.log("\nSitemap");
+/* -- discovery suppression ------------------------------------------------- */
+/* This site is shared, not found. Each of these is one half of that: the meta
+   tag covers HTML, the header covers everything that is not HTML, robots.txt
+   must still permit the crawl (or the noindex is never read), and the schema
+   and sitemap must be absent rather than merely ignored. */
+console.log("\nDiscovery suppression");
 {
-  const sm = await text(`${site}/sitemap.xml`);
-  const locs = [...sm.body.matchAll(/<loc>([^<]+)<\/loc>/g)].map((m) => m[1]);
-  report(locs.length >= 4 ? "ok" : "bad", "lists the landing page, both tools and privacy", `${locs.length} URLs`);
-  const offDomain = locs.filter((l) => !l.startsWith("https://justintmccain.com"));
-  report(
-    offDomain.length === 0 ? "ok" : "bad",
-    "every URL is canonical",
-    offDomain.length ? offDomain.join(", ") : ""
-  );
+  for (const p of ["/", "/privacy", "/scrubber/"]) {
+    const page = await text(site + p);
+    const meta = (page.body.match(/<meta name="robots" content="([^"]*)"/) || [])[1];
+    // The Scrubber is a separate build with no meta tag of its own; the header
+    // is what covers it, so a missing meta there is expected, not a failure.
+    if (p === "/scrubber/") {
+      report("ok", `${p} (header-covered, no meta expected)`, meta ?? "no meta");
+    } else {
+      report(meta?.includes("noindex") ? "ok" : "bad", `meta robots ${p}`, meta ?? "MISSING");
+    }
+
+    const h = await head(site + p);
+    const xr = h.headers?.get("x-robots-tag") ?? "";
+    report(xr.includes("noindex") ? "ok" : "bad", `X-Robots-Tag ${p}`, xr || "MISSING");
+  }
+
+  // Non-HTML cannot carry a meta tag, so the header is the only thing covering
+  // it. The share card is the one that matters most — it is an image of the
+  // page's own headline.
+  for (const p of ["/og/og-image.png", "/assets/motion/signal-master.mp4"]) {
+    const h = await head(site + p);
+    const xr = h.headers?.get("x-robots-tag") ?? "";
+    report(xr.includes("noindex") ? "ok" : "bad", `X-Robots-Tag ${p}`, xr || "MISSING");
+  }
+
+  const home = await text(`${site}/`);
+  report(!/application\/ld\+json/.test(home.body), "no Person schema", "");
+  report(!/worksFor/.test(home.body) ? "ok" : "bad", "no employer in structured data", "");
+
+  // OG must SURVIVE. It is what makes a shared link render a card, and it is
+  // not a search signal — losing it would break the only distribution path.
+  report(/og:title/.test(home.body) ? "ok" : "bad", "og:title still present (sharing works)", "");
+  report(/og:image/.test(home.body) ? "ok" : "bad", "og:image still present", "");
+
+  const robots = await text(`${site}/robots.txt`);
+  const blanketBlock = /User-agent:\s*\*[\s\S]{0,80}?Disallow:\s*\/\s*$/m.test(robots.body);
+  report(!blanketBlock, "robots.txt does NOT blanket-Disallow",
+    blanketBlock ? "a blocked crawler can never read the noindex" : "crawl allowed so noindex is seen");
+  report(!/^Sitemap:/m.test(robots.body), "robots.txt advertises no sitemap", "");
+  report(/GPTBot/.test(robots.body) ? "ok" : "warn", "AI crawlers named explicitly", "");
 }
 
 /* -- Vanish --------------------------------------------------------------- */

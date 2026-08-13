@@ -61,6 +61,21 @@
   # API and its FLoC predecessor. Saying no in a header is cheap and explicit.
   Permissions-Policy: accelerometer=(), autoplay=(), browsing-topics=(), camera=(), display-capture=(), encrypted-media=(), fullscreen=(self), geolocation=(), gyroscope=(), interest-cohort=(), magnetometer=(), microphone=(), midi=(), payment=(), usb=(), xr-spatial-tracking=()
 
+  # --- Discovery ------------------------------------------------------------
+  # This site is shared, not found. The same directive is in a <meta> tag on
+  # every page; this header is the half that covers everything which is NOT
+  # HTML and therefore cannot carry a meta tag — the OG image, the master film,
+  # the fonts, robots.txt itself. Without it those remain independently
+  # indexable even while the pages are not.
+  #
+  # robots.txt deliberately still ALLOWS crawling, because a crawler that is
+  # blocked can never read this. See the reasoning in site/robots.txt.
+  #
+  # noarchive/nosnippet are belt and braces for partial compliance: if some
+  # engine honours only part of this, it still cannot show a cached copy or a
+  # text excerpt.
+  X-Robots-Tag: noindex, nofollow, noarchive, nosnippet
+
   # --- Hardening ------------------------------------------------------------
   X-Content-Type-Options: nosniff
   X-Frame-Options: DENY

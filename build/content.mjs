@@ -46,6 +46,41 @@
 export const FLAGS = {
   SHOW_WRITING: false,
   SHOW_PORTFOLIO: false,
+
+  /* ---------------------------------------------------------------------
+   * ALLOW_INDEXING — false means this site is SHARED, not FOUND.
+   *
+   * The intent: this page should reach people Justin hands it to, from a
+   * résumé or a LinkedIn message. It should NOT be what someone lands on
+   * while searching his employer plus "privacy". A privacy portfolio that
+   * quietly optimises itself for discovery is arguing against itself.
+   *
+   * Setting this false does four things in build.mjs:
+   *   - emits `noindex, nofollow` instead of `index, follow`
+   *   - drops the Person JSON-LD entirely (see the note below)
+   *   - stops emitting sitemap.xml
+   *   - leaves the Open Graph and Twitter tags UNTOUCHED, on purpose
+   *
+   * That last point is the whole trick. og:* is read by LinkedIn, Slack and
+   * iMessage when someone opens a link you sent them; it is not a search
+   * signal. Sharing keeps its preview card, search loses the page.
+   *
+   * THE JSON-LD IS THE REAL REASON THIS FLAG EXISTS. A Person schema naming
+   * jobTitle, worksFor: Roku and ten knowsAbout topics is machine-readable
+   * "index me as this entity, against these subjects, at this employer" —
+   * precisely the search path we are trying not to be in. noindex alone
+   * would probably suffice; removing the schema means not relying on
+   * probably.
+   *
+   * WHAT THIS DOES NOT DO — accepted knowingly:
+   *   - anyone with the URL still sees everything; this is not access control
+   *   - the hostname is public in Certificate Transparency logs the moment a
+   *     TLS cert is issued, and that is permanent
+   *   - crawlers that ignore robots directives ignore these too
+   * If the requirement ever becomes "only people I authorise", that is
+   * Cloudflare Access or a signed URL, not a meta tag.
+   * ------------------------------------------------------------------- */
+  ALLOW_INDEXING: false,
 };
 
 /* ---------------------------------------------------------------------------
