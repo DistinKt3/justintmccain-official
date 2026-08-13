@@ -61,19 +61,27 @@ async function text(url) {
 console.log(`\n\x1b[1mVerifying ${site}\x1b[0m\n`);
 
 /* -- routing -------------------------------------------------------------- */
+/* Accepts a SET of statuses, because the two hosts normalise URLs differently
+   and both are correct:
+     - Cloudflare Workers Static Assets 307s /scrubber → /scrubber/ and
+       /privacy.html → /privacy (extensionless is canonical there)
+     - a literal file server 301s the directory and serves .html directly
+   Pinning one number here would fail a healthy deploy on the other host. */
 console.log("Routing");
 for (const [path, want, required] of [
-  ["/", 200, true],
-  ["/privacy.html", 200, true],
-  ["/scrubber/", 200, true],
-  ["/scrubber", 301, true],
-  ["/sitemap.xml", 200, true],
-  ["/robots.txt", 200, true],
+  ["/", [200], true],
+  ["/privacy", [200], true],                 // canonical; what the footer links to
+  ["/privacy.html", [200, 307, 301], true],  // legacy filename: served or redirected
+  ["/scrubber/", [200], true],
+  ["/scrubber", [301, 307], true],
+  ["/sitemap.xml", [200], true],
+  ["/robots.txt", [200], true],
 ]) {
   const r = await head(site + path);
   if (!r.ok) { report("bad", `${path}`, r.error); continue; }
-  const good = r.status === want;
-  report(good ? "ok" : required ? "bad" : "warn", `${path}`, `${r.status}${good ? "" : ` (expected ${want})`}`);
+  const good = want.includes(r.status);
+  report(good ? "ok" : required ? "bad" : "warn", `${path}`,
+    `${r.status}${good ? (r.loc ? ` → ${r.loc}` : "") : ` (expected ${want.join(" or ")})`}`);
 }
 
 /* -- the Scrubber actually works ------------------------------------------ */

@@ -94,6 +94,24 @@ function headersFor(urlPath) {
 createServer((req, res) => {
   let path = decodeURIComponent(new URL(req.url, "http://x").pathname);
   if (path.endsWith("/")) path += "index.html";
+
+  /* Extensionless path → the matching .html file.
+     Cloudflare Workers Static Assets serves privacy.html at /privacy and
+     307-redirects /privacy.html to it, so /privacy is the canonical URL and it
+     is what build.mjs now links to. Without this the local preview 404s on the
+     footer's own Privacy link.
+
+     This MUST run before `file` and `policy` are derived below — both are
+     computed from `path`, so rewriting it afterwards would leave them pointing
+     at the extensionless path that does not exist on disk. */
+  if (!extname(path)) {
+    const direct = join(ROOT, normalize(path).replace(/^(\.\.[/\\])+/, ""));
+    const asHtml = join(ROOT, normalize(`${path}.html`).replace(/^(\.\.[/\\])+/, ""));
+    if (!existsSync(direct) && asHtml.startsWith(ROOT) && existsSync(asHtml)) {
+      path = `${path}.html`;
+    }
+  }
+
   const policy = headersFor(path);
 
   // Contain everything under ROOT — no traversal out of the site directory.

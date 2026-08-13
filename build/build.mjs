@@ -43,6 +43,27 @@ const ROOT = join(dirname(fileURLToPath(import.meta.url)), "..", "site");
 /* Bump when CSS/JS change so caches don't serve stale assets. */
 const ASSET_VERSION = "13";
 
+/* Canonical URL PATHS, which are deliberately not the same as the output
+   FILENAMES.
+
+   The site is served by Cloudflare Workers Static Assets, whose default
+   html_handling makes extensionless URLs canonical: privacy.html is served at
+   /privacy, and a request for /privacy.html gets a 307 to it (likewise
+   /index.html → /). Linking to the filename therefore costs every visitor a
+   redirect hop, and — worse — puts a redirecting URL in both the sitemap and
+   the <link rel="canonical">, which is exactly where a canonical URL is
+   supposed to be the final one.
+
+   The emitted FILES keep their .html names; only the links change. Both are
+   defined here so they cannot drift apart.
+
+   If this ever moves to a host that serves paths literally, these two
+   constants are the only thing to change. build/serve.mjs resolves
+   extensionless paths the same way so the local preview does not disagree
+   with production about a real URL. */
+const URL_HOME = "/";
+const URL_PRIVACY = "/privacy";
+
 /* The branch Cloudflare Pages treats as production. Everything else it builds
    is a preview, and previews link to tool deployments differently — see
    toolHref(). Change this only if the Pages project's production branch
@@ -105,7 +126,7 @@ const nav = (isDoc = false) => `
     ${MONOGRAM}
     <nav class="nav__links" aria-label="Primary">
       ${isDoc
-        ? `<a class="nav__link" href="index.html">← Back</a>`
+        ? `<a class="nav__link" href="${URL_HOME}">← Back</a>`
         : NAV.links
             .map(
               (l) =>
@@ -127,10 +148,10 @@ const footer = () => `
         <div class="footer__links">
           <a href="${attr(IDENTITY.linkedin)}" target="_blank" rel="noopener">LinkedIn</a>
           <a href="mailto:${attr(IDENTITY.email)}">${esc(IDENTITY.email)}</a>
-          <a href="privacy.html">Privacy</a>
+          <a href="${URL_PRIVACY}">Privacy</a>
         </div>
       </div>
-      <p class="footer__privacy">${esc(FOOTER.privacyNote)} <a href="privacy.html">${esc(FOOTER.privacyLinkLabel)} →</a></p>
+      <p class="footer__privacy">${esc(FOOTER.privacyNote)} <a href="${URL_PRIVACY}">${esc(FOOTER.privacyLinkLabel)} →</a></p>
       <p class="footer__copy">© ${year} ${esc(IDENTITY.name)}. Built with respect for your attention and your data.</p>
     </div>
   </footer>`;
@@ -556,7 +577,7 @@ const privacyHtml = () => `${head({
   title: PRIVACY_PAGE.title,
   description:
     "This site collects nothing personal. No cookies, no trackers, no third-party requests. It honors Global Privacy Control. The full, honest details.",
-  canonical: `${IDENTITY.origin}/privacy.html`,
+  canonical: `${IDENTITY.origin}${URL_PRIVACY}`,
 })}
 <body>
   <a class="skip" href="#main">Skip to content</a>
@@ -574,7 +595,7 @@ ${nav(true)}
           )
           .join("\n        ")}
         <p class="doc__closing">${esc(PRIVACY_PAGE.closing)}</p>
-        <a class="doc__back" href="index.html"><span class="node" aria-hidden="true"></span> Back to the site</a>
+        <a class="doc__back" href="${URL_HOME}"><span class="node" aria-hidden="true"></span> Back to the site</a>
       </div>
     </main>
 ${footer()}
@@ -604,7 +625,7 @@ ${TOOLS.items
       `  <url><loc>${IDENTITY.origin}${attr(t.href)}</loc><lastmod>${today}</lastmod><priority>0.8</priority></url>`
   )
   .join("\n")}
-  <url><loc>${IDENTITY.origin}/privacy.html</loc><lastmod>${today}</lastmod><priority>0.3</priority></url>
+  <url><loc>${IDENTITY.origin}${URL_PRIVACY}</loc><lastmod>${today}</lastmod><priority>0.3</priority></url>
 </urlset>
 `;
 
