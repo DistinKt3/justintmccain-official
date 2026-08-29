@@ -1,26 +1,47 @@
 # Launch runbook — justintmccain.com
 
-Three deployables serve one domain. This is the order to stand them up and the
+Two deployables serve one domain. This is the order to stand them up and the
 checks that prove each one worked.
 
 | What | Where it runs | URL | Deployed by |
 |---|---|---|---|
-| Portfolio (static) | Cloudflare Pages | `/` | upload `site/` |
-| Metadata Scrubber (static) | same Pages project | `/scrubber/` | built into `site/scrubber/` |
+| Portfolio (static) | Worker `justintmccain-official` | `/` | `wrangler deploy`, or git push |
+| Metadata Scrubber (static) | same Worker, from `site/scrubber/` | `/scrubber/` | same deploy |
+| `/vanish` proxy | same Worker, `worker/index.js` | `/vanish*` | same deploy |
 | Vanish (Next + one server route) | Netlify | `/vanish` | git push / Netlify CLI |
-| `vanish-proxy` | Cloudflare Worker | routes `/vanish*` | `wrangler deploy` |
+
+> **This was Cloudflare Pages once, and is not any more.** The Pages project
+> `justintmccain` does not exist, so every `wrangler pages deploy` against it
+> fails with "project does not exist". One Worker now serves the assets *and*
+> proxies `/vanish`; `worker/index.js` explains why the proxy stopped being a
+> second deployable. If you are reading an older copy of this file that
+> describes three deployables and a `vanish-proxy`, that is the shape this
+> project used to have.
+
+Two consequences worth holding onto:
+
+- **A git push deploys.** The Worker has a Workers Builds integration, so
+  pushing to `main` ships to production on its own, without anyone running a
+  deploy command. Use `./deploy/stage.sh preview` when that is not what you
+  want.
+- **Preview URLs are fully functional.** `wrangler versions upload` returns a
+  `<version-id>-justintmccain-official.<subdomain>.workers.dev` URL that serves
+  the whole site including `/vanish`, because the proxy travels with the Worker
+  instead of being bound to the production hostname.
 
 ---
 
 ## The one rule that matters
 
-**`site/` is the Cloudflare Pages publish directory, and Pages publishes it
-wholesale with no exclude mechanism. Everything in it becomes a public URL.**
+**`site/` is the Worker's asset directory (`assets.directory` in
+`wrangler.jsonc`), and it is uploaded wholesale with no exclude mechanism.
+Everything in it becomes a public URL.**
 
-Both tool source trees used to live inside `site/`. That meant 34,532 files
-against Pages' 20,000-file limit — the deploy would have been rejected outright —
-and `Vanish_PRD.docx`, 85 source files, the internal design specs, `netlify.toml`
-and 530 `.git` objects would all have been fetchable.
+Both tool source trees used to live inside `site/`. That meant 34,532 files, and
+`Vanish_PRD.docx`, 85 source files, the internal design specs, `netlify.toml`
+and 530 `.git` objects would all have been fetchable. The move from Pages to a
+Worker did not soften this rule — the upload is still wholesale, and the file
+ceiling is still finite.
 
 Source now lives in `tools/`. Only build OUTPUT goes into `site/`.
 
@@ -59,13 +80,20 @@ requests for the film:
 node build/serve.mjs 4173
 ```
 
-## 2. Cloudflare Pages
+## 2. Cloudflare Worker
 
-Publish directory `site/`. No build command needed if you build locally first.
+`wrangler.jsonc` is the whole configuration: `main` is `worker/index.js`,
+`assets.directory` is `site/`, and `assets.binding` lets the Worker hand
+non-`/vanish` misses back to the asset server so they 404 consistently.
 
-Point `justintmccain.com` at the project and make sure the apex record is
-**proxied (orange cloud)** — a DNS-only record means requests never touch
-Cloudflare's network and the Worker route in step 4 will never fire.
+```bash
+./deploy/stage.sh preview       # preview URL, production untouched
+./deploy/stage.sh production    # wrangler deploy
+```
+
+Assets are served **before** the Worker runs, so the landing page and
+`/scrubber/` never pay for a Worker invocation and keep their `site/_headers`
+response headers. Attaching the real domain is step 4.
 
 ## 3. Netlify — Vanish
 
@@ -86,22 +114,43 @@ rebuild; clearing the cache and redeploying is not enough.
 the proxy.** Debugging the app through the proxy is much harder than debugging it
 directly.
 
-## 4. Cloudflare Worker — the `/vanish` proxy
+## 4. Attach the domain
 
-```bash
-cd deploy/cloudflare/vanish-proxy
-# set VANISH_ORIGIN in wrangler.toml to the Netlify origin first
-npx wrangler deploy
+The Worker answers on `*.workers.dev` from its first deploy. Putting it on
+`justintmccain.com` is a **custom domain**, declared in `wrangler.jsonc` so the
+binding is reproducible from the repo instead of living as clicks in a
+dashboard:
+
+```jsonc
+"routes": [
+  { "pattern": "justintmccain.com",     "custom_domain": true },
+  { "pattern": "www.justintmccain.com", "custom_domain": true }
+]
 ```
 
-It is a separate deployable rather than a Pages Function on purpose: a mistake in
-the proxy takes out `/vanish` and leaves every other page untouched.
+Then apply it. Custom domains are a **trigger**, and triggers are not applied by
+`versions upload` — only by a real deploy:
 
-It registers **two** routes — `/vanish` and `/vanish/*`. Vanish is a Next app with
-`trailingSlash: false`, so `/vanish` (no slash) is the canonical URL and is the
-one people type. A single `/vanish/*` pattern would leave the front door unrouted.
+```bash
+npx wrangler@latest deploy          # creates the domains + DNS records
+```
 
-Note the asymmetry, which is correct and not a typo:
+Cloudflare creates the proxied records itself, issues the certificate, and
+routes the hostname to the Worker. There is no A record to add by hand, and no
+orange-cloud toggle to get wrong — a Worker custom domain is not a DNS-only
+record. The domain must already be a zone in the same Cloudflare account.
+
+Certificate issuance takes a few minutes; until it completes the hostname can
+return a TLS error. That is expected and resolves on its own.
+
+`/vanish` needs nothing extra. The proxy is inside this Worker, so it answers on
+whatever hostname the Worker serves.
+
+### The `/vanish` path, and one asymmetry
+
+Vanish is a Next app with `trailingSlash: false`, so `/vanish` (no slash) is the
+canonical URL and the one people type. Note the asymmetry, which is correct and
+not a typo:
 
 - `/vanish` — no trailing slash (Next canonical; `/vanish/` 301s to it)
 - `/scrubber/` — trailing slash (static directory; `/scrubber` 301s to it)
@@ -116,11 +165,11 @@ All of this is wrapped by `./deploy/stage.sh` — use that rather than the raw
 commands, because it also runs the guards described below:
 
 ```bash
-./deploy/stage.sh preflight                        # audits + builds + publish-dir check
-./deploy/stage.sh vanish                           # Netlify draft deploy
-./deploy/stage.sh site   https://<host>/vanish     # staging build → Cloudflare Pages
-./deploy/stage.sh verify https://<pages> https://<netlify>
-./deploy/stage.sh production                       # canonical rebuild + prod deploy
+./deploy/stage.sh preflight                    # audits + builds + publish-dir check
+./deploy/stage.sh vanish                       # Netlify draft deploy
+./deploy/stage.sh preview                      # Worker preview URL, prod untouched
+./deploy/stage.sh verify https://<preview-url>
+./deploy/stage.sh production                   # canonical rebuild + wrangler deploy
 ```
 
 `deploy/verify.mjs` runs ~35 assertions over a deployed URL: routing, the CSP
@@ -128,7 +177,7 @@ split, whether basePath survived, whether `/vanish/api/scan` is actually
 mounted, and whether anything private shipped. It exits non-zero on failure, so
 it works as a gate.
 
-You can have all three pieces live and reviewable on their platform URLs without
+You can have both pieces live and reviewable on their platform URLs without
 touching `justintmccain.com` at all. Nothing below is destructive and nothing
 below is visible to anyone who does not have the URL.
 
@@ -146,32 +195,28 @@ Gives a one-off draft URL. When it looks right, `--prod` publishes it to the
 site's main `*.netlify.app` address. Confirm `…netlify.app/vanish` loads and a
 scan completes before going near the proxy.
 
-**2. Portfolio → Cloudflare Pages.** From the repo root:
+**2. Portfolio → Worker preview.** From the repo root:
 
 ```bash
 npx wrangler@latest login
-npx wrangler@latest pages deploy site --project-name justintmccain
+./deploy/stage.sh preview
 ```
 
-Gives a `*.pages.dev` URL serving the landing page and `/scrubber/`.
+Gives a `<version-id>-justintmccain-official.<subdomain>.workers.dev` URL
+serving the landing page, `/scrubber/` **and** `/vanish` — production keeps
+serving the previous version throughout. Promote a reviewed version with
+`npx wrangler@latest versions deploy`, or just run `./deploy/stage.sh
+production`.
 
-**3. The catch, and the fix.** On `*.pages.dev` the Worker route does not exist,
-so `/vanish` 404s there — the one tool most worth reviewing would be the one you
-cannot click. Build the staging copy with the link pointed at Netlify:
-
-```bash
-STAGING_VANISH_URL=https://<your-site>.netlify.app/vanish node build/build.mjs
-npx wrangler@latest pages deploy site --project-name justintmccain
-```
-
-The build prints a loud **STAGING BUILD** banner when any override is active. The
-sitemap deliberately ignores overrides and always emits the canonical
-`justintmccain.com` URLs, so a staging deploy cannot publish a sitemap pointing
-at netlify.app.
-
-**Before production, rebuild with no override** and confirm the build says
-`Tool links: canonical (production-ready)`. Shipping a staging build leaves a
-netlify.app link in the page indefinitely.
+**On the old staging-URL override.** Under Pages, `/vanish` 404'd on preview
+hosts (the proxy was a separate Worker bound to the real domain), so previews
+were built with `STAGING_VANISH_URL` pointing the link off-domain at
+netlify.app. The proxy now lives in this Worker and answers on every hostname it
+serves, so the override is no longer needed. `build.mjs` still honours it and
+still prints a loud **STAGING BUILD** banner when it is set; `stage.sh` builds
+with it explicitly unset and refuses to deploy if a staging host reaches the
+output. Confirm any production build says `Tool links: canonical
+(production-ready)`.
 
 ---
 
