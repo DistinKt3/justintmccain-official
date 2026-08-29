@@ -199,28 +199,35 @@ export const THESIS = {
  * ------------------------------------------------------------------------- */
 export const WORK = {
   label: "WHAT I'VE SHIPPED",
-  heading: "Not programs. Products. Here's what shipped, and what it moved.",
+  heading: "Not programs. Products. Here's what shipped, how fast, and what it moved.",
   cards: [
     {
       title: "Hardening the opt-out signal",
       tag: "ROKU",
       broken: "Opt-out signal enforcement looks simple and rarely is. Regional carve-outs, legacy integrations, and browser-level nuance are where it quietly breaks.",
-      built:  "Audited and hardened signal enforcement across the web governance stack, end to end.",
-      moved:  "<strong>~$1.75M/yr in recovered ad revenue.</strong>",
+      built:  "Audited and hardened signal enforcement across the web governance stack, end to end. Enforced <strong>Global Privacy Controls (GPC)</strong> across Roku ecosystem domains for true governance, applied correctly by jurisdiction.",
+      moved:  "<strong>~$1.75M/yr in recovered ad revenue</strong>, inside my first five months.",
+    },
+    {
+      title: "A new front door for privacy rights",
+      tag: "ROKU",
+      broken: "A legacy rights portal can no longer be iterated against or upgraded, only replaced. The regulation that forces the rebuild sets the date for compliance, and the date does not move.",
+      built:  "Led vision and strategy for Roku's Privacy Rights Portal, with updated security, compliance and simple ease of expansion built in the MVP, not as a fast follow. Shipped <strong>EU Data Act functionality</strong> along with launch.",
+      moved:  "One front door and backend system, in the same design language as Roku's Design System &amp; Device Settings (easy on purpose). Figma to prototype in <strong>3 days</strong> with AI, a <strong>15-week plan delivered in weeks</strong>, inside my first nine months.",
     },
     {
       title: "DSAR, from inbox to product",
       tag: "ROKU",
       broken: "Hundreds of data-subject requests arrived as email and were triaged by hand, one at a time. Slow, unauditable, and impossible to prove after the fact.",
       built:  "Owned the end-to-end DSAR product: automated parsing, system routing, verification, and audit logging. Held <strong>zero regression</strong> through a major CRM migration that could easily have broken deletion compliance at cutover.",
-      moved:  "Time to kick off a request fell from <strong>8 days to same day</strong>, and a manual liability became an audited, scalable product.",
+      moved:  "Time to kick off a request fell from <strong>8 days to same day</strong>, and a manual liability became an audited, scalable product. Delivered in my first five months.",
     },
     {
       title: "Deletion that scales",
       tag: "ROKU",
       broken: "Partner deletion ran on manual email and CSV hand-offs. Brittle, unauditable, impossible to scale.",
       built:  "Led the <strong>first API-first partner-deletion pilot</strong>, replacing a legacy manual process with an automated, auditable one.",
-      moved:  "Proved a scalable path off brittle process for the entire partner ecosystem.",
+      moved:  "Proved a scalable path off brittle process for the entire partner ecosystem. Delivered in my first five months.",
     },
     {
       title: "A privacy program, stood up fast",
