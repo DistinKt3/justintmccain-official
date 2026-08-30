@@ -290,7 +290,6 @@ export const LEDGER = {
     { record: "Global privacy delivery",               proof: "<strong>309</strong> launches across <strong>55</strong> countries" },
     { record: "CCPA program built 0→1",                proof: "Enterprise-wide DSAR rollout · led a <strong>100+</strong> associate project team" },
     { record: "Engineering teams led",                 proof: "Up to <strong>30</strong> engineers across time zones" },
-    { record: "Program maturity",                      proof: "First Privacy Risk Register, benchmarked to <strong>NIST</strong>" },
     { record: "Incident response led",                 proof: "<strong>3</strong> incidents, intake to notification decision" },
     { record: "Cross-border transfer risk",            proof: "Enterprise <strong>Schrems II</strong> remediation" },
     { record: "Budget ownership",                      proof: "<strong>$700K–$1.2M</strong>" },
@@ -321,7 +320,7 @@ export const CAPABILITIES = {
     {
       name: "Durable Evidence & Trusted Escalation",
       claim: "I make privacy provable, and I am the escalation point when it has to be right.",
-      detail: "Append-only evidence · data governance and retention · incident response · third-party risk · NIST-benchmarked risk register.",
+      detail: "Append-only evidence · data governance and retention · incident response · third-party risk.",
     },
   ],
   emerging: {
