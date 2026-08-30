@@ -552,22 +552,45 @@ export const FOOTER = {
 export const PRIVACY_PAGE = {
   title: "Privacy | Justin T. McCain",
   heading: "This site collects nothing.",
-  updated: "July 2026",
+  updated: "August 2026",
   intro:
     "I build privacy infrastructure for a living. It would be strange to run a site that quietly did the opposite, so this one doesn't. Here is the whole truth about it, in plain language.",
   sections: [
     {
       h: "What's collected",
       p: [
-        "Nothing personal. No cookies are set. No localStorage or sessionStorage is used to identify or follow you. There is no analytics script, no tag manager, no advertising pixel, no session recording, no fingerprinting, and no cross-site identifier of any kind.",
+        /* "no fingerprinting" deliberately no longer appears in this list.
+           Cloudflare's bot screening injects an inline JS-detection script into
+           every page: it is blocked by CSP and never executes, but it IS in the
+           markup, so an absolute denial here would be contestable by anyone
+           reading source. It gets its own section below instead, which is the
+           stronger position anyway. */
+        "Nothing personal. No cookies are set. No localStorage or sessionStorage is used to identify or follow you. There is no analytics script, no tag manager, no advertising pixel, no session recording, and no cross-site identifier of any kind.",
         "You can verify this yourself: open your browser's developer tools, load this page, and look at Application → Cookies (empty) and the Network tab (first-party requests only).",
       ],
     },
     {
       h: "Third parties",
       p: [
-        "There are none on this page. Fonts, images, motion, styles, and scripts are all served from this domain. Notably there is no Google Fonts request, because that CDN would see your IP address and there is no reason for it to.",
+        "No third-party resource loads on this page. Fonts, images, motion, styles, and scripts are all served from this domain. Notably there is no Google Fonts request, because that CDN would see your IP address and there is no reason for it to.",
+        "Cloudflare serves this site, so it necessarily sees the request that delivers it to you. That is the relationship every site has with its host. It also adds one thing of its own, which is the next section.",
         "The only third-party destinations here are links you choose to click: LinkedIn, and a mailto: link to my inbox. Clicking them takes you to those services under their own policies, not mine.",
+      ],
+    },
+    /* This section exists because the claim above used to be absolute ("there
+       are none") and quietly stopped being true when Cloudflare began injecting
+       a script. No deploy, no commit, no notification: the copy went stale while
+       the code stood still. Claiming ENFORCEMENT rather than purity is what
+       makes this page survive the next infrastructure change, and it matches
+       what TOOLS already says about the Scrubber: enforced by CSP, not by
+       promise. If the CSP is ever loosened, rewrite this section first. */
+    {
+      h: "The one thing I don't control",
+      p: [
+        "This site sits behind Cloudflare, which serves it and screens it for automated abuse. That screening injects a small inline script into every page for bot protection. From a pixel governance view, we'd view this as “Strictly Necessary”, with no other use aside from the above.",
+        "It never runs. This site's Content Security Policy allows exactly one inline script, pinned by cryptographic hash, and refuses everything else. Cloudflare's script is not the one, so your browser blocks it before it executes. It sets no cookie, fetches nothing, and builds no profile.",
+        "You can watch that happen. Open developer tools, load this page, and look at the Console: there is one error, where the browser reports blocking Cloudflare's script. That error is the protection working.",
+        "That is the difference between a promise and an enforcement. I would rather show you the mechanism than ask you to trust my intent.",
       ],
     },
     {
@@ -585,7 +608,7 @@ export const PRIVACY_PAGE = {
     {
       h: "Server logs",
       p: [
-        "Whoever hosts this site may keep standard, short-lived request logs, the ordinary plumbing of serving a web page. I don't build profiles from them, I don't sell or share them, and I don't combine them with anything else.",
+        "Whoever hosts this site may keep standard, short-lived request logs, the ordinary plumbing of serving a web page. Cloudflare also asks your browser to report network errors back to it, failures only, held for seven days. I don't build profiles from any of it, I don't sell or share it, and I don't combine it with anything else.",
       ],
     },
   ],
