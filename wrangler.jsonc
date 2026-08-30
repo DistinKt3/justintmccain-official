@@ -41,6 +41,28 @@
     "html_handling": "auto-trailing-slash"
   },
 
+  // The public hostnames. Both are Worker CUSTOM DOMAINS, so Cloudflare creates
+  // the proxied DNS records and issues the certificates itself. There is no A
+  // record to add by hand and no orange-cloud toggle to get wrong — a Worker
+  // custom domain is never a DNS-only record.
+  //
+  // www is canonical (see IDENTITY.origin in build/content.mjs). The apex is
+  // here so that typing justintmccain.com resolves at all; it is redirected to
+  // www by a zone-level Single Redirect rule, NOT by this Worker.
+  //
+  // WHY NOT IN THE WORKER: static assets are served BEFORE the Worker runs, so
+  // worker/index.js is never invoked for "/" — it matches index.html. A
+  // redirect written there would silently never fire for the one path that
+  // matters most. Redirect Rules execute earlier in the request pipeline than
+  // Workers, which is the whole reason they are the right tool here.
+  //
+  // Custom domains are TRIGGERS: `wrangler versions upload` does NOT apply
+  // them, only `wrangler deploy` does.
+  "routes": [
+    { "pattern": "justintmccain.com", "custom_domain": true },
+    { "pattern": "www.justintmccain.com", "custom_domain": true }
+  ],
+
   "vars": {
     // The Netlify deployment that answers /vanish. Vanish is built with
     // basePath=/vanish, so it serves at <origin>/vanish and the Worker can

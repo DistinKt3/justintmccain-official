@@ -93,8 +93,17 @@ export const IDENTITY = {
   role: "Privacy Product Leader",
   linkedin: "https://www.linkedin.com/in/justintmccain/",
   email: "JustinTMcCain@protonmail.com",
+  /* www IS THE CANONICAL HOST. The apex redirects to it at the Cloudflare edge,
+     so both hostnames resolve and exactly one of them is ever the URL.
+     Chrome elides "www." in the address bar, so a visitor still reads
+     "justintmccain.com" while the real URL underneath is the www one.
+
+     `origin` is what every canonical link, og:url, twitter:image and sitemap
+     entry is built from — change it here and all of them follow.
+     `domain` is the bare name kept for display; nothing in build/ reads it
+     today, so it stays apex-form on purpose. */
   domain: "justintmccain.com",
-  origin: "https://justintmccain.com",
+  origin: "https://www.justintmccain.com",
 };
 
 /* ---------------------------------------------------------------------------
@@ -145,10 +154,15 @@ export const META = {
  * ------------------------------------------------------------------------- */
 export const NAV = {
   links: [
+    /* ORDER MUST MATCH THE DOM ORDER OF THE SECTIONS, which is:
+       work, proof, capabilities, about, testimonials, tools, contact.
+       Tools used to sit before About here while About comes first on the page,
+       so clicking straight down the nav jumped past About, then back up to it.
+       If a section is ever reordered, reorder this with it. */
     { label: "Work",    href: "#work" },
     { label: "Proof",   href: "#proof" },
-    { label: "Tools",   href: "#tools" },
     { label: "About",   href: "#about" },
+    { label: "Tools",   href: "#tools" },
     { label: "Contact", href: "#contact" },
   ],
 };
@@ -199,7 +213,7 @@ export const THESIS = {
  * ------------------------------------------------------------------------- */
 export const WORK = {
   label: "WHAT I'VE SHIPPED",
-  heading: "Not programs. Products. Here's what shipped, how fast, and what it moved.",
+  heading: "Examples of what I've shipped, how fast, and what it moved.",
   cards: [
     {
       title: "Hardening the opt-out signal",
@@ -219,7 +233,7 @@ export const WORK = {
       title: "DSAR, from inbox to product",
       tag: "ROKU",
       broken: "Hundreds of data-subject requests arrived as email and were triaged by hand, one at a time. Slow, unauditable, and impossible to prove after the fact.",
-      built:  "Owned the end-to-end DSAR product: automated parsing, system routing, verification, and audit logging. Held <strong>zero regression</strong> through a major CRM migration that could easily have broken deletion compliance at cutover.",
+      built:  "Automated emailed Data Subject Requests for backend system parsing, system routing, and audit logging. Simplified processing Authorized Agent Request time to <strong>minutes</strong> while still maintaining a Human-In-The-Loop where necessary.",
       moved:  "Time to kick off a request fell from <strong>8 days to same day</strong>, and a manual liability became an audited, scalable product. Delivered in my first five months.",
     },
     {
@@ -232,9 +246,9 @@ export const WORK = {
     {
       title: "A privacy program, stood up fast",
       tag: "CENGAGE",
-      broken: "Enterprises this size often run privacy as a legal checklist rather than a product: no unified opt-out handling, no formal risk program, reactive by default.",
-      built:  "Shipped Global Privacy Controls enterprise-wide in <strong>90 days</strong>, rebuilt DSAR to cover deletion, access, and rectification within six months, and stood up the company's <strong>first Privacy Risk Register</strong> with KRIs, KPIs, and a maturity scorecard benchmarked to NIST.",
-      moved:  "Privacy became an auditable, benchmarked product function in under two quarters.",
+      broken: "Enterprises this size often run privacy as a legal checklist rather than a product: no unified opt-out handling, no jurisdictional consent model, reactive by default.",
+      built:  "Shipped Global Privacy Controls enterprise-wide in the <strong>first 90 days</strong>. Rebuilt the enterprise consent management framework at <strong>six months</strong>, including automated opt-in and opt-out jurisdictional models across 30+ root domains. Rebuilt the DSAR framework to cover access requests by <strong>month nine</strong>.",
+      moved:  "Privacy stopped being a checklist and started being enforced: opt-out honored automatically, consent governed by jurisdiction, and access requests answered by a framework instead of by hand.",
     },
     {
       title: "Consent, rebuilt for a global enterprise",
