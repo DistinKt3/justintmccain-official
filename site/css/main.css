@@ -300,9 +300,13 @@ strong { font-weight: 600; color: var(--daylight); }
   .nav__links { gap: 0.1rem; }
   .nav__link { padding: 0.7rem 0.35rem; font-size: 0.75rem; letter-spacing: 0.04em; }
 }
+/* Which links survive the collapse is a CONTENT decision, set by keepOnMobile
+   in build/content.mjs, not by a label match in the template. It was Proof
+   alone, which left the phone — the device a LinkedIn link is opened on — with
+   no nav entry to the tools or the contact block. Now Proof, Tools, Contact. */
 @media (max-width: 26rem) {
   .nav__links .nav__link { display: none; }
-  .nav__links .nav__link--proof { display: inline-flex; }
+  .nav__links .nav__link--keep { display: inline-flex; }
 }
 
 /* 8. SECTIONS -------------------------------------------------------------- */

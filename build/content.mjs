@@ -159,11 +159,18 @@ export const NAV = {
        Tools used to sit before About here while About comes first on the page,
        so clicking straight down the nav jumped past About, then back up to it.
        If a section is ever reordered, reorder this with it. */
+    /* keepOnMobile survives the ≤26rem collapse, where there is not room for
+       five links. It used to be Proof alone, hardcoded by label in build.mjs,
+       which meant the phone nav had no entry to the tools or the contact block
+       — on the arrival path that matters most, since a LinkedIn link is opened
+       on a phone. Tools carries the MVPs and Contact is the conversion, so both
+       earn their place over Work (the first section anyway) and About.
+       Re-measure nav.scrollWidth vs clientWidth at 360px if this set grows. */
     { label: "Work",    href: "#work" },
-    { label: "Proof",   href: "#proof" },
+    { label: "Proof",   href: "#proof",   keepOnMobile: true },
     { label: "About",   href: "#about" },
-    { label: "Tools",   href: "#tools" },
-    { label: "Contact", href: "#contact" },
+    { label: "Tools",   href: "#tools",   keepOnMobile: true },
+    { label: "Contact", href: "#contact", keepOnMobile: true },
   ],
 };
 
@@ -232,14 +239,14 @@ export const WORK = {
     {
       title: "DSAR, from inbox to product",
       tag: "ROKU",
-      broken: "Hundreds of data-subject requests arrived as email and were triaged by hand, one at a time. Slow, unauditable, and impossible to prove after the fact.",
+      broken: "Data-subject requests arrive as email and get triaged by hand, one at a time. It is slow, and it leaves nothing behind that proves the request was honored.",
       built:  "Automated emailed Data Subject Requests for backend system parsing, system routing, and audit logging. Simplified processing Authorized Agent Request time to <strong>minutes</strong> while still maintaining a Human-In-The-Loop where necessary.",
       moved:  "Time to kick off a request fell from <strong>8 days to same day</strong>, and a manual liability became an audited, scalable product. Delivered in my first five months.",
     },
     {
       title: "Deletion that scales",
       tag: "ROKU",
-      broken: "Partner deletion ran on manual email and CSV hand-offs. Brittle, unauditable, impossible to scale.",
+      broken: "Partner deletion tends to run on manual email and CSV hand-offs. Brittle, hard to evidence, and impossible to scale past a handful of partners.",
       built:  "Led the <strong>first API-first partner-deletion pilot</strong>, replacing a legacy manual process with an automated, auditable one.",
       moved:  "Proved a scalable path off brittle process for the entire partner ecosystem. Delivered in my first five months.",
     },
@@ -253,7 +260,7 @@ export const WORK = {
     {
       title: "Consent, rebuilt for a global enterprise",
       tag: "BAYER",
-      broken: "A 100,000-person enterprise operating in more than 80 countries had no single way to capture or honor consent. Every region solved it locally, so no one could answer a basic question about what a person had agreed to.",
+      broken: "Enterprises operating across 80+ countries tend to accumulate a consent model per region. Each one works locally, and together they cannot answer a basic question about what a person actually agreed to.",
       built:  "Built the enterprise consent framework and the platform beneath it, integrating <strong>20+ source systems</strong> and harmonizing <strong>~40M user profiles</strong> into one record. Owned <strong>350+ consent banners</strong> enterprise-wide.",
       moved:  "One consent record, one answer, in every market.",
     },
@@ -284,7 +291,11 @@ export const LEDGER = {
     { record: "Consent lifecycle owned",               proof: "<strong>100M+</strong> user accounts" },
     { record: "DSR email intake automated",            proof: "<strong>8 days → same day</strong> to kick off" },
     { record: "Privacy-complaint closure process rebuilt", proof: "<strong>&gt;10 days → &lt;2 business days</strong>" },
-    { record: "Partner deletion automated (API-first)", proof: "Replaced a manual email and CSV process" },
+    /* Must not outrun its own card. The work card calls this a PILOT that
+       "proved a scalable path"; this row previously said "automated" and
+       "Replaced", which is the stronger claim of the two. A reader who sees
+       both believes the weaker one and discounts the rest of the table. */
+    { record: "Partner deletion pilot (API-first)", proof: "Proved a scalable path off manual email and CSV" },
     { record: "Enterprise consent framework built 0→1", proof: "<strong>100k-person</strong> enterprise across <strong>80+</strong> countries" },
     { record: "Consent platform integration",          proof: "<strong>20+</strong> systems · <strong>~40M</strong> profiles harmonized" },
     { record: "Global privacy delivery",               proof: "<strong>309</strong> launches across <strong>55</strong> countries" },
@@ -474,7 +485,15 @@ export const TOOLS = {
       claim: "Find out which people-search sites are selling you, then make them stop.",
       detail:
         "Scans the brokers that publish your name, address, and relatives, tells you where you actually appear, and generates the removal request for each one. Your identity is posted once, held in memory for the length of the scan, and never written down.",
-      proof: "23 brokers, each verified against the California data broker registry.",
+      /* Provenance is split and MUST be stated as such. brokers.json carries a
+         `source` field: 14 entries are "ca-registry", 9 are "published". An
+         earlier version of this line said "23 brokers, each verified against
+         the California data broker registry", which is false for 9 of them
+         (TruePeopleSearch and FastPeopleSearch are not registrants). In the one
+         section whose rule is that a sceptic can falsify the claim from the
+         running tool, an overstated verification claim is the worst possible
+         error. Re-count both numbers if brokers.json changes. */
+      proof: "23 brokers. 14 verified against the California data broker registry, 9 confirmed by published listing.",
       stack: "Next.js · one server route · no accounts, no logs",
       cta: "Run a scan",
     },
@@ -485,7 +504,7 @@ export const TOOLS = {
       claim: "See what your photos say about you, then strip it.",
       detail:
         "Every photo carries where you stood, what device you used, and the second you pressed the shutter. Drop a file in and it comes back clean, with a plain-language report of exactly what was removed.",
-      proof: "JPEG, PNG, HEIC, and PDF. Turn your wifi off first — it still works.",
+      proof: "JPEG, PNG, HEIC, and PDF. Turn your wifi off first. It still works.",
       stack: "React · no network calls after load · enforced by CSP, not by promise",
       cta: "Scrub a file",
     },

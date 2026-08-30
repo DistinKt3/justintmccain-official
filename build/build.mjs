@@ -41,7 +41,7 @@ import {
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), "..", "site");
 
 /* Bump when CSS/JS change so caches don't serve stale assets. */
-const ASSET_VERSION = "13";
+const ASSET_VERSION = "14";
 
 /* Canonical URL PATHS, which are deliberately not the same as the output
    FILENAMES.
@@ -130,7 +130,7 @@ const nav = (isDoc = false) => `
         : NAV.links
             .map(
               (l) =>
-                `<a class="nav__link${l.label === "Proof" ? " nav__link--proof" : ""}" href="${attr(l.href)}">${esc(l.label)}</a>`
+                `<a class="nav__link${l.keepOnMobile ? " nav__link--keep" : ""}" href="${attr(l.href)}">${esc(l.label)}</a>`
             )
             .join("\n      ")}
       <a class="nav__li" href="${attr(IDENTITY.linkedin)}" aria-label="${attr(IDENTITY.name)} on LinkedIn (opens in a new tab)" target="_blank" rel="noopener">${LINKEDIN_GLYPH}</a>
