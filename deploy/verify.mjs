@@ -40,9 +40,29 @@ function report(level, label, detail) {
   console.log(`  ${mark} ${label}${detail ? `  ${C.dim}${detail}${C.off}` : ""}`);
 }
 
+/* WHY THIS SCRIPT PRETENDS TO BE A BROWSER.
+   Cloudflare rewrites HTML only for requests that look like one. Every fetch
+   here used to go out with Node's default headers, so the edge skipped
+   injection and this script read clean markup while real visitors were served
+   an analytics beacon and a bot-detection script. Same URL, same minute:
+   36,185 bytes without a UA, 36,544 bytes with one. The gate could not see the
+   one class of change that arrives with no deploy and no commit, and it sat
+   unnoticed until a manual audit found it.
+
+   Verifying anything about injected markup REQUIRES these headers. Do not
+   remove them to "keep the client honest" — an honest client here is a blind
+   one. */
+const BROWSER_HEADERS = {
+  "User-Agent":
+    "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 " +
+    "(KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36",
+  Accept: "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
+  "Accept-Language": "en-US,en;q=0.9",
+};
+
 async function head(url) {
   try {
-    const r = await fetch(url, { redirect: "manual" });
+    const r = await fetch(url, { redirect: "manual", headers: BROWSER_HEADERS });
     return { status: r.status, headers: r.headers, ok: true };
   } catch (e) {
     return { ok: false, error: e.message };
@@ -51,7 +71,7 @@ async function head(url) {
 
 async function text(url) {
   try {
-    const r = await fetch(url, { redirect: "follow" });
+    const r = await fetch(url, { redirect: "follow", headers: BROWSER_HEADERS });
     return { status: r.status, body: await r.text(), headers: r.headers };
   } catch (e) {
     return { status: 0, body: "", error: e.message };
@@ -240,6 +260,50 @@ console.log("\nDiscovery suppression");
     blanketBlock ? "a blocked crawler can never read the noindex" : "crawl allowed so noindex is seen");
   report(!/^Sitemap:/m.test(robots.body) ? "ok" : "bad", "robots.txt advertises no sitemap", "");
   report(/GPTBot/.test(robots.body) ? "ok" : "warn", "AI crawlers named explicitly", "");
+}
+
+/* -- edge injection ------------------------------------------------------- */
+/* The class of failure this section exists for: markup that changes with no
+   deploy, no commit and no notification, because a CDN feature was toggled on
+   by someone else's default. Cloudflare Observatory enables RUM automatically
+   on Free plans INDEPENDENT of the Web Analytics setting, so "analytics is off
+   in the dashboard" is not evidence. Only the served bytes are evidence. */
+console.log("\nEdge injection");
+{
+  const home = await text(`${site}/`);
+  const priv = await text(`${site}/privacy`);
+
+  const beacon = /cloudflareinsights/.test(home.body) || /cloudflareinsights/.test(priv.body);
+  report(!beacon ? "ok" : "bad", "no analytics beacon injected",
+    beacon ? "Observatory RUM is back on — Speed → Real user monitoring" : "");
+
+  /* Deliberately general. This site self-hosts every script, so ANY off-domain
+     src is something the edge added. Catches the NEXT injection, not just the
+     one that prompted this check. */
+  const external = [...home.body.matchAll(/<script[^>]+src=["'](https?:\/\/[^"']+)/g)].map((m) => m[1]);
+  report(external.length === 0 ? "ok" : "bad", "no third-party <script src>",
+    external.length ? external.join(", ") : "");
+
+  /* Bot Fight Mode is kept ON deliberately. Its inline JS-detection script is
+     blocked by CSP and disclosed on /privacy, so its PRESENCE is correct. Both
+     directions matter: if it ever stops shipping, the privacy copy describing
+     it goes stale, which is the same drift in the opposite direction. */
+  const botJs = /__CF\$cv\$params|cdn-cgi\/challenge-platform/.test(home.body);
+  const disclosed = /bot protection/i.test(priv.body);
+  if (botJs) {
+    report(disclosed ? "ok" : "bad", "bot-detection script is disclosed",
+      disclosed ? "blocked by CSP, described on /privacy" : "injected but NOT described on /privacy");
+  } else {
+    report("warn", "no bot-detection script present",
+      "/privacy still describes one — update the copy or re-enable Bot Fight Mode");
+  }
+
+  /* The policy may not re-assert an absolute the markup contradicts. This is
+     the assertion that would have caught the original defect: the page claimed
+     "no fingerprinting" while shipping a fingerprinting script. */
+  const absolute = /no fingerprinting/i.test(priv.body);
+  report(!(absolute && botJs) ? "ok" : "bad", "/privacy claims nothing the markup contradicts",
+    absolute && botJs ? '"no fingerprinting" while a bot-fingerprinting script ships' : "");
 }
 
 /* -- Vanish --------------------------------------------------------------- */
